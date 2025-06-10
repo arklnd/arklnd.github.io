@@ -210,10 +210,28 @@ function typeWriter(element, text, speed = 100) {
 document.addEventListener('DOMContentLoaded', () => {
     const heroTitle = document.querySelector('.hero-title');
     if (heroTitle) {
-        const originalText = heroTitle.innerHTML;
+        // Extract just the text content, preserving the structure
+        const textToType = "Hi, I'm Arijit Kundu";
+        // Clear the element and set up the structure
+        heroTitle.innerHTML = '';
+        
+        // Create the structure with placeholder for typing
+        heroTitle.innerHTML = 'Hi, I\'m <span class="highlight"></span>';
+        
+        // Type the name part into the span
+        const highlightSpan = heroTitle.querySelector('.highlight');
+        const nameText = "Arijit Kundu";
+        
+        // Type the first part normally
+        let currentText = "Hi, I'm ";
+        heroTitle.innerHTML = currentText;
+        
+        // Then add the span and type into it
         setTimeout(() => {
-            typeWriter(heroTitle, originalText, 50);
-        }, 500);
+            heroTitle.innerHTML = currentText + '<span class="highlight"></span>';
+            const span = heroTitle.querySelector('.highlight');
+            typeWriter(span, nameText, 50);
+        }, currentText.length * 50);
     }
 });
 
