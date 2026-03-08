@@ -8,17 +8,17 @@ const posts = (await getCollection("posts")).sort(
 );
 ---
 
-<Layout title="Arijit Kundu Blog">
+<Layout title="Arijit's Blog">
   <script slot="head" type="application/ld+json" set:html={JSON.stringify({
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "name": "Arijit Kundu Blog",
+    "name": "Arijit's Blog",
     "description": "A tech blog.",
     "url": Astro.site?.href,
   })} />
   <section class="home">
     <header class="home-header">
-      <Heading as="h1">Arijit Kundu Blog</Heading>
+      <Heading as="h1">Arijit's Blog</Heading>
       <p class="home-tagline">A tech blog.</p>
     </header>
     <ul class="post-list">
