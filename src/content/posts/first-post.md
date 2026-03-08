@@ -15,4 +15,24 @@ Astro is great because:
 - It has a great developer experience.
 - It's highly extensible.
 
+### C++ Example
+
+Here's a small C++ "Hello World" you can try locally:
+
+```cpp
+#include <iostream>
+
+int main() {
+	std::cout << "Hello, world!\n";
+	return 0;
+}
+```
+
+Compile and run:
+
+```bash
+g++ -std=c++17 hello.cpp -o hello
+./hello
+```
+
 Stay tuned for more updates!
