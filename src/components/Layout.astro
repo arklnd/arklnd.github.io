@@ -48,6 +48,20 @@ const googleVerification = import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION;
     <!-- JSON-LD -->
     <slot name="head" />
 
+    <!-- Theme init — runs before first paint to prevent FOUC -->
+    <script is:inline>
+      (function () {
+        var stored = localStorage.getItem("theme");
+        if (stored === "dark" || stored === "light") {
+          document.documentElement.dataset.theme = stored;
+        } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+          document.documentElement.dataset.theme = "dark";
+        } else {
+          document.documentElement.dataset.theme = "light";
+        }
+      })();
+    </script>
+
     <link rel="alternate" type="application/rss+xml" title="Arijit Kundu Blog" href="/rss.xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
