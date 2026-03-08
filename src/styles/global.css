@@ -19,14 +19,14 @@
   --color-code-bg: #f4f4f2;
 
   --width-content: 640px;
-  --width-page: 720px;
+  --width-page: 1080px;
 
   --space-xs: 0.25rem;
   --space-sm: 0.5rem;
   --space-md: 1rem;
-  --space-lg: 2rem;
-  --space-xl: 3rem;
-  --space-2xl: 5rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
 }
 
 *,
@@ -69,7 +69,7 @@ img {
 }
 
 ::selection {
-  background-color: #d4d4d0;
+  background-color: #7fd4e1;
 }
 
 /* ── Dark mode ─────────────────────────────── */
