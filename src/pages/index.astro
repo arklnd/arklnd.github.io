@@ -13,13 +13,13 @@ const posts = (await getCollection("posts")).sort(
     "@context": "https://schema.org",
     "@type": "WebSite",
     "name": "Arijit Kundu Blog",
-    "description": "Writing about systems, design, and building with restraint.",
+    "description": "A tech blog.",
     "url": Astro.site?.href,
   })} />
   <section class="home">
     <header class="home-header">
       <Heading as="h1">Arijit Kundu Blog</Heading>
-      <p class="home-tagline">Writing about systems, design, and building with restraint.</p>
+      <p class="home-tagline">A tech blog.</p>
     </header>
     <ul class="post-list">
       {
