@@ -19,31 +19,13 @@ import Prose from "../components/Prose.astro";
   })} />
   <section class="about-container">
     <Heading as="h1">About Me</Heading>
-    
-    <div class="hero-content">
-      <p class="hero-description">
-        Passionate software developer with 3.3 years of experience at Hyland Software, 
-        specializing in C# .NET and Angular development.
-      </p>
-    </div>
 
     <Prose>
-      <div class="about-text">
-        <p>
-          I'm a dedicated software developer with 3.3 years of professional experience at Hyland Software. 
-          My expertise lies in building robust applications using C# .NET and creating dynamic user interfaces with Angular.
-        </p>
-        <p>
-          I have a strong foundation in multiple programming languages including Python, Java, Kotlin, C, and C++. 
-          I'm passionate about clean code, innovative solutions, and continuous learning in the ever-evolving tech landscape.
-        </p>
-      </div>
 
       <div class="experience-section">
-        <Heading as="h2">Experience</Heading>
+        <!-- <Heading as="h2">Experience</Heading> -->
         <div class="experience-item">
           <h3>Software Developer at Hyland Software</h3>
-          <p class="date">2021 - Present (3.3 years)</p>
           <p>
             Developing and maintaining enterprise software solutions using C# .NET and Angular. 
             Collaborating with cross-functional teams to deliver high-quality applications that serve 
@@ -76,21 +58,8 @@ import Prose from "../components/Prose.astro";
 </Layout>
 
 <style>
-  .about-container {
-    max-width: var(--width-content);
-  }
-  .hero-description {
-    font-size: 1.25rem;
-    color: var(--color-text-muted);
-    margin-bottom: 2rem;
-  }
   .experience-item h3 {
     margin-bottom: 0.25rem;
-  }
-  .date {
-    font-size: 0.9rem;
-    color: var(--color-text-muted);
-    margin-bottom: 1rem;
   }
   .skills-section ul, .contact-section ul {
     list-style: none;
