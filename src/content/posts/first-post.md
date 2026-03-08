@@ -14,5 +14,3 @@ Astro is great because:
 - It ships zero JavaScript by default.
 - It has a great developer experience.
 - It's highly extensible.
-
-Stay tuned for more updates!
