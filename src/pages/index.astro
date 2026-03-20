@@ -60,6 +60,7 @@ const posts = (await getCollection("posts")).sort(
     font-family: var(--font-body);
     font-size: 1rem;
     color: var(--color-text-secondary);
+    font-style: italic;
     margin-top: var(--space-sm);
   }
 
@@ -70,23 +71,47 @@ const posts = (await getCollection("posts")).sort(
 
   .post-item {
     border-bottom: 1px solid var(--color-border);
+    position: relative;
   }
 
   .post-item:first-child {
     border-top: 1px solid var(--color-border);
   }
 
+  .post-item::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background-color: var(--color-gold);
+    opacity: 0;
+    transform: scaleY(0.4);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+
+  .post-item:hover::before {
+    opacity: 0.7;
+    transform: scaleY(1);
+  }
+
   .post-item a {
     display: flex;
     flex-direction: column;
     gap: var(--space-xs);
-    padding: var(--space-lg) 0;
+    padding: var(--space-lg) var(--space-md);
     text-decoration: none;
     color: var(--color-text);
+    transition: padding-left 0.2s ease;
+  }
+
+  .post-item:hover a {
+    padding-left: var(--space-lg);
   }
 
   .post-item a:hover .post-title {
-    color: var(--color-text-secondary);
+    color: var(--color-gold);
   }
 
   .post-title {

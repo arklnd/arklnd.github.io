@@ -40,6 +40,7 @@
     color: var(--color-link);
     text-decoration-thickness: 1px;
     text-underline-offset: 2px;
+    transition: color 0.15s ease;
   }
 
   .prose :global(a:hover) {
@@ -47,11 +48,13 @@
   }
 
   .prose :global(blockquote) {
-    border-left: 2px solid var(--color-border);
+    border-left: 2px solid var(--color-gold);
     padding-left: var(--space-lg);
     margin: 1.5em 0;
     color: var(--color-text-secondary);
     font-style: italic;
+    background: linear-gradient(90deg, var(--color-gold-muted), transparent 80%);
+    border-radius: 0 4px 4px 0;
   }
 
   .prose :global(ul),
@@ -89,7 +92,16 @@
 
   .prose :global(hr) {
     border: none;
-    border-top: 1px solid var(--color-border);
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      var(--color-gold) 30%,
+      var(--color-gold-light) 50%,
+      var(--color-gold) 70%,
+      transparent 100%
+    );
+    opacity: 0.5;
     margin: 2.5em 0;
   }
 

@@ -1,22 +1,31 @@
 /* ============================================
    Kintsugi-Life — Global Styles
-   A calm, typography-first design system.
+   Warmth, gold, and finding beauty in the broken.
    ============================================ */
 
 :root {
+  --font-display: "Cormorant Garamond", Georgia, "Times New Roman", serif;
   --font-body: "Newsreader", Georgia, "Times New Roman", serif;
-  --font-heading: "Newsreader", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  --font-heading: "Newsreader", Georgia, "Times New Roman", serif;
   --font-mono: "JetBrains Mono", "Fira Code", Consolas, monospace;
 
-  --color-text: #1a1a1a;
-  --color-text-secondary: #555;
-  --color-text-tertiary: #888;
-  --color-bg: #fafaf9;
-  --color-surface: #fff;
-  --color-border: #e5e5e3;
-  --color-link: #1a1a1a;
-  --color-link-hover: #555;
-  --color-code-bg: #f4f4f2;
+  /* Gold — the lacquer that heals */
+  --color-gold: #C9A448;
+  --color-gold-light: #EAD8A8;
+  --color-gold-muted: #F2E8CC;
+  /* Darkened gold for readable text on light backgrounds (~4.8:1 on cream) */
+  --color-gold-text: #7A5D1C;
+
+  /* Warm earth palette */
+  --color-text: #2C2314;
+  --color-text-secondary: #6B5D45;
+  --color-text-tertiary: #9E9080;
+  --color-bg: #F5EFE4;
+  --color-surface: #FAF7F2;
+  --color-border: #DDD4C2;
+  --color-link: #8A6B2A;
+  --color-link-hover: #C9A448;
+  --color-code-bg: #EEE8D8;
 
   --width-content: 640px;
   --width-page: 1080px;
@@ -69,24 +78,30 @@ img {
 }
 
 ::selection {
-  background-color: #7fd4e1;
+  background-color: #F0D890;
 }
 
 /* ── Dark mode ─────────────────────────────── */
 [data-theme="dark"] {
-  --color-text: #e8e8e6;
-  --color-text-secondary: #a0a09e;
-  --color-text-tertiary: #6a6a68;
-  --color-bg: #1a1a1a;
-  --color-surface: #222220;
-  --color-border: #333331;
-  --color-link: #e8e8e6;
-  --color-link-hover: #a0a09e;
-  --color-code-bg: #2a2a28;
+  --color-gold: #C9A448;
+  --color-gold-light: #E0C070;
+  --color-gold-muted: #3D3420;
+  /* In dark mode the regular gold has sufficient contrast on dark bg */
+  --color-gold-text: #C9A448;
+
+  --color-text: #EDE4D0;
+  --color-text-secondary: #A89880;
+  --color-text-tertiary: #7A6D60;
+  --color-bg: #1E1A10;
+  --color-surface: #272210;
+  --color-border: #3C3526;
+  --color-link: #C9A448;
+  --color-link-hover: #E0C070;
+  --color-code-bg: #2A2518;
 }
 
 [data-theme="dark"] ::selection {
-  background-color: #444442;
+  background-color: #4D3C14;
 }
 
 /* ── Shiki dual-theme code blocks ──────────── */
