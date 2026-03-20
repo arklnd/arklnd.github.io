@@ -1,10 +1,10 @@
-# KintsugiLife
+# Kintsugi-Life
 
 A calm, writing-first blogging system built with Astro.
 
 ## What it is
 
-KintsugiLife is a static blog system designed for long-form writing. It prioritizes typography, whitespace, and readability over visual complexity. It uses Markdown for content, file-based routing, and ships minimal client-side JavaScript (search only).
+Kintsugi-Life is a static blog system designed for long-form writing. It prioritizes typography, whitespace, and readability over visual complexity. It uses Markdown for content, file-based routing, and ships minimal client-side JavaScript (search only).
 
 ## What it is not
 

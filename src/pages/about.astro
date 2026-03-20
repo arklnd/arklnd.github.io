@@ -4,25 +4,25 @@ import Heading from "../components/Heading.astro";
 import Prose from "../components/Prose.astro";
 ---
 
-<Layout title="About — KintsugiLife" description="About KintsugiLife.">
+<Layout title="About — Kintsugi-Life" description="About Kintsugi-Life.">
   <script slot="head" type="application/ld+json" set:html={JSON.stringify({
     "@context": "https://schema.org",
     "@type": "AboutPage",
-    "name": "About KintsugiLife",
-    "description": "About KintsugiLife.",
+    "name": "About Kintsugi-Life",
+    "description": "About Kintsugi-Life.",
     "url": new URL("/about", Astro.site).href,
     "isPartOf": {
       "@type": "WebSite",
-      "name": "KintsugiLife",
+      "name": "Kintsugi-Life",
       "url": Astro.site?.href,
     },
   })} />
   <section class="about-container">
-    <Heading as="h1">About KintsugiLife</Heading>
+    <Heading as="h1">About Kintsugi-Life</Heading>
 
     <Prose>
 
-      <div>KintsugiLife</div>
+      <div>Kintsugi-Life</div>
     </Prose>
   </section>
 </Layout>

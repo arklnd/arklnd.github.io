@@ -2,7 +2,7 @@ import { defineConfig } from "astro/config";
 import mdx from "@astrojs/mdx";
 
 export default defineConfig({
-  site: "https://arklnd.github.io",
+  site: "https://Kintsugi-Life.in",
   integrations: [mdx()],
   markdown: {
     shikiConfig: {
