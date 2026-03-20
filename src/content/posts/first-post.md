@@ -6,6 +6,8 @@ date: 2026-03-08T11:30:00
 
 ## Welcome!
 
+![Demo image](/image.png)
+
 This is the very first post on my blog. I've built this site using [Astro](https://astro.build/), a modern web framework that makes building fast websites easy.
 
 ### Why Astro?
