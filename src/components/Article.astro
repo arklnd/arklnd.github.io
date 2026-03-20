@@ -15,6 +15,14 @@ const formattedDate = date.toLocaleDateString("en-US", {
   year: "numeric",
   month: "long",
   day: "numeric",
+  timeZone: "UTC",
+});
+
+const formattedTime = date.toLocaleTimeString("en-US", {
+  hour: "numeric",
+  minute: "2-digit",
+  hour12: true,
+  timeZone: "UTC",
 });
 ---
 
@@ -43,7 +51,7 @@ const formattedDate = date.toLocaleDateString("en-US", {
           x2="21"
           y2="10"></line></svg
       >
-      <time datetime={date.toISOString()}>{formattedDate}</time>
+      <time datetime={date.toISOString()}>{formattedDate} at {formattedTime}</time>
       {
         readingTime && (
           <>
