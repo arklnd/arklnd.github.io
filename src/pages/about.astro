@@ -4,55 +4,25 @@ import Heading from "../components/Heading.astro";
 import Prose from "../components/Prose.astro";
 ---
 
-<Layout title="About — Arijit's Blog" description="About Arijit's Blog.">
+<Layout title="About — KintsugiLife" description="About KintsugiLife.">
   <script slot="head" type="application/ld+json" set:html={JSON.stringify({
     "@context": "https://schema.org",
     "@type": "AboutPage",
-    "name": "About Arijit's Blog",
-    "description": "About Arijit's Blog.",
+    "name": "About KintsugiLife",
+    "description": "About KintsugiLife.",
     "url": new URL("/about", Astro.site).href,
     "isPartOf": {
       "@type": "WebSite",
-      "name": "Arijit's Blog",
+      "name": "KintsugiLife",
       "url": Astro.site?.href,
     },
   })} />
   <section class="about-container">
-    <Heading as="h1">About Me</Heading>
+    <Heading as="h1">About KintsugiLife</Heading>
 
     <Prose>
 
-      <div class="experience-section">
-        <!-- <Heading as="h2">Experience</Heading> -->
-        <div class="experience-item">
-          <h3>Software Developer at Hyland Software</h3>
-          <p>
-            Developing and maintaining enterprise software solutions using C# .NET and Angular. 
-            Collaborating with cross-functional teams to deliver high-quality applications that serve 
-            thousands of users worldwide.
-          </p>
-        </div>
-      </div>
-
-      <div class="skills-section">
-        <Heading as="h2">Technical Skills</Heading>
-        <ul>
-          <li><strong>Primary:</strong> C# .NET, Angular</li>
-          <li><strong>Languages:</strong> Python, Java, Kotlin, C, C++</li>
-          <li><strong>Web:</strong> HTML5, CSS3, JavaScript, TypeScript</li>
-          <li><strong>Tools:</strong> Git, SQL Server, Docker, Azure</li>
-        </ul>
-      </div>
-
-      <div class="contact-section">
-        <Heading as="h2">Get In Touch</Heading>
-        <p>I'm always open to discussing new opportunities, interesting projects, or just having a chat about technology.</p>
-        <ul>
-          <li>Email: arijit.kundu@hyland.com</li>
-          <li>LinkedIn: linkedin.com/in/arikundu9</li>
-          <li>GitHub: github.com/arklnd</li>
-        </ul>
-      </div>
+      <div>KintsugiLife</div>
     </Prose>
   </section>
 </Layout>

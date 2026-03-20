@@ -31,18 +31,18 @@ const jsonLd = {
   },
   "author": {
     "@type": "Person",
-    "name": "Arijit Kundu",
+    "name": "KintsugiLife",
     "url": "https://arklnd.github.io",
   },
   "publisher": {
     "@type": "Person",
-    "name": "Arijit Kundu",
+    "name": "KintsugiLife",
     "url": "https://arklnd.github.io",
   },
 };
 ---
 
-<Layout title={`${post.data.title} — Arijit's Blog`} description={post.data.description} ogType="article">
+<Layout title={`${post.data.title} — KintsugiLife`} description={post.data.description} ogType="article">
   <script slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
   <Article title={post.data.title} date={post.data.date} description={post.data.description} readingTime={readingTime}>
     <Content />
