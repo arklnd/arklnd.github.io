@@ -78,6 +78,30 @@ img {
   background-color: #7fd4e1;
 }
 
+/* ── Scrollbar ─────────────────────────────── */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--color-border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-text-tertiary);
+}
+
 /* ── Dark mode ─────────────────────────────── */
 [data-theme="dark"] {
   --color-text: #e8e8e6;
