@@ -29,6 +29,12 @@
   --space-2xl: 3rem;
 }
 
+@media (max-width: 768px) {
+  :root {
+    --width-page: 1080px;
+  }
+}
+
 *,
 *::before,
 *::after {
