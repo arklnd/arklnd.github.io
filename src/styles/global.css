@@ -29,9 +29,9 @@
   --space-2xl: 3rem;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1150px) {
   :root {
-    --width-page: 1080px;
+    --width-page: 100%;
   }
 }
 

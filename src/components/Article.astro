@@ -148,6 +148,12 @@ const formattedDate = date.toLocaleDateString("en-US", {
     transition: color 0.15s ease;
   }
 
+  @media (max-width: 1150px) {
+    .width-toggle {
+      display: none;
+    }
+  }
+
   .width-toggle:hover {
     color: var(--color-text);
   }
