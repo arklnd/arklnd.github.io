@@ -48,7 +48,7 @@ const googleVerification = import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION;
     <!-- JSON-LD -->
     <slot name="head" />
 
-    <!-- Theme init — runs before first paint to prevent FOUC -->
+    <!-- Theme + width init — runs before first paint to prevent FOUC -->
     <script is:inline>
       (function () {
         var stored = localStorage.getItem("theme");
@@ -58,6 +58,10 @@ const googleVerification = import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION;
           document.documentElement.dataset.theme = "dark";
         } else {
           document.documentElement.dataset.theme = "light";
+        }
+
+        if (localStorage.getItem("wide") === "true") {
+          document.documentElement.dataset.wide = "true";
         }
       })();
     </script>

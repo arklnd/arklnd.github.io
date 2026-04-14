@@ -18,8 +18,8 @@
   --color-link-hover: #555;
   --color-code-bg: #f4f4f2;
 
-  --width-content: 640px;
-  --width-page: 1080px;
+  --width-content: 800px;
+  --width-page: 70dvw;
 
   --space-xs: 0.25rem;
   --space-sm: 0.5rem;

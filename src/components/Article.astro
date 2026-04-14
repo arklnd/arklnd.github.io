@@ -67,6 +67,20 @@ const formattedDate = date.toLocaleDateString("en-US", {
           </>
         )
       }
+      <button id="width-toggle" class="width-toggle" aria-label="Toggle width" title="Toggle reading width">
+        <svg class="icon-expand" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="15 3 21 3 21 9"></polyline>
+          <polyline points="9 21 3 21 3 15"></polyline>
+          <line x1="21" y1="3" x2="14" y2="10"></line>
+          <line x1="3" y1="21" x2="10" y2="14"></line>
+        </svg>
+        <svg class="icon-compress" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="4 14 10 14 10 20"></polyline>
+          <polyline points="20 10 14 10 14 4"></polyline>
+          <line x1="10" y1="14" x2="3" y2="21"></line>
+          <line x1="21" y1="3" x2="14" y2="10"></line>
+        </svg>
+      </button>
     </p>
   </header>
   <Prose>
@@ -77,6 +91,11 @@ const formattedDate = date.toLocaleDateString("en-US", {
 <style>
   .article {
     max-width: var(--width-content);
+    transition: max-width 0.25s ease;
+  }
+
+  :global(html[data-wide="true"]) .article {
+    max-width: var(--width-page);
   }
 
   .article-header {
@@ -105,4 +124,48 @@ const formattedDate = date.toLocaleDateString("en-US", {
     color: var(--color-text-tertiary);
     margin: 0 0.125rem;
   }
+
+  .article-meta {
+    justify-content: flex-start;
+  }
+
+  .width-toggle {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: var(--color-text-tertiary);
+    line-height: 1;
+    transition: color 0.15s ease;
+  }
+
+  .width-toggle:hover {
+    color: var(--color-text);
+  }
+
+  :global(html[data-wide="true"]) .width-toggle .icon-expand { display: none; }
+  :global(html[data-wide="true"]) .width-toggle .icon-compress { display: inline; }
+  :global(html:not([data-wide])) .width-toggle .icon-compress { display: none; }
+  :global(html:not([data-wide])) .width-toggle .icon-expand { display: inline; }
 </style>
+
+<script>
+  const widthBtn = document.getElementById("width-toggle");
+
+  function applyWidth(wide: boolean) {
+    if (wide) {
+      document.documentElement.dataset.wide = "true";
+      localStorage.setItem("wide", "true");
+    } else {
+      delete document.documentElement.dataset.wide;
+      localStorage.removeItem("wide");
+    }
+  }
+
+  widthBtn?.addEventListener("click", () => {
+    applyWidth(document.documentElement.dataset.wide !== "true");
+  });
+</script>
