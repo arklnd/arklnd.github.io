@@ -13,7 +13,7 @@ export function remarkMermaid() {
 
       parent.children[index] = {
         type: "html",
-        value: `<div class="mermaid">\n${node.value}\n</div>`,
+        value: `<div class="mermaid mermaid-loading">\n${node.value}\n</div>`,
       } as any;
     });
   };

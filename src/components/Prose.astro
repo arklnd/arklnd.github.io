@@ -558,9 +558,14 @@
   }
 
   .prose :global(.mermaid.mermaid-loading) {
-    opacity: 0.4;
     pointer-events: none;
     min-height: 120px;
+    color: transparent;
+    overflow: hidden;
+  }
+
+  .prose :global(.mermaid.mermaid-loading) :global(svg) {
+    opacity: 0.3;
   }
 
   .prose :global(.mermaid.mermaid-loading)::after {
