@@ -75,10 +75,19 @@ const formattedDate = date.toLocaleDateString("en-US", {
   </Prose>
   {postId && (
     <div class="article-hits">
-      <img class="hits-light" alt="Hits" src={`https://hits.sh/knhs.in/${postId}.svg?style=plastic&color=3d6aa8&labelColor=525d68`} />
-      <img class="hits-dark" alt="Hits" src={`https://hits.sh/knhs.in/${postId}.svg?style=plastic&color=6ba3f5&labelColor=333331`} />
+      <img id="hits-badge" alt="Hits" data-post-id={postId} />
     </div>
   )}
+  <script>
+    const badge = document.getElementById('hits-badge');
+    if (badge) {
+      const id = badge.dataset.postId;
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      const color = isDark ? '6ba3f5' : '3d6aa8';
+      const label = isDark ? '333331' : '525d68';
+      badge.src = `https://hits.sh/knhs.in/${id}.svg?style=plastic&color=${color}&labelColor=${label}`;
+    }
+  </script>
 </article>
 
 <div class="floating-buttons">
@@ -167,18 +176,6 @@ const formattedDate = date.toLocaleDateString("en-US", {
     margin-top: var(--space-xl);
     display: flex;
     justify-content: center;
-  }
-
-  .article-hits .hits-dark {
-    display: none;
-  }
-
-  :global([data-theme="dark"]) .article-hits .hits-light {
-    display: none;
-  }
-
-  :global([data-theme="dark"]) .article-hits .hits-dark {
-    display: inline;
   }
 
   /* ── Floating button panel ─────────────── */
