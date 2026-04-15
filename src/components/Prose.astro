@@ -247,13 +247,16 @@
 
   /* ── Tables ────────────────────────────── */
   .prose :global(table) {
-    width: 100%;
+    width: max-content;
+    max-width: 100%;
     border-collapse: collapse;
     margin: 2em 0;
     font-size: 0.9em;
     line-height: 1.5;
     overflow-x: auto;
     display: block;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
   }
 
   .prose :global(thead) {
@@ -264,19 +267,28 @@
     text-align: left;
     font-weight: 600;
     padding: 0.65em 1em;
-    color: var(--color-text);
+    color: var(--color-text-secondary);
     background-color: var(--color-surface);
     letter-spacing: 0.01em;
     font-size: 0.85em;
     text-transform: uppercase;
-    color: var(--color-text-secondary);
+    border-right: 1px solid var(--color-border);
+  }
+
+  .prose :global(th:last-child) {
+    border-right: none;
   }
 
   .prose :global(td) {
     padding: 0.6em 1em;
     border-bottom: 1px solid var(--color-border);
+    border-right: 1px solid var(--color-border);
     color: var(--color-text);
     vertical-align: top;
+  }
+
+  .prose :global(td:last-child) {
+    border-right: none;
   }
 
   .prose :global(tbody tr:last-child td) {
