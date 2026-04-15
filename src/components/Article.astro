@@ -7,9 +7,10 @@ interface Props {
   date: Date;
   description: string;
   readingTime?: string;
+  postId?: string;
 }
 
-const { title, date, description, readingTime } = Astro.props;
+const { title, date, description, readingTime, postId } = Astro.props;
 
 const formattedDate = date.toLocaleDateString("en-US", {
   year: "numeric",
@@ -72,6 +73,12 @@ const formattedDate = date.toLocaleDateString("en-US", {
   <Prose>
     <slot />
   </Prose>
+  {postId && (
+    <div class="article-hits">
+      <img class="hits-light" alt="Hits" src={`https://hits.sh/knhs.in/${postId}.svg?style=plastic&color=3d6aa8&labelColor=525d68`} />
+      <img class="hits-dark" alt="Hits" src={`https://hits.sh/knhs.in/${postId}.svg?style=plastic&color=6ba3f5&labelColor=333331`} />
+    </div>
+  )}
 </article>
 
 <div class="floating-buttons">
@@ -154,6 +161,24 @@ const formattedDate = date.toLocaleDateString("en-US", {
 
   .article-meta {
     justify-content: flex-start;
+  }
+
+  .article-hits {
+    margin-top: var(--space-xl);
+    display: flex;
+    justify-content: center;
+  }
+
+  .article-hits .hits-dark {
+    display: none;
+  }
+
+  :global([data-theme="dark"]) .article-hits .hits-light {
+    display: none;
+  }
+
+  :global([data-theme="dark"]) .article-hits .hits-dark {
+    display: inline;
   }
 
   /* ── Floating button panel ─────────────── */
