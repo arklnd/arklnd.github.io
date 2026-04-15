@@ -806,6 +806,23 @@ main          ─●────────────────────
               v3.0   (untouched — different version)
 ```
 
+#### Why not deploy the patch from `develop`?
+
+`develop` is a moving target — it contains work-in-progress for the **next** release. By the time you need a patch for `v2.0`, `develop` may already have half-finished features for `v2.1` or `v3.0`. Deploying from `develop` would ship untested, incomplete code alongside your one-line fix.
+
+```
+develop  ─●───────●───────●───────●───────●──────────────►
+          ↑       ↑       ↑       ↑       ↑
+         v2.0   feat/X  feat/Y  feat/Z   WIP
+        merged  (half    (not    (not   (broken)
+                done)   tested) reviewed)
+
+     ⚠ Deploying from here would ship ALL of this
+       just to deliver a single bug fix
+```
+
+The whole point of a hotfix is **surgical precision** — you branch from the exact code that is running in production (`main` or a support branch), change only what is broken, and deploy only that. `develop` has diverged from production the moment the first new feature was merged after the release.
+
 #### Summary
 
 | Scenario | Hotfix merges into | Deployed from | Tag applied on |
