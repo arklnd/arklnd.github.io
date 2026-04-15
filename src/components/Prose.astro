@@ -611,6 +611,17 @@
   .prose :global(.mermaid .arrow) {
     stroke-width: 4 !important;
   }
+
+  /* gitGraph: better contrast for highlight nodes */
+  .prose :global(.mermaid [class*="commit-highlight-outer"]) {
+    stroke: var(--color-text-secondary) !important;
+    fill: var(--color-surface) !important;
+  }
+
+  .prose :global(.mermaid .commit-highlight-inner) {
+    stroke: var(--color-text-tertiary) !important;
+    fill: var(--color-text-tertiary) !important;
+  }
 </style>
 
 <script>
