@@ -8,15 +8,15 @@
   --font-heading: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   --font-mono: "JetBrains Mono", "Fira Code", Consolas, monospace;
 
-  --color-text: #1a1a1a;
-  --color-text-secondary: #444;
-  --color-text-tertiary: #666;
-  --color-bg: #fafaf9;
-  --color-surface: #fff;
-  --color-border: #e5e5e3;
-  --color-link: #1a56db;
-  --color-link-hover: #1341b0;
-  --color-code-bg: #f4f4f2;
+  --color-text: #303840;
+  --color-text-secondary: #525d68;
+  --color-text-tertiary: #747e8a;
+  --color-bg: #e6e9ed;
+  --color-surface: #edf0f3;
+  --color-border: #c5cad2;
+  --color-link: #3d6aa8;
+  --color-link-hover: #2c4f82;
+  --color-code-bg: #dce0e5;
 
   --width-content: 800px;
   --width-page: 70dvw;
