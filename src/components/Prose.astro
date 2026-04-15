@@ -543,6 +543,22 @@
   .prose :global(.heading-anchor.copied::after) {
     opacity: 1;
   }
+
+  /* ── Mermaid diagrams ──────────────────── */
+  .prose :global(.mermaid) {
+    margin: 2em 0;
+    text-align: center;
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    padding: var(--space-md);
+    overflow-x: auto;
+  }
+
+  .prose :global(.mermaid svg) {
+    max-width: 100%;
+    height: auto;
+  }
 </style>
 
 <script>

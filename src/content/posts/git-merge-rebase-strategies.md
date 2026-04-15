@@ -38,6 +38,20 @@ When you want to integrate changes from one branch into another, Git gives you f
 
 A merge commit is created when Git combines two branches that have **diverged** — both branches have commits the other doesn't. Git finds the common ancestor, compares both tips against it, and creates a new **merge commit** with two parents.
 
+```mermaid
+gitGraph
+   commit id: "A"
+   commit id: "B"
+   branch feature
+   commit id: "C"
+   commit id: "D"
+   commit id: "E"
+   checkout main
+   commit id: "F"
+   commit id: "G"
+   merge feature id: "M"
+```
+
 ### Command
 
 ```bash
