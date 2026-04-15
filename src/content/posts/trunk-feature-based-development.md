@@ -20,7 +20,13 @@ date: 2026-04-14T11:30:00
 8. [Managing Long Framework Version Upgrades](#8-managing-long-framework-version-upgrades)
 9. [Branching Strategy Walkthroughs](#9-branching-strategy-walkthroughs)
 10. [Merge vs Rebase — When to Use Which at Every Merge Point](#10-merge-vs-rebase--when-to-use-which-at-every-merge-point)
-11. [Q&A — Common Scenarios](#11-qa--common-scenarios)
+11. [Q&A — Feature-Based Development (GitFlow) Scenarios](#11-qa--feature-based-development-gitflow-scenarios)
+    1. [What if a feature needs changes right after it was merged into `develop`?](#1-what-if-a-feature-needs-changes-right-after-it-was-merged-into-develop)
+    2. [Where do bug fix branches come from during release hardening?](#2-where-do-bug-fix-branches-come-from-during-release-hardening)
+    3. [How are patch fixes / patch releases maintained in Feature-Based Development?](#3-how-are-patch-fixes--patch-releases-maintained-in-feature-based-development)
+    4. [Where is a patch release actually deployed from?](#4-where-is-a-patch-release-actually-deployed-from)
+    5. [If a release branch passes QA with zero fixes, do we still merge it into `develop` and `main`?](#5-if-a-release-branch-passes-qa-with-zero-fixes-do-we-still-merge-it-into-develop-and-main)
+    6. [What is the difference between `release/vX.X` and `hotfix/vX.X.X` (patch) branches?](#6-what-is-the-difference-between-releasevxx-and-hotfixvxxx-patch-branches)
 
 ---
 
@@ -609,7 +615,7 @@ Choosing the wrong operation at a merge point is one of the most common causes o
 
 ---
 
-## 11. Q&A — Common Scenarios
+## 11. Q&A — Feature-Based Development (GitFlow) Scenarios
 
 ### 1. What if a feature needs changes right after it was merged into `develop`?
 
