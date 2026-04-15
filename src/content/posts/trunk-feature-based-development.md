@@ -19,6 +19,7 @@ date: 2026-04-14T11:30:00
 7. [Avoiding Git Conflicts in Feature-Based Development](#7-avoiding-git-conflicts-in-feature-based-development)
 8. [Managing Long Framework Version Upgrades](#8-managing-long-framework-version-upgrades)
 9. [Branching Strategy Walkthroughs](#9-branching-strategy-walkthroughs)
+10. [Merge vs Rebase — When to Use Which at Every Merge Point](#10-merge-vs-rebase--when-to-use-which-at-every-merge-point)
 
 ---
 
@@ -496,3 +497,113 @@ main          ─●────────────────────
 5. **Hotfix Branch** (bottom) — A critical bug is found in `v2.0` after it goes live. A `hotfix/v2.0.1` branch is cut directly from `main`, the fix is applied, and it merges back into **both** `main` (tagged as `v2.0.1`) and `develop` to prevent the bug from reappearing in the next release cycle.
 
 > **Key takeaway:** In GitFlow, code flows in one direction — from feature branches → `develop` → `release` → `main` — with hotfixes being the sole exception that flows the opposite way, from `main` back into `develop`.
+
+---
+
+## 10. Merge vs Rebase — When to Use Which at Every Merge Point
+
+Choosing the wrong operation at a merge point is one of the most common causes of avoidable conflicts and messy histories. The rule of thumb is simple: **rebase to keep your branch up-to-date; merge to deliver your work into a shared branch.**
+
+### The Core Principle
+
+| Operation | What It Does | Golden Rule |
+|---|---|---|
+| **Rebase** | Replays your commits on top of the target branch's latest state. Rewrites your commit history. | Use on **private/local** branches only. Never rebase a branch others are working on. |
+| **Merge** | Creates a new "merge commit" that ties two histories together. Preserves both histories as-is. | Use when integrating into a **shared/protected** branch. |
+
+> **Why this matters for conflicts:** Rebase resolves conflicts commit-by-commit (small, isolated chunks), while merge resolves them all at once in a single giant diff. Rebasing frequently keeps conflicts tiny; merging a stale branch makes them huge.
+
+---
+
+### Trunk-Based Development — Merge Points
+
+#### 1. Keeping Your Short-Lived Branch Updated (↓ main → feature)
+
+- **Use: Rebase**
+- **Command:** `git pull --rebase origin main`
+- **Why:** Your branch lives for hours, not days. Rebasing replays your few commits on top of the latest `main`, keeping a linear history and surfacing conflicts one commit at a time.
+
+#### 2. Merging Your Branch into Main (↑ feature → main)
+
+- **Use: Merge (Squash Merge preferred)**
+- **Command:** Handled via the PR — select **"Squash and Merge"** on GitHub / Azure DevOps.
+- **Why:** Squash merge collapses your branch into a single commit on `main`, keeping the trunk history clean and easy to bisect. A regular merge commit is also acceptable if you want to preserve the granular commit history.
+
+#### 3. Hotfix Committed to Main
+
+- **Use: Direct Commit (or fast-forward merge)**
+- **Why:** In TBD, hotfixes are committed straight to `main`. There is no separate branch to merge, so the question of merge vs rebase does not apply.
+
+---
+
+### Feature-Based Development (GitFlow) — Merge Points
+
+#### 1. Keeping Your Feature Branch Updated (↓ develop → feature)
+
+- **Use: Rebase**
+- **Command:** `git pull --rebase origin develop`
+- **Why:** This is the highest-impact habit for reducing conflicts. Rebasing daily re-stacks your work on top of the latest `develop`, so you resolve small conflicts incrementally instead of facing a wall of them at PR time.
+
+> **Warning:** If multiple developers share a feature branch, use `merge` instead — rebasing a shared branch rewrites history and will force-push over your teammates' work.
+
+#### 2. Merging a Feature into Develop (↑ feature → develop)
+
+- **Use: Merge (No Fast-Forward)**
+- **Command:** `git merge --no-ff feature/auth`
+- **Why:** The `--no-ff` flag preserves the branch topology in the history, creating an explicit merge commit that shows "this group of commits was the auth feature." This is critical for traceability in regulated or audited environments.
+
+#### 3. Cutting a Release Branch from Develop
+
+- **Use: Branch (no merge or rebase)**
+- **Command:** `git checkout -b release/v2.0 develop`
+- **Why:** This is a branch creation, not a merge. No operation needed — just cut the branch and freeze features.
+
+#### 4. Bug Fixes on the Release Branch (↓ release → develop)
+
+- **Use: Merge**
+- **Command:** `git checkout develop && git merge release/v2.0`
+- **Why:** Bug fixes made during QA hardening must flow back into `develop` so they are not lost in the next release. A merge commit clearly records the sync point.
+
+#### 5. Release Branch into Main (↑ release → main)
+
+- **Use: Merge (No Fast-Forward)**
+- **Command:** `git checkout main && git merge --no-ff release/v2.0`
+- **Why:** This is the production delivery point. The merge commit acts as a permanent record of exactly which release branch produced this version. Tag the resulting commit (`v2.0`).
+
+#### 6. Hotfix Branch into Main (↑ hotfix → main)
+
+- **Use: Merge (No Fast-Forward)**
+- **Command:** `git checkout main && git merge --no-ff hotfix/v2.0.1`
+- **Why:** Same rationale as the release merge — you need a visible record that a hotfix was applied.
+
+#### 7. Hotfix Backport into Develop (↓ hotfix → develop)
+
+- **Use: Merge (or Cherry-Pick)**
+- **Command:** `git checkout develop && git merge hotfix/v2.0.1`
+- **Why:** Merge to bring the fix into the development line. If `develop` has diverged significantly and the merge drags in unwanted changes, use `git cherry-pick [commit-hash]` to apply only the specific fix commit.
+
+#### 8. Fix for a Legacy Support Branch
+
+- **Use: Cherry-Pick (not merge, not rebase)**
+- **Command:** `git checkout support/v1.x && git cherry-pick [commit-hash]`
+- **Why:** The legacy branch and `main` have diverged so far that a merge would pull in years of unrelated changes. Cherry-pick applies only the exact fix commit, nothing else.
+
+---
+
+### Quick Reference Table
+
+| Merge Point | Direction | Operation | Why |
+|---|---|---|---|
+| Update feature from develop/main | ↓ into your branch | **Rebase** | Small conflicts, linear history |
+| Feature → Develop | ↑ into shared branch | **Merge (`--no-ff`)** | Preserves branch topology |
+| Feature → Main (TBD) | ↑ into trunk | **Squash Merge** | Clean single-commit history |
+| Release → Main | ↑ into production | **Merge (`--no-ff`)** | Auditable release record |
+| Release → Develop (sync) | ↓ backport | **Merge** | Prevents bug regression |
+| Hotfix → Main | ↑ into production | **Merge (`--no-ff`)** | Visible hotfix record |
+| Hotfix → Develop | ↓ backport | **Merge / Cherry-Pick** | Prevents bug regression |
+| Fix → Legacy Support Branch | ↓ isolated patch | **Cherry-Pick** | Avoids dragging in unrelated code |
+
+### The One Rule to Remember
+
+> **Rebase _down_, Merge _up_.** 
+> Pull changes _down_ into your private branch with rebase. Push changes _up_ into a shared branch with merge.
