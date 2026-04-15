@@ -759,3 +759,59 @@ The support branch lives indefinitely — as long as you have clients on that ma
 - **Always backport.** Every patch merged into `main` must also reach `develop` (via merge) and any active `release` branch (via merge or cherry-pick). Skipping this step is the number-one cause of "bugs that come back."
 - **Tag immediately.** After every patch merge into `main` (or a support branch), tag the commit. The tag is the single source of truth for "what is deployed."
 - **Regression test the patch in isolation.** Run your full test suite against the patched branch before merging — not just the test for the fix. Patches applied under pressure are the most likely to introduce new issues.
+
+---
+
+### 4. If a release branch passes QA with zero fixes, do we still merge it into `develop` and `main`?
+
+**Yes — both merges are mandatory regardless of whether any bug fixes were made on the release branch.**
+
+The merges serve different purposes and skipping either one breaks the workflow:
+
+#### Why merge into `main`?
+
+The merge into `main` **is the release itself**. `main` represents "what is in production." Without this merge, the release never officially ships.
+
+```
+                    release/v2.0
+                     ●  (no fixes needed — clean pass)
+                   /   \
+develop  ─●───────●     \
+                         \
+main     ─●───────────────●──►
+                         v2.0
+                          ↑
+                     tag applied & deployed
+```
+
+#### Why merge back into `develop`?
+
+Even if zero bug fixes were made, the release branch may still differ from `develop` because:
+
+1. **Version bumps or changelog updates** were committed on the release branch (e.g., updating `package.json` version, writing release notes).
+2. **New feature commits landed on `develop`** after the release branch was cut. The merge back creates a sync point that ties the two histories together.
+3. **Future hotfixes** will be merged into both `main` and `develop`. If the release branch was never merged back, `develop`'s history diverges from `main`'s, making those future merges messier.
+
+```
+                    release/v2.0
+                     ●  (version bump, changelog only)
+                   /   \
+develop  ─●───────●─────●──────────────────────►
+                  ↑      ↑
+            branch cut   sync back (even with no fixes)
+```
+
+#### The Complete Flow (Clean Release, No Fixes)
+
+```
+                    release/v2.0
+                     ●──────────────┐  (QA passes, no bugs)
+                   /                │
+develop  ─●───────●────────────────●│───────────────────►
+                                    │  ← sync back
+                                    │
+main     ─●────────────────────────●────────────────────►
+                                   v2.0
+```
+
+> **Key point:** The merge into `main` delivers the release. The merge back into `develop` keeps the two histories aligned. Both happen every time — zero fixes or fifty fixes, it makes no difference to the process.
