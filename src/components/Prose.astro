@@ -427,4 +427,100 @@
   .prose :global(sup a[data-footnote-ref]:hover) {
     color: var(--color-link);
   }
+
+  /* ── Heading anchor copy-links ─────────── */
+  .prose :global(h2),
+  .prose :global(h3),
+  .prose :global(h4),
+  .prose :global(h5),
+  .prose :global(h6) {
+    scroll-margin-top: 1.5rem;
+  }
+
+  .prose :global(.heading-anchor) {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 0.4em;
+    color: var(--color-text-tertiary);
+    opacity: 0;
+    transition: opacity 0.15s ease, color 0.15s ease;
+    text-decoration: none !important;
+    vertical-align: middle;
+    position: relative;
+  }
+
+  .prose :global(h2:hover .heading-anchor),
+  .prose :global(h3:hover .heading-anchor),
+  .prose :global(h4:hover .heading-anchor),
+  .prose :global(h5:hover .heading-anchor),
+  .prose :global(h6:hover .heading-anchor) {
+    opacity: 1;
+  }
+
+  .prose :global(.heading-anchor:hover) {
+    color: var(--color-link) !important;
+  }
+
+  .prose :global(.heading-anchor.copied) {
+    color: #22c55e !important;
+  }
+
+  .prose :global(.heading-anchor::after) {
+    content: attr(data-tip);
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: calc(100% + 6px);
+    font-family: var(--font-heading);
+    font-size: 0.7rem;
+    font-weight: 500;
+    background-color: var(--color-text);
+    color: var(--color-bg);
+    padding: 0.2em 0.5em;
+    border-radius: 4px;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.1s ease;
+  }
+
+  .prose :global(.heading-anchor:hover::after),
+  .prose :global(.heading-anchor.copied::after) {
+    opacity: 1;
+  }
 </style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const prose = document.querySelector('.prose');
+    if (!prose) return;
+
+    const headings = prose.querySelectorAll('h2[id], h3[id], h4[id], h5[id], h6[id]');
+
+    headings.forEach((heading) => {
+      const id = heading.id;
+      const anchor = document.createElement('a');
+      anchor.href = `#${id}`;
+      anchor.className = 'heading-anchor';
+      anchor.setAttribute('aria-label', 'Copy link to this section');
+      anchor.setAttribute('data-tip', 'Copy link');
+      anchor.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>`;
+
+      anchor.addEventListener('click', (e) => {
+        e.preventDefault();
+        const url = `${window.location.origin}${window.location.pathname}#${id}`;
+        navigator.clipboard.writeText(url).then(() => {
+          anchor.setAttribute('data-tip', 'Copied!');
+          anchor.classList.add('copied');
+          setTimeout(() => {
+            anchor.classList.remove('copied');
+            anchor.setAttribute('data-tip', 'Copy link');
+          }, 2000);
+        });
+        history.pushState(null, '', `#${id}`);
+      });
+
+      heading.appendChild(anchor);
+    });
+  });
+</script>
