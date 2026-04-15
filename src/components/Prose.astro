@@ -594,6 +594,13 @@
   /* gitGraph: make commit labels more visible */
   .prose :global(.mermaid .commit-label-bkg) {
     opacity: 0.85;
+    stroke: var(--color-text-secondary);
+    stroke-width: 1px;
+    stroke-dasharray: 4 2;
+    rx: 4;
+    ry: 4;
+    height: 22px;
+    transform: translateY(-3px);
   }
   .prose :global(.mermaid .commit-label) {
     font-size: 14px !important;
