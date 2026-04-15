@@ -450,37 +450,49 @@ If a client reports a critical bug in `v1.0` while `main` is already at `v3.0`, 
         │
         │  git checkout -b support/v1.x v1.0.0
         ↓
-support/v1.x  ─●────────────────●──────────────────────────────────►
-               ↑                 │
-          (legacy v1 code)   fix applied → v1.0.1
-                                 │
-                            deployed to legacy clients only
-========================================================================= 
-                cherry-pick (if bug also present in current version)
-                                 │
-                                 ↓
-main          ─●─────────────────────────────●─────────────────────►
-              v3.0                            v3.0.1
+support/v1.x  ─●───────────────────●───────────────────────────────►
+               ↑                    │
+          (legacy v1 code)    fix applied → v1.0.1
+                                    │
+                           deployed to legacy clients only
+═════════════════════════════════════════════════════════════════════
+              cherry-pick (if bug also present in current version)
+                                    │
+                                    ↓
+main          ─●────────────────────────────────●───────────────────►
+              v3.0                              v3.0.1
 ```
 
 #### Full Picture — All Branch Types Across Time
 
-```
-TIME ──────────────────────────────────────────────────────────────────────────►
+This diagram consolidates every branch type from the GitFlow model into a single timeline. Reading it top-to-bottom shows how the branches interact with each other across a product's lifecycle:
 
-support/v1.x ─●────────────────●────────────────────────────────────────────►
-               ↑ (from v1.0)   v1.0.1 → legacy clients
-
-feat/auth     ┌─●─●─●─●─●─●─●─┐
-              |               ↓
-develop      ─●───────────────●─────────────────────●──────────────────────►
-                                                    /│
-                              feat/dashboard ─●─●─● ↓
-                                                    ●
-                                        release/v2.0 ─●─●─●─┐ (QA fixes)
-                                                             ↓
-main         ─●──────────────────────────────────────────────●─────●────────►
-             v1.0                                            v2.0  v2.0.1
-                                                                    ↑
-                                              hotfix/v2.0.1 ─●─●───┘ (→ main & develop)
 ```
+TIME ──────────────────────────────────────────────────────────────────────────────►
+
+support/v1.x  ─●──────────────────●─────────────────────────────────────────────►
+                ↑ (from v1.0)      v1.0.1 → legacy clients
+
+feat/auth      ┌─●─●─●─●─●─●─●──┐
+               │                ↓
+develop       ─●────────────────●──────────────────────●────────────────────────►
+                                                      /│
+                                feat/dashboard ─●─●─●┘ │
+                                                       │
+                                          release/v2.0 ─●─●─●─┐ (QA fixes)
+                                                               ↓
+main          ─●───────────────────────────────────────────────●──────●─────────►
+              v1.0                                             v2.0   v2.0.1
+                                                                       ↑
+                                                hotfix/v2.0.1 ─●─●─●───┘ (→ main & develop)
+```
+
+**Reading the diagram:**
+
+1. **Support Branch** (top) — A `support/v1.x` branch was created from the old `v1.0` tag long after the team moved on. A patch (`v1.0.1`) is applied and shipped only to legacy clients still running v1.
+2. **Feature Branches → Develop** — `feat/auth` is developed independently, then merged into `develop` via a Pull Request. Later, `feat/dashboard` follows the same pattern. Each `●` represents a commit on the feature branch.
+3. **Release Branch** — Once `develop` has enough features, a `release/v2.0` branch is cut. Only QA bug fixes go here (no new features). After hardening, it merges down into `main`.
+4. **Main** — Receives the stable release as `v2.0`. This is the only branch that reaches production.
+5. **Hotfix Branch** (bottom) — A critical bug is found in `v2.0` after it goes live. A `hotfix/v2.0.1` branch is cut directly from `main`, the fix is applied, and it merges back into **both** `main` (tagged as `v2.0.1`) and `develop` to prevent the bug from reappearing in the next release cycle.
+
+> **Key takeaway:** In GitFlow, code flows in one direction — from feature branches → `develop` → `release` → `main` — with hotfixes being the sole exception that flows the opposite way, from `main` back into `develop`.
