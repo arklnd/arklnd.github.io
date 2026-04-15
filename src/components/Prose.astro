@@ -559,6 +559,20 @@
     max-width: 100%;
     height: auto;
   }
+
+  /* gitGraph: make commit labels more visible */
+  .prose :global(.mermaid .commit-label-bkg) {
+    opacity: 0.85;
+  }
+  .prose :global(.mermaid .commit-label) {
+    font-size: 14px !important;
+    font-weight: 600;
+  }
+
+  /* gitGraph: thinner arrow lines */
+  .prose :global(.mermaid .arrow) {
+    stroke-width: 4 !important;
+  }
 </style>
 
 <script>
