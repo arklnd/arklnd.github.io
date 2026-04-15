@@ -762,7 +762,62 @@ The support branch lives indefinitely — as long as you have clients on that ma
 
 ---
 
-### 4. If a release branch passes QA with zero fixes, do we still merge it into `develop` and `main`?
+### 4. Where is a patch release actually deployed from?
+
+The patch is **never deployed from the hotfix branch itself**. The hotfix branch is a workspace — once the fix is merged, deployment happens from the **target branch** (the one that received the merge). Which target branch that is depends on the scenario:
+
+#### Current Version Patch → Deployed from `main`
+
+After the hotfix branch merges into `main`, CI/CD deploys from the **tagged commit on `main`**. The sequence is:
+
+1. `hotfix/v2.0.1` merges into `main`.
+2. Tag `v2.0.1` is applied to the merge commit on `main`.
+3. The CI/CD pipeline triggers on the new tag and **deploys from `main`**.
+
+```
+          hotfix/v2.0.1  ●─●─┐
+         /                    \  (merge)
+main  ──●──────────────────────●──►
+       v2.0                   v2.0.1
+                               ↑
+                          tag applied here
+                          CI/CD deploys THIS commit
+```
+
+The hotfix branch is deleted after the merge. It has served its purpose.
+
+#### Older Version Patch → Deployed from `support/vX.x`
+
+If the patch targets an old version that is no longer on `main`, the fix merges into the **support branch**, and deployment happens from the **tagged commit on the support branch**:
+
+1. `patch/v2.0.1` merges into `support/v2.x`.
+2. Tag `v2.0.1` is applied to the merge commit on `support/v2.x`.
+3. The CI/CD pipeline (or a manual deployment) **deploys from `support/v2.x`**.
+
+```
+                patch/v2.0.1 ●─●─┐
+               /                  \  (merge)
+support/v2.x ─●───────────────────●──►
+              ↑                    ↑
+         (from v2.0 tag)      v2.0.1 tag applied here
+                               CI/CD deploys THIS commit
+═══════════════════════════════════════════════════════
+main          ─●──────────────────────────────────────►
+              v3.0   (untouched — different version)
+```
+
+#### Summary
+
+| Scenario | Hotfix merges into | Deployed from | Tag applied on |
+|---|---|---|---|
+| Bug in the current live version | `main` | `main` | `main` |
+| Bug in an older version | `support/vX.x` | `support/vX.x` | `support/vX.x` |
+
+> **Key point:** The hotfix/patch branch is never the deployment source. It is always the **receiving branch** (`main` or a support branch) that gets tagged, and the tag is what the CI/CD pipeline uses to trigger the deployment.
+
+---
+
+### 5. If a release branch passes QA with zero fixes, do we still merge it into `develop` and `main`?
 
 **Yes — both merges are mandatory regardless of whether any bug fixes were made on the release branch.**
 
