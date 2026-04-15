@@ -57,8 +57,14 @@ const currentPath = Astro.url.pathname;
   }
 
   btn?.addEventListener("click", () => {
-    const current = document.documentElement.dataset.theme;
-    applyTheme(current === "dark" ? "light" : "dark");
+    const loader = document.getElementById("theme-loader");
+    if (loader) loader.classList.add("active");
+
+    requestAnimationFrame(() => {
+      const current = document.documentElement.dataset.theme;
+      applyTheme(current === "dark" ? "light" : "dark");
+      setTimeout(() => loader?.classList.remove("active"), 350);
+    });
   });
 </script>
 
