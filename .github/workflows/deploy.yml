@@ -27,6 +27,8 @@ jobs:
           # path: . # The root location of your Astro project inside the repository. (optional)
           # node-version: 20 # The specific version of Node.js to use. (optional)
           package-manager: pnpm@latest # The specific version of pnpm to use. (optional)
+        env:
+          HITS_KEY: ${{ secrets.HITS_KEY }}
 
   deploy:
     needs: build

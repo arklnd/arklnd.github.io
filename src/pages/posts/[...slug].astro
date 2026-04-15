@@ -3,6 +3,7 @@ import Layout from "../../components/Layout.astro";
 import Article from "../../components/Article.astro";
 import { getCollection, render } from "astro:content";
 import { getReadingTime } from "../../utils/readingTime";
+import { HITS_KEY } from "astro:env/server";
 
 export async function getStaticPaths() {
   const posts = await getCollection("posts");
@@ -15,7 +16,7 @@ export async function getStaticPaths() {
 const post = Astro.props;
 const { Content } = await render(post);
 const readingTime = getReadingTime(post.body || "");
-const postId = Buffer.from(post.id).toString("base64");
+const postId = Buffer.from(`${HITS_KEY}/${post.id}`).toString("base64");
 
 const postUrl = new URL(`/posts/${post.id}`, Astro.site).href;
 

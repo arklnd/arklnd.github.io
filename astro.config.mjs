@@ -1,10 +1,15 @@
-import { defineConfig } from "astro/config";
+import { defineConfig, envField } from "astro/config";
 import mdx from "@astrojs/mdx";
 import { remarkMermaid } from "./src/utils/remarkMermaid";
 
 export default defineConfig({
   site: "https://arklnd.github.io",
   integrations: [mdx()],
+  env: {
+    schema: {
+      HITS_KEY: envField.string({ context: "server", access: "public", default: "dev" }),
+    },
+  },
   markdown: {
     remarkPlugins: [remarkMermaid],
     shikiConfig: {
