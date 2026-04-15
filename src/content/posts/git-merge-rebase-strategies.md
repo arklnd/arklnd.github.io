@@ -38,6 +38,32 @@ When you want to integrate changes from one branch into another, Git gives you f
 
 A merge commit is created when Git combines two branches that have **diverged** — both branches have commits the other doesn't. Git finds the common ancestor, compares both tips against it, and creates a new **merge commit** with two parents.
 
+### Command
+
+```bash
+git checkout main
+git merge feature
+```
+
+### Before Merge
+
+```mermaid
+gitGraph
+   commit id: "A"
+   commit id: "B"
+   branch feature
+   commit id: "C"
+   commit id: "D"
+   commit id: "E"
+   checkout main
+   commit id: "F"
+   commit id: "G"
+```
+
+Both `main` and `feature` have progressed independently since they diverged at commit `B`.
+
+### After Merge
+
 ```mermaid
 gitGraph
    commit id: "A"
@@ -50,31 +76,6 @@ gitGraph
    commit id: "F"
    commit id: "G"
    merge feature id: "M"
-```
-
-### Command
-
-```bash
-git checkout main
-git merge feature
-```
-
-### Before Merge
-
-```
-          C---D---E   (feature)
-         /
-A---B---F---G         (main)
-```
-
-Both `main` and `feature` have progressed independently since they diverged at commit `B`.
-
-### After Merge
-
-```
-          C---D---E
-         /         \
-A---B---F---G---M     (main)
 ```
 
 Commit `M` is the **merge commit**. It has **two parents**: `G` (from main) and `E` (from feature). The feature branch topology is fully preserved.
@@ -109,18 +110,27 @@ git merge --ff-only feature  # Fails if FF is not possible
 
 ### Before Merge
 
-```
-A---B---C         (main)
-         \
-          D---E   (feature)
+```mermaid
+gitGraph
+   commit id: "A"
+   commit id: "B"
+   commit id: "C"
+   branch feature
+   commit id: "D"
+   commit id: "E"
 ```
 
 `main` has not moved since `feature` was branched off at `C`.
 
 ### After Merge (Fast-Forward)
 
-```
-A---B---C---D---E   (main, feature)
+```mermaid
+gitGraph
+   commit id: "A"
+   commit id: "B"
+   commit id: "C"
+   commit id: "D"
+   commit id: "E"
 ```
 
 The `main` pointer simply jumps forward to `E`. The history is perfectly linear — as if the feature work was done directly on `main`.
@@ -140,10 +150,17 @@ The `main` pointer simply jumps forward to `E`. The history is perfectly linear 
 
 ### When Fast-Forward Is Not Possible
 
-```
-          D---E       (feature)
-         /
-A---B---C---F---G     (main)
+```mermaid
+gitGraph
+   commit id: "A"
+   commit id: "B"
+   commit id: "C"
+   branch feature
+   commit id: "D"
+   commit id: "E"
+   checkout main
+   commit id: "F"
+   commit id: "G"
 ```
 
 Here, `main` has moved forward (`F`, `G`) since `feature` branched off. A fast-forward is impossible — Git must create a merge commit or you must rebase first.
@@ -166,26 +183,46 @@ git merge feature   # This will now be a fast-forward
 
 ### Before Rebase
 
-```
-          C---D---E   (feature)
-         /
-A---B---F---G         (main)
+```mermaid
+gitGraph
+   commit id: "A"
+   commit id: "B"
+   branch feature
+   commit id: "C"
+   commit id: "D"
+   commit id: "E"
+   checkout main
+   commit id: "F"
+   commit id: "G"
 ```
 
 ### After Rebase
 
-```
-                  C'--D'--E'   (feature)
-                 /
-A---B---F---G                  (main)
+```mermaid
+gitGraph
+   commit id: "A"
+   commit id: "B"
+   commit id: "F"
+   commit id: "G"
+   branch feature
+   commit id: "C'"
+   commit id: "D'"
+   commit id: "E'"
 ```
 
 The original commits `C`, `D`, `E` are gone. New commits `C'`, `D'`, `E'` have the same diffs but sit on top of `G`. Their **hashes are different** because their parent changed.
 
 ### After Fast-Forward Merge
 
-```
-A---B---F---G---C'--D'--E'   (main, feature)
+```mermaid
+gitGraph
+   commit id: "A"
+   commit id: "B"
+   commit id: "F"
+   commit id: "G"
+   commit id: "C'"
+   commit id: "D'"
+   commit id: "E'"
 ```
 
 The end result is a perfectly linear history with no merge commit.
@@ -222,30 +259,54 @@ Rebasing rewrites history. If other people have based work on the old commits, t
 
 **Starting point:**
 
-```
-          C---D       (feature)
-         /
-A---B---E---F         (main)
+```mermaid
+gitGraph
+   commit id: "A"
+   commit id: "B"
+   branch feature
+   commit id: "C"
+   commit id: "D"
+   checkout main
+   commit id: "E"
+   commit id: "F"
 ```
 
 **After `git merge feature` (Merge Commit):**
 
-```
-          C---D
-         /     \
-A---B---E---F---M     (main)
+```mermaid
+gitGraph
+   commit id: "A"
+   commit id: "B"
+   branch feature
+   commit id: "C"
+   commit id: "D"
+   checkout main
+   commit id: "E"
+   commit id: "F"
+   merge feature id: "M"
 ```
 
 **After `git rebase main` + `git merge feature` (Rebase + FF):**
 
-```
-A---B---E---F---C'--D'   (main)
+```mermaid
+gitGraph
+   commit id: "A"
+   commit id: "B"
+   commit id: "E"
+   commit id: "F"
+   commit id: "C'"
+   commit id: "D'"
 ```
 
 **After `git merge --squash feature` (Squash Merge):**
 
-```
-A---B---E---F---S         (main)
+```mermaid
+gitGraph
+   commit id: "A"
+   commit id: "B"
+   commit id: "E"
+   commit id: "F"
+   commit id: "S" type: HIGHLIGHT
 ```
 
 Where `S` is a single commit containing all changes from `C` and `D` combined.
@@ -294,12 +355,24 @@ drop   m0n1o2p WIP - debugging              # Remove this commit entirely
 
 ### Result
 
-```
-# Before:
-A---B---C---D---E   (feature, 4 messy commits)
+**Before** — 4 messy commits:
 
-# After interactive rebase:
-A---X---Y           (feature, 2 clean commits)
+```mermaid
+gitGraph
+   commit id: "A"
+   commit id: "B"
+   commit id: "C"
+   commit id: "D"
+   commit id: "E"
+```
+
+**After interactive rebase** — 2 clean commits:
+
+```mermaid
+gitGraph
+   commit id: "A"
+   commit id: "X"
+   commit id: "Y"
 ```
 
 Interactive rebase is invaluable for cleaning up your work **before** sharing it, turning a messy stream-of-consciousness into a logical, reviewable sequence.
@@ -320,16 +393,28 @@ git commit -m "Add user authentication feature"
 
 ### Before
 
-```
-          C---D---E   (feature)
-         /
-A---B---F---G         (main)
+```mermaid
+gitGraph
+   commit id: "A"
+   commit id: "B"
+   branch feature
+   commit id: "C"
+   commit id: "D"
+   commit id: "E"
+   checkout main
+   commit id: "F"
+   commit id: "G"
 ```
 
 ### After
 
-```
-A---B---F---G---S     (main)
+```mermaid
+gitGraph
+   commit id: "A"
+   commit id: "B"
+   commit id: "F"
+   commit id: "G"
+   commit id: "S" type: HIGHLIGHT
 ```
 
 `S` contains all the changes from `C`, `D`, and `E` but as a single commit.
@@ -408,22 +493,19 @@ git commit -m "feat: add signup form with validation"
 
 ### Decision Flowchart
 
-```
-Is the branch shared by others?
-├── YES → Use MERGE COMMIT (never rewrite shared history)
-└── NO
-    ├── Does main have new commits since your branch?
-    │   ├── NO → Use FAST-FORWARD
-    │   └── YES
-    │       ├── Do you want to preserve individual commits?
-    │       │   ├── YES → REBASE then FAST-FORWARD
-    │       │   └── NO → SQUASH MERGE
-    │       └── Do you need an audit trail of the branch?
-    │           ├── YES → MERGE COMMIT (--no-ff)
-    │           └── NO → REBASE or SQUASH
-    └── Is your commit history messy?
-        ├── YES → INTERACTIVE REBASE to clean up, then merge
-        └── NO → REBASE then FAST-FORWARD
+```mermaid
+flowchart TD
+    A{"Is the branch shared\nby others?"} -->|YES| B["MERGE COMMIT\n<i>never rewrite shared history</i>"]
+    A -->|NO| C{"Does main have new commits\nsince your branch?"}
+    C -->|NO| D["FAST-FORWARD"]
+    C -->|YES| E{"Preserve individual\ncommits?"}
+    E -->|YES| F["REBASE then FF"]
+    E -->|NO| G{"Need audit trail\nof the branch?"}
+    G -->|YES| H["MERGE COMMIT --no-ff"]
+    G -->|NO| I["SQUASH MERGE"]
+    A -->|NO| K{"Is your commit\nhistory messy?"}
+    K -->|YES| L["INTERACTIVE REBASE\nthen merge"]
+    K -->|NO| F
 ```
 
 ---
