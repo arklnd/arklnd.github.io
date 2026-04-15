@@ -611,7 +611,7 @@ Choosing the wrong operation at a merge point is one of the most common causes o
 
 ## 11. Q&A — Common Scenarios
 
-### What if a feature needs changes right after it was merged into `develop`?
+### 1. What if a feature needs changes right after it was merged into `develop`?
 
 It depends on **when** the change is needed and **whether a release branch has been cut yet**:
 
@@ -665,3 +665,29 @@ develop  ──●────────────────────�
 ---
 
 > **Key point:** In GitFlow, once a feature branch is merged into `develop`, that branch is considered "done" and typically deleted. Any further changes are just new branches off `develop` — Git doesn't distinguish between "fixing an old feature" and "building a new one." It's all just commits flowing into `develop` via PRs.
+
+---
+
+### 2. Where do bug fix branches come from during release hardening?
+
+During the QA hardening phase, bug fix branches are created **from the release branch itself** — not from `develop` or `main`. Each developer branches off the release, fixes their assigned bug, and merges back via a PR. Multiple bugfix branches can run in parallel.
+
+```
+                    bugfix/login ─●─┐    bugfix/cart ─●─●─┐
+                   /                ↓   /                 ↓
+release/v2.0 ─────●─────────────────●─────────────────────●──────●
+                                                          │       \
+                                                          │        \ (sync back)
+develop  ─●───────────────────────────────────────────────│─────────●────►
+                                                          │
+                                                          ↓ (final merge)
+main     ─●───────────────────────────────────────────────●────────────►
+                                                         v2.0
+```
+
+**Key rules:**
+
+- **Branch from:** `release/v2.0`
+- **Merge back to:** `release/v2.0` (via PR, with review)
+- **Never branch from** `develop` or `main` for release bugs — `develop` may already have new features for v2.1 that shouldn't be in the v2.0 release. The release branch is frozen to the v2.0 scope.
+- **Sync periodically:** Merge `release/v2.0` into `develop` so bug fixes don't get lost.
