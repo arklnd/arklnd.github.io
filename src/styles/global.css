@@ -9,13 +9,13 @@
   --font-mono: "JetBrains Mono", "Fira Code", Consolas, monospace;
 
   --color-text: #1a1a1a;
-  --color-text-secondary: #555;
-  --color-text-tertiary: #888;
+  --color-text-secondary: #444;
+  --color-text-tertiary: #666;
   --color-bg: #fafaf9;
   --color-surface: #fff;
   --color-border: #e5e5e3;
-  --color-link: #1a1a1a;
-  --color-link-hover: #555;
+  --color-link: #1a56db;
+  --color-link-hover: #1341b0;
   --color-code-bg: #f4f4f2;
 
   --width-content: 800px;
@@ -105,18 +105,18 @@ img {
 /* ── Dark mode ─────────────────────────────── */
 [data-theme="dark"] {
   --color-text: #e8e8e6;
-  --color-text-secondary: #a0a09e;
-  --color-text-tertiary: #6a6a68;
+  --color-text-secondary: #c0c0be;
+  --color-text-tertiary: #909090;
   --color-bg: #1a1a1a;
   --color-surface: #222220;
   --color-border: #333331;
-  --color-link: #e8e8e6;
-  --color-link-hover: #a0a09e;
+  --color-link: #6ba3f5;
+  --color-link-hover: #93bbf8;
   --color-code-bg: #2a2a28;
 }
 
 [data-theme="dark"] ::selection {
-  background-color: #444442;
+  background-color: #1d6b75;
 }
 
 /* ── Shiki dual-theme code blocks ──────────── */

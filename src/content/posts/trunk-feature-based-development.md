@@ -4,7 +4,7 @@ description: "A comprehensive comparison of TBD and GitFlow covering workflows, 
 date: 2026-04-14T11:30:00
 ---
 
-A comprehensive comparison guide covering workflows, release mechanisms, conflict management, and framework upgrade strategies.
+## A comprehensive comparison guide covering workflows, release mechanisms, conflict management, and framework upgrade strategies.
 
 ---
 
