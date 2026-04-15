@@ -88,11 +88,46 @@ const formattedDate = date.toLocaleDateString("en-US", {
   </Prose>
 </article>
 
-<button id="scroll-top" class="scroll-top" aria-label="Scroll to top" title="Scroll to top">
-  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-    <polyline points="18 15 12 9 6 15"></polyline>
-  </svg>
-</button>
+<div class="floating-buttons">
+  <button id="float-width-toggle" class="float-btn" aria-label="Toggle reading width" title="Toggle reading width">
+    <svg class="icon-expand" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <polyline points="15 3 21 3 21 9"></polyline>
+      <polyline points="9 21 3 21 3 15"></polyline>
+      <line x1="21" y1="3" x2="14" y2="10"></line>
+      <line x1="3" y1="21" x2="10" y2="14"></line>
+    </svg>
+    <svg class="icon-compress" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <polyline points="4 14 10 14 10 20"></polyline>
+      <polyline points="20 10 14 10 14 4"></polyline>
+      <line x1="10" y1="14" x2="3" y2="21"></line>
+      <line x1="21" y1="3" x2="14" y2="10"></line>
+    </svg>
+  </button>
+  <button id="float-theme-toggle" class="float-btn" aria-label="Toggle theme" title="Toggle dark / light mode">
+    <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+    <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="5"/>
+      <line x1="12" y1="1" x2="12" y2="3"/>
+      <line x1="12" y1="21" x2="12" y2="23"/>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+      <line x1="1" y1="12" x2="3" y2="12"/>
+      <line x1="21" y1="12" x2="23" y2="12"/>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+    </svg>
+  </button>
+  <button id="scroll-toggle" class="float-btn" aria-label="Scroll to bottom" title="Scroll to bottom">
+    <svg class="icon-up" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <polyline points="18 15 12 9 6 15"></polyline>
+    </svg>
+    <svg class="icon-down" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <polyline points="6 9 12 15 18 9"></polyline>
+    </svg>
+  </button>
+</div>
 
 <style>
   .article {
@@ -163,11 +198,18 @@ const formattedDate = date.toLocaleDateString("en-US", {
   :global(html:not([data-wide])) .width-toggle .icon-compress { display: none; }
   :global(html:not([data-wide])) .width-toggle .icon-expand { display: inline; }
 
-  /* ── Scroll to top button ──────────────── */
-  .scroll-top {
+  /* ── Floating button panel ─────────────── */
+  .floating-buttons {
     position: fixed;
     bottom: 2rem;
     right: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    z-index: 50;
+  }
+
+  .float-btn {
     width: 2.5rem;
     height: 2.5rem;
     display: flex;
@@ -179,23 +221,38 @@ const formattedDate = date.toLocaleDateString("en-US", {
     color: var(--color-text-secondary);
     cursor: pointer;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(0.5rem);
-    transition: opacity 0.25s ease, visibility 0.25s ease, transform 0.25s ease, color 0.15s ease, border-color 0.15s ease;
-    z-index: 50;
+    transition: color 0.15s ease, border-color 0.15s ease;
   }
 
-  .scroll-top:hover {
+  .float-btn:hover {
     color: var(--color-text);
     border-color: var(--color-text-tertiary);
   }
 
-  .scroll-top.visible {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
+  /* Width toggle icons (floating) */
+  :global(html[data-wide="true"]) #float-width-toggle .icon-expand { display: none; }
+  :global(html[data-wide="true"]) #float-width-toggle .icon-compress { display: block; }
+  :global(html:not([data-wide])) #float-width-toggle .icon-compress { display: none; }
+  :global(html:not([data-wide])) #float-width-toggle .icon-expand { display: block; }
+
+  /* Theme toggle icons (floating) */
+  :global([data-theme="dark"]) #float-theme-toggle .icon-moon { display: none; }
+  :global([data-theme="dark"]) #float-theme-toggle .icon-sun { display: block; }
+  :global([data-theme="light"]) #float-theme-toggle .icon-sun { display: none; }
+  :global([data-theme="light"]) #float-theme-toggle .icon-moon { display: block; }
+
+  /* Hide width toggle on small screens (wide mode has no effect there) */
+  @media (max-width: 1150px) {
+    #float-width-toggle {
+      display: none;
+    }
   }
+
+  /* Scroll toggle icons — toggled by JS via .scrolled class */
+  #scroll-toggle .icon-up { display: none; }
+  #scroll-toggle .icon-down { display: block; }
+  #scroll-toggle.scrolled .icon-up { display: block; }
+  #scroll-toggle.scrolled .icon-down { display: none; }
 </style>
 
 <script>
@@ -215,15 +272,44 @@ const formattedDate = date.toLocaleDateString("en-US", {
     applyWidth(document.documentElement.dataset.wide !== "true");
   });
 
-  // Scroll-to-top button
-  const scrollBtn = document.getElementById("scroll-top");
-  if (scrollBtn) {
-    window.addEventListener("scroll", () => {
-      scrollBtn.classList.toggle("visible", window.scrollY > 400);
-    }, { passive: true });
+  // ── Floating width toggle ───────────────
+  const floatWidthBtn = document.getElementById("float-width-toggle");
+  floatWidthBtn?.addEventListener("click", () => {
+    applyWidth(document.documentElement.dataset.wide !== "true");
+  });
 
-    scrollBtn.addEventListener("click", () => {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    });
+  // ── Floating theme toggle ───────────────
+  const floatThemeBtn = document.getElementById("float-theme-toggle");
+
+  function applyTheme(theme: string) {
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem("theme", theme);
   }
+
+  floatThemeBtn?.addEventListener("click", () => {
+    const current = document.documentElement.dataset.theme;
+    applyTheme(current === "dark" ? "light" : "dark");
+  });
+
+  // ── Scroll toggle (top ↔ bottom) ────────
+  const scrollToggle = document.getElementById("scroll-toggle");
+
+  function updateScrollBtn() {
+    if (!scrollToggle) return;
+    const atTop = window.scrollY < 100;
+    scrollToggle.classList.toggle("scrolled", !atTop);
+    scrollToggle.setAttribute("aria-label", atTop ? "Scroll to bottom" : "Scroll to top");
+    scrollToggle.setAttribute("title", atTop ? "Scroll to bottom" : "Scroll to top");
+  }
+
+  window.addEventListener("scroll", updateScrollBtn, { passive: true });
+  updateScrollBtn();
+
+  scrollToggle?.addEventListener("click", () => {
+    if (window.scrollY < 100) {
+      window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+    } else {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  });
 </script>
