@@ -18,6 +18,7 @@ date: 2026-04-14T11:30:00
 6. [Bug Fixes for Old Releases](#6-bug-fixes-for-old-releases)
 7. [Avoiding Git Conflicts in Feature-Based Development](#7-avoiding-git-conflicts-in-feature-based-development)
 8. [Managing Long Framework Version Upgrades](#8-managing-long-framework-version-upgrades)
+9. [Branching Strategy Walkthroughs](#9-branching-strategy-walkthroughs)
 
 ---
 
@@ -59,7 +60,7 @@ date: 2026-04-14T11:30:00
 - **Speed:** Accelerates the feedback loop; bugs are caught almost immediately after they are written.
 - **Simplicity:** No complex branching logic or "branch management" overhead.
 - **Collaboration:** Forces team members to stay in sync, reducing duplicate work.
-- **DORA Excellence:** Consistently linked to high-performing DevOps teams.
+- **DORA Excellence:** A hallmark of elite engineering organizations, as recognized by DORA research.
 
 #### Cons
 
@@ -312,3 +313,174 @@ If the framework upgrade is a massive rewrite (e.g., moving from an old monolith
 - **Dual CI Pipelines:** If possible, set up two CI jobs. One that runs the current `develop` code and one that runs the `upgrade` branch code.
 - **Breaking Change Audit:** Before starting, create a document listing every breaking change in the framework and assign "owners" to investigate how they affect your specific codebase.
 - **Lock Dependencies:** During an upgrade, strictly lock your `package.json` or `NuGet` versions to prevent "version drift" where a sub-dependency breaks the build.
+
+---
+
+## 9. Branching Strategy Walkthroughs
+
+End-to-end examples using ASCII diagrams for both strategies, covering feature development, release cycles, hotfixes, and legacy version support.
+
+---
+
+### Trunk-Based Development Walkthrough
+
+#### Step 1 — Feature Work (Short-Lived Branch)
+
+Each developer works on a branch that lives for less than 24 hours. Incomplete features are merged behind a **feature flag** so they cannot affect users.
+
+```
+TIME ────────────────────────────────────────────────────────────────►
+
+  feat/search  ●─●─●
+              /     \
+main  ─●──────────────●──────────────────────────────────────────────►
+      v1.0           [M1]
+                      │
+                  flag=OFF → "search" hidden from users
+
+                       feat/checkout  ●─●─●─●
+                                     /       \
+main  ──────────────────────────────────────────●────────────────────►
+                                               [M2]
+                                                │
+                                           flag=ON → live for users
+```
+
+#### Step 2 — Release (Tag on Main, No Dedicated Release Branch)
+
+There is no release branch. The `main` branch is always deployable. A tag marks a production release, and the CI/CD pipeline handles the rest.
+
+```
+main  ─●──────●──────●──────●──────●──────────────────────────────────►
+       │      │      │      │      │
+      v1.0   v1.1   v1.2   v1.3   v2.0
+       ↑      ↑      ↑      ↑      ↑
+  CD deploys automatically on every tagged commit
+```
+
+#### Step 3 — Hotfix (Fix Committed Directly on Main)
+
+There is no hotfix branch. The developer commits the fix directly to `main`. The CI/CD pipeline validates and deploys it within minutes.
+
+```
+main  ──────────────────●──────────────────────────────────────────────►
+                        │
+                       v2.0
+                        │
+                    bug discovered
+                        │
+                    fix committed directly to main
+                        │
+main  ───────────────────────────●─────────────────────────────────────►
+                                 │
+                                v2.0.1
+                                 │
+                            CD deploys within minutes
+```
+
+#### Step 4 — Old Version Support
+
+> TBD deliberately maintains only **one live version**. If your product requires concurrent support for old releases, TBD is not the right model — use GitFlow with Support Branches.
+
+---
+
+### Feature-Based Development (GitFlow) Walkthrough
+
+#### Step 1 — Feature Work (Feature Branch → Develop)
+
+Each feature lives on its own branch and only merges to `develop` after a full code review and approval.
+
+```
+feat/auth       ┌─●─●─●─●─●─┐
+                │           ↓ (PR merged after review)
+develop        ─●───────────●────────────────────────────────────────►
+
+
+feat/dashboard              ┌─●─●─●─●─●─●─┐
+                            │             ↓ (PR merged after review)
+develop        ─●───────────●─────────────●──────────────────────────►
+```
+
+#### Step 2 — Release Cycle (Develop → Release Branch → Main)
+
+Once enough features accumulate in `develop`, a release branch is cut. Only bug fixes go in. After QA sign-off it merges to `main`, gets a version tag, and is deployed. It is then synced back to `develop`.
+
+```
+                               release/v2.0
+                                ●─●─●  (QA hardening & bug fixes only)
+                              /       \
+                             /         \ (sync back)
+develop  ─●─────────────────●───────────●───────────────────────────►
+          ↑                 ↑
+     sprint begins     branch cut
+      (features)      from develop
+
+main     ─●──────────────────────────────●──────────────────────────►
+         v1.0                            v2.0
+                                          ↑
+                                     tag applied
+                                     & deployed to production
+```
+
+#### Step 3 — Hotfix (Bug in the Current Live Version on Main)
+
+A hotfix branch is cut from `main`, not `develop`. After the fix is verified, it merges into **both** `main` (for the immediate release) and `develop` (to prevent the bug from reappearing in the next version).
+
+```
+          ─●─● hotfix/v2.0.1 ●─●─●─
+        /                           \
+main  ─●─────────────────────────────●──────────────────────────────►
+      v2.0                           v2.0.1
+                                     ↑
+                                tag applied & deployed
+
+              hotfix/v2.0.1 ─────────●  (backported)
+                                      \
+develop  ─●────────────────────────────●───────────────────────────►
+                                       ↑
+                               prevents regression in v2.1
+```
+
+#### Step 4 — Support Branch (Bug Fix for an Old Version)
+
+If a client reports a critical bug in `v1.0` while `main` is already at `v3.0`, create a Support Branch from the old git tag. Fixes stay on this branch and are tagged as legacy patch releases. If the bug also affects the current version, use `git cherry-pick` to apply it to `main`.
+
+```
+  git tag: v1.0.0  ← 2 years old; main is now at v3.0
+        │
+        │  git checkout -b support/v1.x v1.0.0
+        ↓
+support/v1.x  ─●────────────────●──────────────────────────────────►
+               ↑                 │
+          (legacy v1 code)   fix applied → v1.0.1
+                                 │
+                            deployed to legacy clients only
+========================================================================= 
+                cherry-pick (if bug also present in current version)
+                                 │
+                                 ↓
+main          ─●─────────────────────────────●─────────────────────►
+              v3.0                            v3.0.1
+```
+
+#### Full Picture — All Branch Types Across Time
+
+```
+TIME ──────────────────────────────────────────────────────────────────────────►
+
+support/v1.x ─●────────────────●────────────────────────────────────────────►
+               ↑ (from v1.0)   v1.0.1 → legacy clients
+
+feat/auth     ┌─●─●─●─●─●─●─●─┐
+              |               ↓
+develop      ─●───────────────●─────────────────────●──────────────────────►
+                                                    /│
+                              feat/dashboard ─●─●─● ↓
+                                                    ●
+                                        release/v2.0 ─●─●─●─┐ (QA fixes)
+                                                             ↓
+main         ─●──────────────────────────────────────────────●─────●────────►
+             v1.0                                            v2.0  v2.0.1
+                                                                    ↑
+                                              hotfix/v2.0.1 ─●─●───┘ (→ main & develop)
+```
