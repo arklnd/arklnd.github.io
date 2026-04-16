@@ -19,9 +19,9 @@ const posts = (await getCollection("posts")).sort(
   <section class="home">
     <header class="home-header">
       <Heading as="h1">Arijit's Blog</Heading>
-      <p class="home-tagline">A tech blog.</p>
+      <p class="home-tagline">A tech blog about systems, tools, and ideas.</p>
     </header>
-    <ul class="post-list">
+    <ul class="post-grid">
       {
         posts.map((post) => {
           const formattedDate = post.data.date.toLocaleDateString("en-US", {
@@ -30,11 +30,16 @@ const posts = (await getCollection("posts")).sort(
             day: "numeric",
           });
           return (
-            <li class="post-item">
+            <li class="post-card">
               <a href={`/posts/${post.id}`}>
-                <span class="post-title">{post.data.title}</span>
-                <span class="post-description">{post.data.description}</span>
-                <time datetime={post.data.date.toISOString()}>{formattedDate}</time>
+                <div class="card-body">
+                  <span class="post-title">{post.data.title}</span>
+                  <span class="post-description">{post.data.description}</span>
+                </div>
+                <footer class="card-footer">
+                  <time datetime={post.data.date.toISOString()}>{formattedDate}</time>
+                  <span class="card-arrow" aria-hidden="true">→</span>
+                </footer>
               </a>
             </li>
           );
@@ -47,6 +52,8 @@ const posts = (await getCollection("posts")).sort(
 <style>
   .home-header {
     margin-bottom: var(--space-2xl);
+    padding-bottom: var(--space-xl);
+    border-bottom: 1px solid var(--color-border);
   }
 
   .home-tagline {
@@ -56,52 +63,99 @@ const posts = (await getCollection("posts")).sort(
     margin-top: var(--space-sm);
   }
 
-  .post-list {
+  .post-grid {
     list-style: none;
     padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-lg);
   }
 
-  .post-item {
-    border-bottom: 1px solid var(--color-border);
+  @media (max-width: 640px) {
+    .post-grid {
+      grid-template-columns: 1fr;
+    }
   }
 
-  .post-item:first-child {
-    border-top: 1px solid var(--color-border);
+  .post-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
   }
 
-  .post-item a {
+  .post-card:hover {
+    border-color: var(--color-link);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+  }
+
+  [data-theme="dark"] .post-card:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  }
+
+  .post-card a {
     display: flex;
     flex-direction: column;
-    gap: var(--space-xs);
-    padding: var(--space-lg) 0;
+    height: 100%;
+    padding: var(--space-lg);
     text-decoration: none;
     color: var(--color-text);
   }
 
-  .post-item a:hover .post-title {
-    color: var(--color-text-secondary);
+  .card-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-lg);
   }
 
   .post-title {
     font-family: var(--font-heading);
-    font-size: 1.125rem;
+    font-size: 1.0625rem;
     font-weight: 600;
     letter-spacing: -0.01em;
-    line-height: 1.3;
+    line-height: 1.35;
+    color: var(--color-text);
     transition: color 0.15s ease;
+  }
+
+  .post-card:hover .post-title {
+    color: var(--color-link);
   }
 
   .post-description {
     font-family: var(--font-body);
-    font-size: 0.9375rem;
+    font-size: 0.875rem;
     color: var(--color-text-secondary);
-    line-height: 1.5;
+    line-height: 1.6;
   }
 
-  .post-item time {
+  .card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: var(--space-sm);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .card-footer time {
     font-family: var(--font-heading);
-    font-size: 0.75rem;
+    font-size: 0.8125rem;
     color: var(--color-text-tertiary);
-    margin-top: var(--space-xs);
+    letter-spacing: 0.01em;
+  }
+
+  .card-arrow {
+    font-size: 1rem;
+    color: var(--color-text-tertiary);
+    transition: color 0.15s ease, transform 0.15s ease;
+    display: inline-block;
+  }
+
+  .post-card:hover .card-arrow {
+    color: var(--color-link);
+    transform: translateX(3px);
   }
 </style>
