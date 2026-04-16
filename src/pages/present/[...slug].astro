@@ -150,7 +150,7 @@ const formattedDate = post.data.date.toLocaleDateString("en-US", {
       </div>
     </div>
 
-    <script define:vars={{ postSlug: post.id }}>
+    <script define:vars={{ postSlug: post.id, postTitle: post.data.title }}>
       (function () {
         const source = document.getElementById('content-source');
         const viewport = document.getElementById('slides-viewport');
@@ -311,6 +311,47 @@ const formattedDate = post.data.date.toLocaleDateString("en-US", {
             slide.appendChild(body);
             viewport.appendChild(slide);
           });
+
+          // ── End slide ─────────────────────────────────────────────
+          const endSlide = document.createElement('div');
+          endSlide.className = 'slide end-slide';
+          endSlide.dataset.heading = '';
+
+          const endContent = document.createElement('div');
+          endContent.className = 'end-content';
+
+          const endOrnament = document.createElement('div');
+          endOrnament.className = 'end-ornament';
+          endOrnament.setAttribute('aria-hidden', 'true');
+          const lineA = document.createElement('span'); lineA.className = 'end-ornament-line';
+          const diamond = document.createElement('span'); diamond.className = 'end-ornament-diamond';
+          const lineB = document.createElement('span'); lineB.className = 'end-ornament-line';
+          endOrnament.appendChild(lineA); endOrnament.appendChild(diamond); endOrnament.appendChild(lineB);
+
+          const endEyebrow = document.createElement('p');
+          endEyebrow.className = 'end-eyebrow';
+          endEyebrow.textContent = 'End of Presentation';
+
+          const endHeading = document.createElement('h2');
+          endHeading.className = 'end-heading';
+          endHeading.textContent = 'The End';
+
+          const endSubtitle = document.createElement('p');
+          endSubtitle.className = 'end-subtitle';
+          endSubtitle.textContent = postTitle;
+
+          const endLink = document.createElement('a');
+          endLink.className = 'end-link';
+          endLink.href = '/posts/' + postSlug;
+          endLink.textContent = 'Read the article →';
+
+          endContent.appendChild(endOrnament);
+          endContent.appendChild(endEyebrow);
+          endContent.appendChild(endHeading);
+          endContent.appendChild(endSubtitle);
+          endContent.appendChild(endLink);
+          endSlide.appendChild(endContent);
+          viewport.appendChild(endSlide);
         }
 
         // ── Navigation ───────────────────────────────────────────────
@@ -1094,5 +1135,102 @@ const formattedDate = post.data.date.toLocaleDateString("en-US", {
   #deck-split-toggle[data-active="true"] {
     background: var(--color-border);
     border-color: var(--color-text-tertiary);
+  }
+
+  /* ── End slide ──────────────────────────────── */
+  .end-slide {
+    align-items: center;
+    justify-content: center;
+  }
+
+  .end-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    max-width: 640px;
+    padding: 2rem;
+    gap: 1.125rem;
+  }
+
+  .end-ornament {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .end-ornament-line {
+    display: block;
+    width: 56px;
+    height: 1px;
+    background: var(--color-text-tertiary);
+  }
+
+  .end-ornament-diamond {
+    display: block;
+    width: 8px;
+    height: 8px;
+    background: var(--color-link);
+    transform: rotate(45deg);
+    flex-shrink: 0;
+  }
+
+  .end-eyebrow {
+    font-family: var(--font-heading);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-link);
+    margin: 0;
+  }
+
+  .end-heading {
+    font-family: var(--font-heading);
+    font-size: clamp(2.75rem, 9vw, 5.5rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1.05;
+    color: var(--color-text);
+    margin: 0;
+  }
+
+  .end-subtitle {
+    font-family: var(--font-body);
+    font-size: clamp(0.875rem, 1.5vw, 1rem);
+    color: var(--color-text-secondary);
+    margin: 0;
+    max-width: 480px;
+    line-height: 1.65;
+    font-style: italic;
+  }
+
+  .end-link {
+    font-family: var(--font-heading);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-link);
+    text-decoration: none;
+    border: 1px solid var(--color-border);
+    padding: 0.5rem 1.375rem;
+    border-radius: 6px;
+    margin-top: 0.625rem;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+  }
+
+  .end-link:hover {
+    background: var(--color-border);
+    border-color: var(--color-text-tertiary);
+    color: var(--color-link-hover);
+  }
+
+  @keyframes end-slide-in {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .end-slide.active .end-content {
+    animation: end-slide-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   }
 </style>
