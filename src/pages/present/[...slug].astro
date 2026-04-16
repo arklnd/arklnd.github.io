@@ -217,18 +217,50 @@ const formattedDate = post.data.date.toLocaleDateString("en-US", {
             }
           }
 
-          // Inject continuation badges outside slide-body so they don't scroll
+          // Assign group IDs to all original (non-continuation) slides that were split
+          var groupCounter = 0;
           viewport.querySelectorAll('.slide[data-has-more]').forEach(function (slide) {
-            const badge = document.createElement('div');
-            badge.className = 'slide-badge slide-badge--more';
-            badge.textContent = 'cont\u2019d \u2192';
-            slide.appendChild(badge);
+            if (!slide.dataset.splitGroup) {
+              groupCounter++;
+              // Propagate the group ID to all siblings in the chain
+              slide.dataset.splitGroup = 'g' + groupCounter;
+              let next = slide.nextElementSibling;
+              while (next && next.dataset.continuation === 'true' && !next.dataset.splitGroup) {
+                next.dataset.splitGroup = 'g' + groupCounter;
+                next = next.nextElementSibling;
+              }
+            }
           });
-          viewport.querySelectorAll('.slide[data-continuation]').forEach(function (slide) {
-            const badge = document.createElement('div');
-            badge.className = 'slide-badge slide-badge--from';
-            badge.textContent = '\u2190 cont\u2019d';
-            slide.insertBefore(badge, slide.querySelector('.slide-body'));
+
+          // Count members per group
+          var groupSizes = {};
+          viewport.querySelectorAll('.slide[data-split-group]').forEach(function (slide) {
+            var g = slide.dataset.splitGroup;
+            groupSizes[g] = (groupSizes[g] || 0) + 1;
+          });
+          var groupPartIndex = {};
+
+          // Inject continuation badges with n/total numbering
+          viewport.querySelectorAll('.slide[data-has-more], .slide[data-continuation]').forEach(function (slide) {
+            var g = slide.dataset.splitGroup;
+            var total = groupSizes[g] || 1;
+            groupPartIndex[g] = (groupPartIndex[g] || 0) + 1;
+            var part = groupPartIndex[g];
+            var numLabel = part + '\u202f/\u202f' + total; // e.g. "1 / 3"
+
+            if (slide.dataset.continuation === 'true') {
+              var topBadge = document.createElement('div');
+              topBadge.className = 'slide-badge slide-badge--from';
+              topBadge.textContent = '\u2190 cont\u2019d \u00b7 ' + numLabel;
+              slide.insertBefore(topBadge, slide.querySelector('.slide-body'));
+            }
+
+            if (slide.dataset.hasMore === 'true') {
+              var botBadge = document.createElement('div');
+              botBadge.className = 'slide-badge slide-badge--more';
+              botBadge.textContent = numLabel + ' \u00b7 cont\u2019d \u2192';
+              slide.appendChild(botBadge);
+            }
           });
         }
 
