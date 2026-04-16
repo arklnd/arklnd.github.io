@@ -97,16 +97,14 @@ const formattedDate = date.toLocaleDateString("en-US", {
 </article>
 
 <div class="floating-buttons">
-  <!-- Collapsible utility buttons -->
-  <div id="float-more-group" class="float-more-group">
-    <button id="float-sticky-toggle" class="float-btn" aria-label="Toggle sticky scroll" title="Toggle sticky scroll">
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <line x1="3" y1="5" x2="21" y2="5"></line>
-        <line x1="3" y1="10" x2="14" y2="10"></line>
-        <line x1="3" y1="15" x2="17" y2="15"></line>
-        <line x1="3" y1="20" x2="12" y2="20"></line>
-      </svg>
-    </button>
+  <button id="float-sticky-toggle" class="float-btn" aria-label="Toggle sticky scroll" title="Toggle sticky scroll">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <line x1="3" y1="5" x2="21" y2="5"></line>
+      <line x1="3" y1="10" x2="14" y2="10"></line>
+      <line x1="3" y1="15" x2="17" y2="15"></line>
+      <line x1="3" y1="20" x2="12" y2="20"></line>
+    </svg>
+  </button>
   <button id="float-width-toggle" class="float-btn" aria-label="Toggle reading width" title="Toggle reading width">
     <svg class="icon-expand" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <polyline points="15 3 21 3 21 9"></polyline>
@@ -135,16 +133,6 @@ const formattedDate = date.toLocaleDateString("en-US", {
       <line x1="21" y1="12" x2="23" y2="12"/>
       <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
       <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-    </svg>
-  </button>
-  </div><!-- /float-more-group -->
-  <!-- Always-visible: more toggle + scroll -->
-  <button id="float-more-toggle" class="float-btn" aria-label="More options" title="More options">
-    <svg class="icon-more-open" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/>
-    </svg>
-    <svg class="icon-more-close" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
     </svg>
   </button>
   <button id="scroll-toggle" class="float-btn" aria-label="Scroll to bottom" title="Scroll to bottom">
@@ -322,32 +310,7 @@ const formattedDate = date.toLocaleDateString("en-US", {
     flex-direction: column;
     gap: 0.5rem;
     z-index: 50;
-    align-items: center;
   }
-
-  /* Collapsible utility group */
-  .float-more-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    overflow: hidden;
-    max-height: 0;
-    opacity: 0;
-    pointer-events: none;
-    transition: max-height 0.28s ease, opacity 0.22s ease;
-  }
-
-  .float-more-group.open {
-    max-height: 16rem;
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  /* more toggle icons */
-  #float-more-toggle .icon-more-close { display: none; }
-  #float-more-toggle.open .icon-more-open { display: none; }
-  #float-more-toggle.open .icon-more-close { display: block; }
-  #float-more-toggle.open { border-color: var(--color-link); color: var(--color-link); }
 
   .float-btn {
     width: 2.5rem;
@@ -405,17 +368,6 @@ const formattedDate = date.toLocaleDateString("en-US", {
       localStorage.removeItem("wide");
     }
   }
-
-  // ── More toggle ─────────────────────────
-  const moreToggleBtn = document.getElementById("float-more-toggle");
-  const moreGroup = document.getElementById("float-more-group");
-
-  moreToggleBtn?.addEventListener("click", () => {
-    const open = moreGroup?.classList.toggle("open");
-    moreToggleBtn.classList.toggle("open", open);
-    moreToggleBtn.setAttribute("aria-label", open ? "Close options" : "More options");
-    moreToggleBtn.setAttribute("title", open ? "Close options" : "More options");
-  });
 
   // ── Floating width toggle ───────────────
   const floatWidthBtn = document.getElementById("float-width-toggle");
