@@ -625,7 +625,7 @@
 </style>
 
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
+  function initProse() {
     const prose = document.querySelector('.prose');
     if (!prose) return;
 
@@ -684,5 +684,7 @@
         });
       });
     });
-  });
+  }
+
+  document.addEventListener('astro:page-load', initProse);
 </script>
