@@ -43,6 +43,8 @@ Windows has a system clock. Rainmeter has a thousand clock skins. Yet every time
 
 ## 2. What It Looks Like
 
+![DesktopClockWidget showing an analog clock face with Bangla numerals and a digital time readout — Thursday, April 16, 2026 · 10:13:55 PM](/images/desktop-clock-widget.png)
+
 The widget ships with **five preset styles** selectable from the right-click context menu:
 
 | Style | Description |
@@ -54,6 +56,10 @@ The widget ships with **five preset styles** selectable from the right-click con
 | **HUD Overlay** | Digital only, transparent green-on-black Consolas display with border glow |
 
 Size options are **Small (50%)**, **Medium (100%)**, and **Large (150%)**, plus a **Digital Only** mode that hides the analog face entirely for the most compact footprint.
+
+Everything is accessible from a right-click context menu — no settings window, no system tray icon, no separate config file to hunt down.
+
+![Right-click context menu showing all options: Size, Clock Style, Always on Top, Smart Always on Top, Time Format, Date Format, Clock Face, Hands, Alarm, Stopwatch, Timer, Reset to Defaults, Exit](/images/desktop-clock-widget-context-menu.png)
 
 ---
 
