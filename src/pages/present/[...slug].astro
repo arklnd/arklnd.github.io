@@ -142,12 +142,10 @@ const formattedDate = post.data.date.toLocaleDateString("en-US", {
         }
         if (cur.heading || cur.nodes.length) groups.push(cur);
 
-        // Heading texts indexed by slide position (0 = title slide)
-        const headingTexts = [''];
-
         groups.forEach(({ heading, nodes }) => {
           const slide = document.createElement('div');
           slide.className = 'slide';
+          slide.dataset.heading = heading;
 
           const body = document.createElement('div');
           body.className = 'slide-body';
@@ -155,8 +153,47 @@ const formattedDate = post.data.date.toLocaleDateString("en-US", {
           nodes.forEach(n => body.appendChild(n));
           slide.appendChild(body);
           viewport.appendChild(slide);
-          headingTexts.push(heading);
         });
+
+        // ── Auto-split overflowing slides ─────────────────────────────
+        // Reading scrollHeight forces a synchronous reflow so measurements
+        // are accurate even though slides are not yet visible.
+        (function splitOverflow() {
+          const toCheck = [...viewport.querySelectorAll('.slide:not(.title-slide)')];
+          for (const slide of toCheck) {
+            const body = slide.querySelector('.slide-body');
+            if (!body || body.scrollHeight <= body.clientHeight) continue;
+
+            const heading = slide.dataset.heading || '';
+            const children = [...body.children];
+            body.innerHTML = '';
+
+            let currentSlide = slide;
+            let currentBody = body;
+
+            for (const child of children) {
+              const hadChildren = currentBody.children.length > 0;
+              currentBody.appendChild(child);
+              // Force reflow before measuring
+              if (hadChildren && currentBody.scrollHeight > currentBody.clientHeight) {
+                // Move the child that caused overflow into a new continuation slide
+                currentBody.removeChild(child);
+
+                const contSlide = document.createElement('div');
+                contSlide.className = 'slide';
+                contSlide.dataset.heading = heading;
+                const contBody = document.createElement('div');
+                contBody.className = 'slide-body';
+                contSlide.appendChild(contBody);
+                currentSlide.after(contSlide);
+
+                currentSlide = contSlide;
+                currentBody = contBody;
+                currentBody.appendChild(child);
+              }
+            }
+          }
+        })();
 
         source.remove();
 
@@ -177,7 +214,7 @@ const formattedDate = post.data.date.toLocaleDateString("en-US", {
             if (body) body.scrollTop = 0;
           }
 
-          deckHeading.textContent = headingTexts[idx] || '';
+          deckHeading.textContent = slides[idx].dataset.heading || '';
           counterEl.textContent = (idx + 1) + ' / ' + slides.length;
 
           const pct = slides.length > 1 ? (idx / (slides.length - 1)) * 100 : 100;
