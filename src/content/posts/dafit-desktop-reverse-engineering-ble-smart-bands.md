@@ -215,7 +215,7 @@ The output looks like:
 
 ```
 ╔══════════════════════════════════════════════════════════╗
-║                  BLE DEVICE SCANNER                     ║
+║                  BLE DEVICE SCANNER                      ║
 ╚══════════════════════════════════════════════════════════╝
 
   [FB:36:0B:37:18:37]  RSSI=-52  Marv Neo
@@ -233,13 +233,13 @@ The output looks like:
 
 Once you have the MAC address, the `FetchBandInfo()` function orchestrates the full connection flow. It's essentially an automated GATT client:
 
-**Step 1 — Establish connection:**
+### Step 1 — Establish connection:
 
 ```cpp
 auto device = BluetoothLEDevice::FromBluetoothAddressAsync(deviceAddress).get();
 ```
 
-**Step 2 — Read Device Information Service (`0x180A`):**
+### Step 2 — Read Device Information Service (`0x180A`):
 
 The code reads four standard characteristics — Serial Number (`0x2A25`), Hardware Revision (`0x2A27`), Firmware Revision (`0x2A28`), and Manufacturer Name (`0x2A29`) — using a reusable helper:
 
@@ -250,7 +250,7 @@ info.firmware     = ReadCharAsString(device, SVC_DEVICE_INFO, CHR_FW_REV);
 info.manufacturer = ReadCharAsString(device, SVC_DEVICE_INFO, CHR_MANUFACTURER);
 ```
 
-**Step 3 — Read Battery Level (`0x180F`):**
+### Step 3 — Read Battery Level (`0x180F`):
 
 ```cpp
 auto battBytes = ReadCharAsBytes(device, SVC_BATTERY, CHR_BATTERY_LEVEL);
@@ -258,7 +258,7 @@ if (!battBytes.empty())
     info.batteryPercent = battBytes[0];
 ```
 
-**Step 4 — Read Activity Snapshot (`0xFEE1`):**
+### Step 4 — Read Activity Snapshot (`0xFEE1`):
 
 The MOYOUNG activity characteristic stores today's totals as three little-endian 3-byte integers:
 
