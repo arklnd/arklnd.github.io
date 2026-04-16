@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://arklnd.github.io/sitemap-index.xml
