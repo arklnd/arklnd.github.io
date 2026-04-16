@@ -63,6 +63,10 @@ const googleVerification = import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION;
         if (localStorage.getItem("wide") === "true") {
           document.documentElement.dataset.wide = "true";
         }
+
+        if (localStorage.getItem("stickyScroll") === "off") {
+          document.documentElement.dataset.stickyScroll = "off";
+        }
       })();
     </script>
 
