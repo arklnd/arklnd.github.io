@@ -1,0 +1,631 @@
+---
+import { getCollection, render } from "astro:content";
+import "../../styles/global.css";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("posts");
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: post,
+  }));
+}
+
+const post = Astro.props;
+const { Content } = await render(post);
+
+const formattedDate = post.data.date.toLocaleDateString("en-US", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+});
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{post.data.title} — Presentation</title>
+    <meta name="robots" content="noindex" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;0,7..72,700;1,7..72,400;1,7..72,500&family=JetBrains+Mono:wght@400&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+    <!-- Prevent FOUC: apply stored theme before first paint -->
+    <script is:inline>
+      (function () {
+        var stored = localStorage.getItem("theme");
+        if (stored === "dark" || stored === "light") {
+          document.documentElement.dataset.theme = stored;
+        } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+          document.documentElement.dataset.theme = "dark";
+        } else {
+          document.documentElement.dataset.theme = "light";
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <!-- Hidden source: rendered markdown content, sliced into slides by JS -->
+    <div id="content-source" aria-hidden="true" style="display:none">
+      <Content />
+    </div>
+
+    <!-- Deck layout -->
+    <div class="deck">
+      <!-- Header: breadcrumb + navigation -->
+      <header class="deck-header">
+        <div id="deck-heading" class="deck-heading" aria-live="polite"></div>
+        <div class="deck-controls">
+          <span class="deck-hint">← → navigate &nbsp;·&nbsp; Esc exit</span>
+          <button id="prev-btn" class="deck-btn" aria-label="Previous slide" disabled>
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="15 18 9 12 15 6"/>
+            </svg>
+          </button>
+          <span id="counter" class="deck-counter" aria-live="polite">1 / 1</span>
+          <button id="next-btn" class="deck-btn" aria-label="Next slide">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="9 18 15 12 9 6"/>
+            </svg>
+          </button>
+          <a href={`/posts/${post.id}`} class="deck-btn deck-exit" aria-label="Exit presentation" title="Exit presentation (Esc)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </a>
+        </div>
+      </header>
+
+      <!-- Progress bar -->
+      <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <div id="progress-fill" class="progress-fill"></div>
+      </div>
+
+      <!-- Slides viewport: title slide is pre-rendered, content slides injected by JS -->
+      <div id="slides-viewport" class="slides-viewport">
+        <div class="slide title-slide" data-slide="0">
+          <div class="title-content">
+            <p class="title-label">Presentation</p>
+            <h1 class="title-h1">{post.data.title}</h1>
+            <p class="title-desc">{post.data.description}</p>
+            <p class="title-date">{formattedDate}</p>
+          </div>
+        </div>
+        <!-- Content slides injected here by JS -->
+      </div>
+    </div>
+
+    <script define:vars={{ postSlug: post.id }}>
+      (function () {
+        const source = document.getElementById('content-source');
+        const viewport = document.getElementById('slides-viewport');
+        const counterEl = document.getElementById('counter');
+        const progressFill = document.getElementById('progress-fill');
+        const progressTrack = document.querySelector('.progress-track');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const deckHeading = document.getElementById('deck-heading');
+
+        // ── Build slides from rendered markdown ──────────────────────
+        // Split content at every <h2>; skip bare <hr> separators
+        const groups = [];
+        let cur = { heading: '', nodes: [] };
+
+        for (const child of [...source.children]) {
+          if (child.tagName === 'H2') {
+            if (cur.heading || cur.nodes.length) groups.push(cur);
+            cur = { heading: child.textContent.trim(), nodes: [] };
+          } else if (child.tagName !== 'HR') {
+            cur.nodes.push(child);
+          }
+        }
+        if (cur.heading || cur.nodes.length) groups.push(cur);
+
+        // Heading texts indexed by slide position (0 = title slide)
+        const headingTexts = [''];
+
+        groups.forEach(({ heading, nodes }) => {
+          const slide = document.createElement('div');
+          slide.className = 'slide';
+
+          const body = document.createElement('div');
+          body.className = 'slide-body';
+
+          if (heading) {
+            const h = document.createElement('h2');
+            h.className = 'slide-h2';
+            h.textContent = heading;
+            body.appendChild(h);
+          }
+
+          nodes.forEach(n => body.appendChild(n));
+          slide.appendChild(body);
+          viewport.appendChild(slide);
+          headingTexts.push(heading);
+        });
+
+        source.remove();
+
+        // ── Navigation ───────────────────────────────────────────────
+        const slides = [...viewport.querySelectorAll('.slide')];
+        let idx = 0;
+        slides[0].classList.add('active');
+
+        function goTo(i) {
+          const from = slides[idx];
+          idx = Math.max(0, Math.min(i, slides.length - 1));
+          const to = slides[idx];
+
+          if (from !== to) {
+            from.classList.remove('active');
+            to.classList.add('active');
+            const body = to.querySelector('.slide-body');
+            if (body) body.scrollTop = 0;
+          }
+
+          deckHeading.textContent = headingTexts[idx] || '';
+          counterEl.textContent = (idx + 1) + ' / ' + slides.length;
+
+          const pct = slides.length > 1 ? (idx / (slides.length - 1)) * 100 : 100;
+          progressFill.style.width = pct + '%';
+          progressTrack.setAttribute('aria-valuenow', Math.round(pct));
+
+          prevBtn.disabled = idx === 0;
+          nextBtn.disabled = idx === slides.length - 1;
+        }
+
+        goTo(0);
+
+        prevBtn.addEventListener('click', () => goTo(idx - 1));
+        nextBtn.addEventListener('click', () => goTo(idx + 1));
+
+        document.addEventListener('keydown', (e) => {
+          const tag = (document.activeElement && document.activeElement.tagName) || '';
+          if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+          if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); goTo(idx - 1); }
+          if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); goTo(idx + 1); }
+          if (e.key === 'Escape') { window.location.href = '/posts/' + postSlug; }
+        });
+
+        // Touch/swipe support
+        let swipeX = null;
+        document.addEventListener('touchstart', function (e) { swipeX = e.touches[0].clientX; }, { passive: true });
+        document.addEventListener('touchend', function (e) {
+          if (swipeX === null) return;
+          var dx = swipeX - e.changedTouches[0].clientX;
+          if (Math.abs(dx) > 50) { dx > 0 ? goTo(idx + 1) : goTo(idx - 1); }
+          swipeX = null;
+        }, { passive: true });
+
+        // ── Mermaid rendering ────────────────────────────────────────
+        var mermaidModule = null;
+        var originals = new Map();
+
+        async function renderMermaid() {
+          var diagrams = document.querySelectorAll('.mermaid');
+          if (!diagrams.length) return;
+
+          diagrams.forEach(function (el) {
+            if (!originals.has(el)) originals.set(el, el.textContent || '');
+          });
+          diagrams.forEach(function (el) { el.classList.add('mermaid-loading'); });
+
+          await new Promise(function (r) { requestAnimationFrame(function () { requestAnimationFrame(r); }); });
+
+          if (!mermaidModule) {
+            mermaidModule = (await import('https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs')).default;
+          }
+          var mermaid = mermaidModule;
+          var isDark = document.documentElement.dataset.theme === 'dark';
+
+          diagrams.forEach(function (el) {
+            var src = originals.get(el);
+            if (src) { el.innerHTML = src; el.removeAttribute('data-processed'); }
+          });
+
+          mermaid.initialize({
+            startOnLoad: false,
+            theme: isDark ? 'dark' : 'base',
+            fontFamily: 'var(--font-body)',
+            themeVariables: isDark ? {} : {
+              primaryColor: '#dce0e5', primaryTextColor: '#303840', primaryBorderColor: '#525d68',
+              lineColor: '#525d68', secondaryColor: '#edf0f3', tertiaryColor: '#f5f6f8',
+              textColor: '#303840', nodeTextColor: '#303840', mainBkg: '#dce0e5',
+              nodeBorder: '#525d68', clusterBkg: '#edf0f3', clusterBorder: '#c5cad2',
+              edgeLabelBackground: '#edf0f3', fontFamily: 'var(--font-body)',
+              git0: '#3d6aa8', git1: '#d45d00', git2: '#2a8c6a', git3: '#8b5cc4',
+              git4: '#c4483e', git5: '#0d7d8c', git6: '#7a6b30', git7: '#b04d8c',
+              gitBranchLabel0: '#ffffff', gitBranchLabel1: '#ffffff', gitBranchLabel2: '#ffffff',
+              gitBranchLabel3: '#ffffff', gitBranchLabel4: '#ffffff', gitBranchLabel5: '#ffffff',
+              gitBranchLabel6: '#ffffff', gitBranchLabel7: '#ffffff',
+              gitInv0: '#ffffff', gitInv1: '#ffffff', gitInv2: '#ffffff', gitInv3: '#ffffff',
+              gitInv4: '#ffffff', gitInv5: '#ffffff', gitInv6: '#ffffff', gitInv7: '#ffffff',
+              tagLabelColor: '#303840', tagLabelBackground: '#dce0e5', tagLabelBorder: '#525d68',
+              commitLabelColor: '#303840', commitLabelBackground: '#edf0f3',
+            },
+          });
+
+          await mermaid.run({ nodes: [...diagrams] });
+          diagrams.forEach(function (el) { el.classList.remove('mermaid-loading'); });
+        }
+
+        renderMermaid();
+
+        new MutationObserver(function (mutations) {
+          for (var m of mutations) {
+            if (m.attributeName === 'data-theme') { renderMermaid(); break; }
+          }
+        }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+      })();
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  /* ── Reset for presentation mode ──────── */
+  html, body {
+    height: 100%;
+    overflow: hidden;
+    margin: 0;
+  }
+
+  /* ── Deck layout ──────────────────────── */
+  .deck {
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+    background: var(--color-bg);
+    overflow: hidden;
+  }
+
+  .deck-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid var(--color-border);
+    background: var(--color-surface);
+    flex-shrink: 0;
+    gap: 1rem;
+    min-height: 44px;
+  }
+
+  .deck-heading {
+    font-family: var(--font-heading);
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .deck-hint {
+    font-family: var(--font-heading);
+    font-size: 0.75rem;
+    color: var(--color-text-tertiary);
+    white-space: nowrap;
+  }
+
+  @media (max-width: 600px) {
+    .deck-hint { display: none; }
+  }
+
+  .deck-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    flex-shrink: 0;
+  }
+
+  .deck-counter {
+    font-family: var(--font-heading);
+    font-size: 0.8125rem;
+    color: var(--color-text-tertiary);
+    min-width: 4.5rem;
+    text-align: center;
+    user-select: none;
+  }
+
+  .deck-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    background: transparent;
+    color: var(--color-text);
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+    text-decoration: none;
+    padding: 0;
+  }
+
+  .deck-btn:hover:not(:disabled) {
+    background: var(--color-border);
+  }
+
+  .deck-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  .deck-exit {
+    margin-left: 0.25rem;
+    color: var(--color-text-secondary);
+  }
+
+  /* ── Progress bar ─────────────────────── */
+  .progress-track {
+    height: 3px;
+    background: var(--color-border);
+    flex-shrink: 0;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--color-link);
+    width: 0%;
+    transition: width 0.3s ease;
+  }
+
+  /* ── Slides viewport ──────────────────── */
+  .slides-viewport {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+
+  .slide.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* ── Title slide ──────────────────────── */
+  .title-slide {
+    align-items: flex-start;
+    justify-content: center;
+    padding: 4rem clamp(2rem, 10vw, 8rem);
+  }
+
+  .title-content {
+    max-width: 760px;
+    width: 100%;
+  }
+
+  .title-label {
+    font-family: var(--font-heading);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-link);
+    margin-bottom: 1.25rem;
+  }
+
+  .title-h1 {
+    font-family: var(--font-heading);
+    font-size: clamp(1.75rem, 5vw, 3rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+    color: var(--color-text);
+    margin-bottom: 1.25rem;
+  }
+
+  .title-desc {
+    font-family: var(--font-body);
+    font-size: clamp(0.95rem, 2vw, 1.15rem);
+    color: var(--color-text-secondary);
+    line-height: 1.65;
+    margin-bottom: 1.5rem;
+    max-width: 600px;
+  }
+
+  .title-date {
+    font-family: var(--font-heading);
+    font-size: 0.8125rem;
+    color: var(--color-text-tertiary);
+  }
+
+  /* ── Content slide body ───────────────── */
+  .slide-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 2.5rem clamp(2rem, 10vw, 8rem);
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border) transparent;
+  }
+
+  .slide-h2 {
+    font-family: var(--font-heading);
+    font-size: clamp(1.2rem, 3vw, 1.875rem);
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    line-height: 1.25;
+    color: var(--color-text);
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--color-border);
+  }
+
+  /* ── Prose styles for slide content ───── */
+  .slide-body p {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    line-height: 1.75;
+    color: var(--color-text);
+    margin-bottom: 1.25em;
+  }
+
+  .slide-body h3 {
+    font-family: var(--font-heading);
+    font-size: 1.15rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--color-text);
+    margin-top: 1.75em;
+    margin-bottom: 0.5em;
+  }
+
+  .slide-body h4 {
+    font-family: var(--font-heading);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-top: 1.5em;
+    margin-bottom: 0.4em;
+  }
+
+  .slide-body ul, .slide-body ol {
+    padding-left: 1.5em;
+    margin-bottom: 1.25em;
+    font-family: var(--font-body);
+    line-height: 1.75;
+    color: var(--color-text);
+  }
+
+  .slide-body li { margin-bottom: 0.3em; }
+  .slide-body li::marker { color: var(--color-text-tertiary); }
+
+  .slide-body code:not(pre code) {
+    font-family: var(--font-mono);
+    font-size: 0.875em;
+    background: var(--color-code-bg);
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+    color: var(--color-text);
+  }
+
+  .slide-body pre {
+    margin-bottom: 1.25em;
+    border-radius: 8px;
+    overflow-x: auto;
+  }
+
+  .slide-body pre code {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    line-height: 1.6;
+  }
+
+  .slide-body blockquote {
+    border-left: 3px solid var(--color-text-tertiary);
+    padding: 0.75em 1.25em;
+    margin: 1.5em 0;
+    background: var(--color-surface);
+    border-radius: 0 4px 4px 0;
+    color: var(--color-text-secondary);
+    font-style: italic;
+  }
+
+  .slide-body blockquote p:last-child { margin-bottom: 0; }
+
+  .slide-body table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    margin-bottom: 1.25em;
+    display: block;
+    overflow-x: auto;
+  }
+
+  .slide-body th, .slide-body td {
+    padding: 0.5em 0.875em;
+    border: 1px solid var(--color-border);
+    text-align: left;
+    font-family: var(--font-heading);
+  }
+
+  .slide-body th {
+    background: var(--color-surface);
+    font-weight: 600;
+  }
+
+  .slide-body a {
+    color: var(--color-link);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+    text-decoration-color: var(--color-text-tertiary);
+    transition: color 0.15s, text-decoration-color 0.15s;
+  }
+
+  .slide-body a:hover {
+    color: var(--color-link-hover);
+    text-decoration-color: var(--color-link-hover);
+  }
+
+  .slide-body strong { font-weight: 700; color: var(--color-text); }
+  .slide-body em { font-style: italic; }
+
+  .slide-body hr {
+    border: none;
+    border-top: 1px solid var(--color-border);
+    margin: 1.5em 0;
+  }
+
+  .slide-body img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 6px;
+    margin: 1em 0;
+  }
+
+  /* ── Mermaid diagrams in slides ────────── */
+  .slide-body .mermaid {
+    margin: 1.5em 0;
+    text-align: center;
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    padding: 1rem;
+    overflow-x: auto;
+    position: relative;
+    transition: opacity 0.15s ease;
+  }
+
+  .slide-body .mermaid.mermaid-loading {
+    pointer-events: none;
+    min-height: 120px;
+    color: transparent;
+    overflow: hidden;
+  }
+
+  .slide-body .mermaid.mermaid-loading svg { opacity: 0.3; }
+
+  .slide-body .mermaid.mermaid-loading::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 36px;
+    height: 36px;
+    margin: -18px 0 0 -18px;
+    border: 4px solid var(--color-border);
+    border-top-color: var(--color-text-secondary);
+    border-radius: 50%;
+    animation: slide-mermaid-spin 0.6s linear infinite;
+  }
+
+  @keyframes slide-mermaid-spin { to { transform: rotate(360deg); } }
+
+  .slide-body .mermaid svg { max-width: 100%; height: auto; }
+</style>
