@@ -60,7 +60,7 @@ const formattedDate = post.data.date.toLocaleDateString("en-US", {
       <header class="deck-header">
         <div id="deck-heading" class="deck-heading" aria-live="polite"></div>
         <div class="deck-controls">
-          <span class="deck-hint">← → navigate &nbsp;·&nbsp; Esc exit</span>
+          <span class="deck-hint">← → navigate &nbsp;·&nbsp; F fullscreen &nbsp;·&nbsp; Esc exit</span>
           <button id="prev-btn" class="deck-btn" aria-label="Previous slide" disabled>
             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <polyline points="15 18 9 12 15 6"/>
@@ -92,6 +92,20 @@ const formattedDate = post.data.date.toLocaleDateString("en-US", {
               <line x1="21" y1="12" x2="23" y2="12"/>
               <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
               <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+            </svg>
+          </button>
+          <button id="deck-fullscreen-toggle" class="deck-btn" aria-label="Enter fullscreen" title="Toggle fullscreen (F)">
+            <svg class="icon-expand" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="15 3 21 3 21 9"/>
+              <polyline points="9 21 3 21 3 15"/>
+              <line x1="21" y1="3" x2="14" y2="10"/>
+              <line x1="3" y1="21" x2="10" y2="14"/>
+            </svg>
+            <svg class="icon-compress" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="4 14 10 14 10 20"/>
+              <polyline points="20 10 14 10 14 4"/>
+              <line x1="10" y1="14" x2="3" y2="21"/>
+              <line x1="21" y1="3" x2="14" y2="10"/>
             </svg>
           </button>
           <a href={`/posts/${post.id}`} class="deck-btn deck-exit" aria-label="Exit presentation" title="Exit presentation (Esc)">
@@ -332,7 +346,14 @@ const formattedDate = post.data.date.toLocaleDateString("en-US", {
           if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
           if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); goTo(idx - 1); }
           if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); goTo(idx + 1); }
-          if (e.key === 'Escape') { window.location.href = '/posts/' + postSlug; }
+          if (e.key === 'Escape') {
+            if (document.fullscreenElement) {
+              document.exitFullscreen();
+            } else {
+              window.location.href = '/posts/' + postSlug;
+            }
+          }
+          if (e.key === 'f' || e.key === 'F') { toggleFullscreen(); }
         });
 
         // Touch/swipe support
@@ -438,6 +459,25 @@ const formattedDate = post.data.date.toLocaleDateString("en-US", {
           });
         }
 
+        // ── Fullscreen toggle ─────────────────────────────────────────
+        var fsBtn = document.getElementById('deck-fullscreen-toggle');
+        function toggleFullscreen() {
+          if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen();
+          } else {
+            document.exitFullscreen();
+          }
+        }
+        fsBtn && fsBtn.addEventListener('click', toggleFullscreen);
+        document.addEventListener('fullscreenchange', function () {
+          var inFs = !!document.fullscreenElement;
+          if (fsBtn) {
+            fsBtn.setAttribute('aria-label', inFs ? 'Exit fullscreen' : 'Enter fullscreen');
+            fsBtn.dataset.active = inFs ? 'true' : 'false';
+          }
+          document.documentElement.dataset.fullscreen = inFs ? 'true' : 'false';
+        });
+
         // ── Theme toggle ─────────────────────────────────────────────
         var themeBtn = document.getElementById('deck-theme-toggle');
         themeBtn && themeBtn.addEventListener('click', function () {
@@ -464,6 +504,12 @@ const formattedDate = post.data.date.toLocaleDateString("en-US", {
   #deck-theme-toggle .icon-moon { display: block; }
   [data-theme="dark"] #deck-theme-toggle .icon-sun { display: block; }
   [data-theme="dark"] #deck-theme-toggle .icon-moon { display: none; }
+
+  /* ── Fullscreen toggle icon switching ── */
+  #deck-fullscreen-toggle .icon-compress { display: none; }
+  #deck-fullscreen-toggle .icon-expand { display: block; }
+  [data-fullscreen="true"] #deck-fullscreen-toggle .icon-compress { display: block; }
+  [data-fullscreen="true"] #deck-fullscreen-toggle .icon-expand { display: none; }
 
   /* ── Deck layout ──────────────────────── */
   .deck {
