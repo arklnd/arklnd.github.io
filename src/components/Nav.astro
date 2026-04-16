@@ -49,23 +49,26 @@ const currentPath = Astro.url.pathname;
 </nav>
 
 <script>
-  const btn = document.getElementById("theme-toggle") as HTMLButtonElement;
-
   function applyTheme(theme: string) {
     document.documentElement.dataset.theme = theme;
     localStorage.setItem("theme", theme);
   }
 
-  btn?.addEventListener("click", () => {
-    const loader = document.getElementById("theme-loader");
-    if (loader) loader.classList.add("active");
+  function setup() {
+    const btn = document.getElementById("theme-toggle") as HTMLButtonElement;
+    btn?.addEventListener("click", () => {
+      const loader = document.getElementById("theme-loader");
+      if (loader) loader.classList.add("active");
 
-    requestAnimationFrame(() => {
-      const current = document.documentElement.dataset.theme;
-      applyTheme(current === "dark" ? "light" : "dark");
-      setTimeout(() => loader?.classList.remove("active"), 350);
+      requestAnimationFrame(() => {
+        const current = document.documentElement.dataset.theme;
+        applyTheme(current === "dark" ? "light" : "dark");
+        setTimeout(() => loader?.classList.remove("active"), 350);
+      });
     });
-  });
+  }
+
+  document.addEventListener("astro:page-load", setup);
 </script>
 
 <style>

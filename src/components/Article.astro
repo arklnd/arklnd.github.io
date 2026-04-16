@@ -359,6 +359,8 @@ const formattedDate = date.toLocaleDateString("en-US", {
 </style>
 
 <script>
+  let pageController: AbortController | null = null;
+
   function applyWidth(wide: boolean) {
     if (wide) {
       document.documentElement.dataset.wide = "true";
@@ -369,59 +371,11 @@ const formattedDate = date.toLocaleDateString("en-US", {
     }
   }
 
-  // ── Floating width toggle ───────────────
-  const floatWidthBtn = document.getElementById("float-width-toggle");
-  floatWidthBtn?.addEventListener("click", () => {
-    applyWidth(document.documentElement.dataset.wide !== "true");
-  });
-
-  // ── Floating theme toggle ───────────────
-  const floatThemeBtn = document.getElementById("float-theme-toggle");
-
   function applyTheme(theme: string) {
     document.documentElement.dataset.theme = theme;
     localStorage.setItem("theme", theme);
   }
 
-  floatThemeBtn?.addEventListener("click", () => {
-    const loader = document.getElementById("theme-loader");
-    if (loader) loader.classList.add("active");
-
-    requestAnimationFrame(() => {
-      const current = document.documentElement.dataset.theme;
-      applyTheme(current === "dark" ? "light" : "dark");
-      setTimeout(() => loader?.classList.remove("active"), 350);
-    });
-  });
-
-  // ── Scroll toggle (top ↔ bottom) ────────
-  const scrollToggle = document.getElementById("scroll-toggle");
-
-  function updateScrollBtn() {
-    if (!scrollToggle) return;
-    const atTop = window.scrollY < 100;
-    scrollToggle.classList.toggle("scrolled", !atTop);
-    scrollToggle.setAttribute("aria-label", atTop ? "Scroll to bottom" : "Scroll to top");
-    scrollToggle.setAttribute("title", atTop ? "Scroll to bottom" : "Scroll to top");
-  }
-
-  window.addEventListener("scroll", updateScrollBtn, { passive: true });
-  updateScrollBtn();
-
-  scrollToggle?.addEventListener("click", () => {
-    if (window.scrollY < 100) {
-      window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
-    } else {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-  });
-
-  // ── VSCode-style Sticky Scroll ──────────
-  const stickyBar = document.getElementById("sticky-scroll-bar");
-  const stickyCrumbs = document.getElementById("sticky-scroll-crumbs");
-  const stickyToggleBtn = document.getElementById("float-sticky-toggle");
-
-  // Init sticky scroll state (default: ON)
   function isStickyScrollOn(): boolean {
     return document.documentElement.dataset.stickyScroll !== "off";
   }
@@ -436,113 +390,163 @@ const formattedDate = date.toLocaleDateString("en-US", {
     }
   }
 
-  // Restore saved preference
-  if (localStorage.getItem("stickyScroll") === "off") {
-    applyStickyScroll(false);
-  }
+  function setup() {
+    // Abort previous page's window listeners
+    if (pageController) pageController.abort();
+    pageController = new AbortController();
+    const { signal } = pageController;
 
-  stickyToggleBtn?.addEventListener("click", () => {
-    applyStickyScroll(!isStickyScrollOn());
-    updateStickyScroll();
-  });
-
-  // Collect headings from article prose (h2–h4)
-  const headings: { el: HTMLElement; level: number; top: number }[] = [];
-
-  function collectHeadings() {
-    headings.length = 0;
-    const prose = document.querySelector(".prose");
-    if (!prose) return;
-    const els = prose.querySelectorAll<HTMLElement>("h2, h3, h4");
-    els.forEach((el) => {
-      const level = parseInt(el.tagName[1], 10);
-      headings.push({ el, level, top: 0 });
+    // ── Floating width toggle ───────────────
+    const floatWidthBtn = document.getElementById("float-width-toggle");
+    floatWidthBtn?.addEventListener("click", () => {
+      applyWidth(document.documentElement.dataset.wide !== "true");
     });
-  }
 
-  function refreshHeadingTops() {
-    headings.forEach((h) => {
-      h.top = h.el.getBoundingClientRect().top + window.scrollY;
+    // ── Floating theme toggle ───────────────
+    const floatThemeBtn = document.getElementById("float-theme-toggle");
+    floatThemeBtn?.addEventListener("click", () => {
+      const loader = document.getElementById("theme-loader");
+      if (loader) loader.classList.add("active");
+      requestAnimationFrame(() => {
+        const current = document.documentElement.dataset.theme;
+        applyTheme(current === "dark" ? "light" : "dark");
+        setTimeout(() => loader?.classList.remove("active"), 350);
+      });
     });
-  }
 
-  // Build the sticky crumb stack from headings above viewport
-  function updateStickyScroll() {
-    if (!stickyBar || !stickyCrumbs) return;
-    if (!isStickyScrollOn()) {
-      stickyBar.classList.remove("visible");
-      return;
+    // ── Scroll toggle (top ↔ bottom) ────────
+    const scrollToggle = document.getElementById("scroll-toggle");
+
+    function updateScrollBtn() {
+      if (!scrollToggle) return;
+      const atTop = window.scrollY < 100;
+      scrollToggle.classList.toggle("scrolled", !atTop);
+      scrollToggle.setAttribute("aria-label", atTop ? "Scroll to bottom" : "Scroll to top");
+      scrollToggle.setAttribute("title", atTop ? "Scroll to bottom" : "Scroll to top");
     }
 
-    const scrollTop = window.scrollY;
+    window.addEventListener("scroll", updateScrollBtn, { passive: true, signal });
+    updateScrollBtn();
 
-    // Find all headings whose top is above the current scroll position
-    // (i.e., heading.top < scrollTop + a small buffer so the heading itself isn't shown while fully visible)
-    const buffer = 10;
-    const above = headings.filter((h) => h.top < scrollTop + buffer);
-
-    if (above.length === 0) {
-      stickyBar.classList.remove("visible");
-      return;
-    }
-
-    // Build a hierarchy breadcrumb: track the last seen heading at each level
-    const crumbMap = new Map<number, typeof above[0]>();
-    let minLevel = 6;
-
-    for (const h of above) {
-      crumbMap.set(h.level, h);
-      if (h.level < minLevel) minLevel = h.level;
-      // When we go up a level, clear deeper levels
-      for (const [lvl] of crumbMap) {
-        if (lvl > h.level) crumbMap.delete(lvl);
+    scrollToggle?.addEventListener("click", () => {
+      if (window.scrollY < 100) {
+        window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+      } else {
+        window.scrollTo({ top: 0, behavior: "smooth" });
       }
+    });
+
+    // ── VSCode-style Sticky Scroll ──────────
+    const stickyBar = document.getElementById("sticky-scroll-bar");
+    const stickyCrumbs = document.getElementById("sticky-scroll-crumbs");
+    const stickyToggleBtn = document.getElementById("float-sticky-toggle");
+
+    // Restore saved preference
+    if (localStorage.getItem("stickyScroll") === "off") {
+      applyStickyScroll(false);
     }
 
-    // Sort by level to display in order
-    const crumbLevels = Array.from(crumbMap.keys()).sort((a, b) => a - b);
+    stickyToggleBtn?.addEventListener("click", () => {
+      applyStickyScroll(!isStickyScrollOn());
+      updateStickyScroll();
+    });
 
-    // Render
-    stickyCrumbs.innerHTML = "";
-    const baseLevel = crumbLevels[0] ?? 2;
+    // Collect headings from article prose (h2–h4)
+    const headings: { el: HTMLElement; level: number; top: number }[] = [];
 
-    crumbLevels.forEach((level) => {
-      const h = crumbMap.get(level)!;
-      const crumb = document.createElement("div");
-      crumb.className = `sticky-crumb sticky-crumb-h${level}`;
+    function collectHeadings() {
+      headings.length = 0;
+      const prose = document.querySelector(".prose");
+      if (!prose) return;
+      const els = prose.querySelectorAll<HTMLElement>("h2, h3, h4");
+      els.forEach((el) => {
+        const level = parseInt(el.tagName[1], 10);
+        headings.push({ el, level, top: 0 });
+      });
+    }
 
-      if (level > baseLevel) {
-        const arrow = document.createElement("span");
-        arrow.className = "sticky-crumb-arrow";
-        arrow.textContent = "›";
-        crumb.appendChild(arrow);
+    function refreshHeadingTops() {
+      headings.forEach((h) => {
+        h.top = h.el.getBoundingClientRect().top + window.scrollY;
+      });
+    }
+
+    // Build the sticky crumb stack from headings above viewport
+    function updateStickyScroll() {
+      if (!stickyBar || !stickyCrumbs) return;
+      if (!isStickyScrollOn()) {
+        stickyBar.classList.remove("visible");
+        return;
       }
 
-      const text = document.createTextNode(h.el.textContent?.trim() ?? "");
-      crumb.appendChild(text);
+      const scrollTop = window.scrollY;
 
-      crumb.addEventListener("click", () => {
-        h.el.scrollIntoView({ behavior: "smooth", block: "start" });
+      const buffer = 10;
+      const above = headings.filter((h) => h.top < scrollTop + buffer);
+
+      if (above.length === 0) {
+        stickyBar.classList.remove("visible");
+        return;
+      }
+
+      // Build a hierarchy breadcrumb: track the last seen heading at each level
+      const crumbMap = new Map<number, typeof above[0]>();
+      let minLevel = 6;
+
+      for (const h of above) {
+        crumbMap.set(h.level, h);
+        if (h.level < minLevel) minLevel = h.level;
+        // When we go up a level, clear deeper levels
+        for (const [lvl] of crumbMap) {
+          if (lvl > h.level) crumbMap.delete(lvl);
+        }
+      }
+
+      // Sort by level to display in order
+      const crumbLevels = Array.from(crumbMap.keys()).sort((a, b) => a - b);
+
+      // Render
+      stickyCrumbs.innerHTML = "";
+      const baseLevel = crumbLevels[0] ?? 2;
+
+      crumbLevels.forEach((level) => {
+        const h = crumbMap.get(level)!;
+        const crumb = document.createElement("div");
+        crumb.className = `sticky-crumb sticky-crumb-h${level}`;
+
+        if (level > baseLevel) {
+          const arrow = document.createElement("span");
+          arrow.className = "sticky-crumb-arrow";
+          arrow.textContent = "›";
+          crumb.appendChild(arrow);
+        }
+
+        const text = document.createTextNode(h.el.textContent?.trim() ?? "");
+        crumb.appendChild(text);
+
+        crumb.addEventListener("click", () => {
+          h.el.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+
+        stickyCrumbs.appendChild(crumb);
       });
 
-      stickyCrumbs.appendChild(crumb);
-    });
+      stickyBar.classList.add("visible");
+    }
 
-    stickyBar.classList.add("visible");
-  }
-
-  // Init
-  collectHeadings();
-  refreshHeadingTops();
-  updateStickyScroll();
-
-  // Update tops on resize (layout shift)
-  window.addEventListener("resize", () => {
+    // Init
+    collectHeadings();
     refreshHeadingTops();
     updateStickyScroll();
-  }, { passive: true });
 
-  window.addEventListener("scroll", () => {
-    updateStickyScroll();
-  }, { passive: true });
+    // Update tops on resize (layout shift)
+    window.addEventListener("resize", () => {
+      refreshHeadingTops();
+      updateStickyScroll();
+    }, { passive: true, signal });
+
+    window.addEventListener("scroll", updateStickyScroll, { passive: true, signal });
+  }
+
+  document.addEventListener("astro:page-load", setup);
 </script>
