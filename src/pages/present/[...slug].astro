@@ -60,7 +60,7 @@ const formattedDate = post.data.date.toLocaleDateString("en-US", {
       <header class="deck-header">
         <div id="deck-heading" class="deck-heading" aria-live="polite"></div>
         <div class="deck-controls">
-          <span class="deck-hint">← → navigate &nbsp;·&nbsp; F fullscreen &nbsp;·&nbsp; Esc exit</span>
+          <span class="deck-hint">← → navigate &nbsp;·&nbsp; L laser &nbsp;·&nbsp; F fullscreen &nbsp;·&nbsp; Esc exit</span>
           <button id="prev-btn" class="deck-btn" aria-label="Previous slide" disabled>
             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <polyline points="15 18 9 12 15 6"/>
@@ -76,6 +76,15 @@ const formattedDate = post.data.date.toLocaleDateString("en-US", {
             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <rect x="2" y="3" width="20" height="7" rx="1"/>
               <rect x="2" y="14" width="20" height="7" rx="1"/>
+            </svg>
+          </button>
+          <button id="deck-laser-toggle" class="deck-btn" aria-label="Toggle laser pointer" title="Toggle laser pointer (L)" aria-pressed="false">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="3"/>
+              <line x1="12" y1="2" x2="12" y2="5"/>
+              <line x1="12" y1="19" x2="12" y2="22"/>
+              <line x1="2" y1="12" x2="5" y2="12"/>
+              <line x1="19" y1="12" x2="22" y2="12"/>
             </svg>
           </button>
           <button id="deck-theme-toggle" class="deck-btn" aria-label="Toggle theme" title="Toggle dark / light mode">
@@ -121,6 +130,11 @@ const formattedDate = post.data.date.toLocaleDateString("en-US", {
       <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
         <div id="progress-fill" class="progress-fill"></div>
       </div>
+
+      <!-- Laser pointer dot -->
+      <div id="laser-dot" aria-hidden="true"></div>
+      <!-- Laser trail canvas -->
+      <canvas id="laser-canvas" aria-hidden="true"></canvas>
 
       <!-- Slides viewport: title slide is pre-rendered, content slides injected by JS -->
       <div id="slides-viewport" class="slides-viewport">
@@ -354,6 +368,7 @@ const formattedDate = post.data.date.toLocaleDateString("en-US", {
             }
           }
           if (e.key === 'f' || e.key === 'F') { toggleFullscreen(); }
+          if (e.key === 'l' || e.key === 'L') { setLaser(!laserActive); }
         });
 
         // Touch/swipe support
@@ -486,6 +501,107 @@ const formattedDate = post.data.date.toLocaleDateString("en-US", {
           document.documentElement.dataset.theme = next;
           localStorage.setItem('theme', next);
         });
+
+        // ── Laser pointer + trail drawing ──────────────────────────────
+        var laserBtn = document.getElementById('deck-laser-toggle');
+        var laserDot = document.getElementById('laser-dot');
+        var laserCanvas = document.getElementById('laser-canvas');
+        var laserCtx = laserCanvas ? laserCanvas.getContext('2d') : null;
+        var laserActive = false;
+        var laserStrokes = [];   // [{points:[{x,y,t},...]}]
+        var currentStroke = null;
+        var isMouseDown = false;
+        var laserRafId = null;
+        var LASER_FADE = 2500; // ms until a stroke fully vanishes
+
+        function resizeLaserCanvas() {
+          if (!laserCanvas) return;
+          laserCanvas.width = window.innerWidth;
+          laserCanvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeLaserCanvas);
+        resizeLaserCanvas();
+
+        function laserDrawLoop() {
+          if (!laserCtx) return;
+          var now = Date.now();
+          laserCtx.clearRect(0, 0, laserCanvas.width, laserCanvas.height);
+          laserStrokes = laserStrokes.filter(function (s) {
+            return (now - s.points[s.points.length - 1].t) < LASER_FADE;
+          });
+          laserStrokes.forEach(function (stroke) {
+            var pts = stroke.points;
+            if (pts.length < 2) return;
+            var age = now - pts[pts.length - 1].t;
+            var alpha = Math.max(0, 1 - age / LASER_FADE);
+            laserCtx.save();
+            laserCtx.globalAlpha = alpha;
+            laserCtx.strokeStyle = 'rgba(255, 45, 45, 1)';
+            laserCtx.lineWidth = 3;
+            laserCtx.lineCap = 'round';
+            laserCtx.lineJoin = 'round';
+            laserCtx.shadowColor = 'rgba(255, 40, 40, 0.85)';
+            laserCtx.shadowBlur = 12;
+            laserCtx.beginPath();
+            laserCtx.moveTo(pts[0].x, pts[0].y);
+            for (var i = 1; i < pts.length; i++) laserCtx.lineTo(pts[i].x, pts[i].y);
+            laserCtx.stroke();
+            laserCtx.restore();
+          });
+          if (laserStrokes.length > 0) {
+            laserRafId = requestAnimationFrame(laserDrawLoop);
+          } else {
+            laserRafId = null;
+          }
+        }
+
+        function startLaserRaf() {
+          if (!laserRafId) laserRafId = requestAnimationFrame(laserDrawLoop);
+        }
+
+        function setLaser(on) {
+          laserActive = on;
+          document.documentElement.dataset.laser = on ? 'true' : 'false';
+          if (laserDot) laserDot.style.display = on ? 'block' : 'none';
+          if (laserBtn) {
+            laserBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+            laserBtn.dataset.active = on ? 'true' : 'false';
+          }
+          if (!on && laserCtx) {
+            laserStrokes = [];
+            currentStroke = null;
+            isMouseDown = false;
+            if (laserRafId) { cancelAnimationFrame(laserRafId); laserRafId = null; }
+            laserCtx.clearRect(0, 0, laserCanvas.width, laserCanvas.height);
+          }
+        }
+
+        document.addEventListener('mousedown', function (e) {
+          if (!laserActive) return;
+          isMouseDown = true;
+          currentStroke = { points: [{ x: e.clientX, y: e.clientY, t: Date.now() }] };
+          laserStrokes.push(currentStroke);
+          startLaserRaf();
+        });
+
+        document.addEventListener('mousemove', function (e) {
+          if (!laserActive) return;
+          if (laserDot) {
+            laserDot.style.left = e.clientX + 'px';
+            laserDot.style.top = e.clientY + 'px';
+          }
+          if (!isMouseDown || !currentStroke) return;
+          currentStroke.points.push({ x: e.clientX, y: e.clientY, t: Date.now() });
+        });
+
+        document.addEventListener('mouseup', function () {
+          isMouseDown = false;
+          currentStroke = null;
+        });
+
+        laserBtn && laserBtn.addEventListener('click', function () {
+          setLaser(!laserActive);
+        });
       })();
     </script>
   </body>
@@ -497,6 +613,45 @@ const formattedDate = post.data.date.toLocaleDateString("en-US", {
     height: 100%;
     overflow: hidden;
     margin: 0;
+  }
+
+  /* ── Laser pointer ───────────────────── */
+  #laser-canvas {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9997;
+  }
+
+  @keyframes laser-pulse {
+    0%   { box-shadow: 0 0 0 3px rgba(255,38,38,0.35), 0 0 14px 6px rgba(255,38,38,0.3); }
+    50%  { box-shadow: 0 0 0 7px rgba(255,38,38,0.12), 0 0 26px 12px rgba(255,38,38,0.2); }
+    100% { box-shadow: 0 0 0 3px rgba(255,38,38,0.35), 0 0 14px 6px rgba(255,38,38,0.3); }
+  }
+
+  #laser-dot {
+    display: none;
+    position: fixed;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: rgba(255, 30, 30, 0.95);
+    box-shadow:
+      0 0 0 3px rgba(255, 38, 38, 0.35),
+      0 0 14px 6px rgba(255, 38, 38, 0.3);
+    animation: laser-pulse 1.1s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+  }
+
+  [data-laser="true"] .slides-viewport { cursor: none; }
+  [data-laser="true"] { user-select: none; }
+
+  #deck-laser-toggle[data-active="true"] {
+    background: rgba(255, 38, 38, 0.12);
+    color: #e02020;
+    border-color: rgba(220, 40, 40, 0.5);
   }
 
   /* ── Theme toggle icon switching ─────── */
