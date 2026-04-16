@@ -221,8 +221,6 @@ const formattedDate = post.data.date.toLocaleDateString("en-US", {
             slide.appendChild(body);
             viewport.appendChild(slide);
           });
-
-          if (splitEnabled) splitOverflow();
         }
 
         // ── Navigation ───────────────────────────────────────────────
@@ -260,7 +258,7 @@ const formattedDate = post.data.date.toLocaleDateString("en-US", {
           goTo(0);
         }
 
-        // Initial build
+        // Initial build (nav works immediately; split fires after mermaid renders below)
         buildContentSlides();
         initNav();
 
@@ -337,7 +335,15 @@ const formattedDate = post.data.date.toLocaleDateString("en-US", {
           diagrams.forEach(function (el) { el.classList.remove('mermaid-loading'); });
         }
 
-        renderMermaid();
+        renderMermaid().then(function () {
+          if (!splitEnabled) return;
+          requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+              splitOverflow();
+              initNav();
+            });
+          });
+        });
 
         new MutationObserver(function (mutations) {
           for (var m of mutations) {
@@ -358,7 +364,15 @@ const formattedDate = post.data.date.toLocaleDateString("en-US", {
             originals.clear();
             buildContentSlides();
             initNav();
-            renderMermaid();
+            renderMermaid().then(function () {
+              if (!splitEnabled) return;
+              requestAnimationFrame(function () {
+                requestAnimationFrame(function () {
+                  splitOverflow();
+                  initNav();
+                });
+              });
+            });
           });
         }
 
@@ -745,7 +759,18 @@ const formattedDate = post.data.date.toLocaleDateString("en-US", {
 
   @keyframes slide-mermaid-spin { to { transform: rotate(360deg); } }
 
-  .slide-body .mermaid svg { max-width: 100%; height: auto; }
+  /* ── Constrain mermaid diagrams so they can't overflow a slide ─ */
+  .slide-body .mermaid {
+    max-height: 55vh;
+    overflow: auto;
+  }
+
+  .slide-body .mermaid svg {
+    max-width: 100%;
+    max-height: 55vh;
+    height: auto;
+    width: auto;
+  }
 
   /* ── Continuation badges ──────────────────── */
   .slide-badge {
