@@ -830,6 +830,37 @@ const formattedDate = post.data.date.toLocaleDateString("en-US", {
     width: auto;
   }
 
+  /* ── gitGraph overrides (matching posts/Prose.astro) ─────────── */
+  .slide-body .mermaid .commit-label-bkg {
+    opacity: 0.85;
+    stroke: var(--color-text-secondary);
+    stroke-width: 1px;
+    stroke-dasharray: 4 2;
+    rx: 4;
+    ry: 4;
+    height: 22px;
+    transform: translateY(-3px);
+  }
+
+  .slide-body .mermaid .commit-label {
+    font-size: 14px !important;
+    font-weight: 600;
+  }
+
+  .slide-body .mermaid .arrow {
+    stroke-width: 4 !important;
+  }
+
+  .slide-body .mermaid [class*="commit-highlight-outer"] {
+    stroke: var(--color-text-secondary) !important;
+    fill: var(--color-surface) !important;
+  }
+
+  .slide-body .mermaid .commit-highlight-inner {
+    stroke: var(--color-text-tertiary) !important;
+    fill: var(--color-text-tertiary) !important;
+  }
+
   /* ── Continuation badges ──────────────────── */
   .slide-badge {
     flex-shrink: 0;
