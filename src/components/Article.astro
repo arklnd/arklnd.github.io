@@ -97,6 +97,12 @@ const formattedDate = date.toLocaleDateString("en-US", {
 </article>
 
 <div class="floating-buttons">
+  <a href="/" class="float-btn" aria-label="Back to home" title="Back to home">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+      <polyline points="9 22 9 12 15 12 15 22"/>
+    </svg>
+  </a>
   <button id="float-sticky-toggle" class="float-btn" aria-label="Toggle sticky scroll" title="Toggle sticky scroll">
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <line x1="3" y1="5" x2="21" y2="5"></line>
@@ -325,6 +331,7 @@ const formattedDate = date.toLocaleDateString("en-US", {
     cursor: pointer;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     transition: color 0.15s ease, border-color 0.15s ease;
+    text-decoration: none;
   }
 
   .float-btn:hover {
