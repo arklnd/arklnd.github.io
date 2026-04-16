@@ -12,6 +12,8 @@
     "@astrojs/mdx": "4.3.13",
     "@astrojs/rss": "4.0.15",
     "astro": "5.18.1",
+    "rehype-katex": "7.0.1",
+    "remark-math": "6.0.0",
     "unist-util-visit": "^5.0.0"
   }
 }

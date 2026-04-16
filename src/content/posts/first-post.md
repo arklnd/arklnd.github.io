@@ -36,3 +36,21 @@ g++ -std=c++17 hello.cpp -o hello
 ```
 
 Stay tuned for more updates!
+
+### Arithmetic Progression (AP)
+
+An **arithmetic progression** is a sequence where each term differs from the previous by a constant $d$, called the **common difference**.
+
+The $n$-th term is:
+
+$$
+a_n = a_1 + (n - 1)d
+$$
+
+The sum of the first $n$ terms is:
+
+$$
+S_n = \frac{n}{2}\bigl(2a_1 + (n-1)d\bigr) = \frac{n}{2}(a_1 + a_n)
+$$
+
+For example, the AP $2, 5, 8, 11, \ldots$ has $a_1 = 2$ and $d = 3$, so its 10th term is $a_{10} = 2 + 9 \times 3 = 29$ and the sum of the first 10 terms is $S_{10} = \frac{10}{2}(2 + 29) = 155$.
