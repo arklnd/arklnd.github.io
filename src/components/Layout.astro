@@ -110,9 +110,12 @@ const googleVerification = import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION;
       <Footer />
     </div>
 
-    <script>
-      import { registerSW } from "virtual:pwa-register";
-      registerSW({ immediate: true });
+    <script is:inline>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", function () {
+          navigator.serviceWorker.register("/sw.js");
+        });
+      }
     </script>
 
     <script>
