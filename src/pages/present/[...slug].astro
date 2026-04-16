@@ -72,6 +72,12 @@ const formattedDate = post.data.date.toLocaleDateString("en-US", {
               <polyline points="9 18 15 12 9 6"/>
             </svg>
           </button>
+          <button id="deck-split-toggle" class="deck-btn" aria-label="Toggle auto-split" title="Toggle auto-split slides" aria-pressed="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="2" y="3" width="20" height="7" rx="1"/>
+              <rect x="2" y="14" width="20" height="7" rx="1"/>
+            </svg>
+          </button>
           <button id="deck-theme-toggle" class="deck-btn" aria-label="Toggle theme" title="Toggle dark / light mode">
             <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
@@ -127,38 +133,27 @@ const formattedDate = post.data.date.toLocaleDateString("en-US", {
         const nextBtn = document.getElementById('next-btn');
         const deckHeading = document.getElementById('deck-heading');
 
-        // ── Build slides from rendered markdown ──────────────────────
+        // ── Collect groups as HTML strings (enables rebuild on toggle) ──
         // Split content at every <h2>; skip bare <hr> separators
         const groups = [];
-        let cur = { heading: '', nodes: [] };
+        let cur = { heading: '', htmls: [] };
 
         for (const child of [...source.children]) {
           if (child.tagName === 'H2') {
-            if (cur.heading || cur.nodes.length) groups.push(cur);
-            cur = { heading: child.textContent.trim(), nodes: [] };
+            if (cur.heading || cur.htmls.length) groups.push(cur);
+            cur = { heading: child.textContent.trim(), htmls: [] };
           } else if (child.tagName !== 'HR') {
-            cur.nodes.push(child);
+            cur.htmls.push(child.outerHTML);
           }
         }
-        if (cur.heading || cur.nodes.length) groups.push(cur);
+        if (cur.heading || cur.htmls.length) groups.push(cur);
+        source.remove();
 
-        groups.forEach(({ heading, nodes }) => {
-          const slide = document.createElement('div');
-          slide.className = 'slide';
-          slide.dataset.heading = heading;
-
-          const body = document.createElement('div');
-          body.className = 'slide-body';
-
-          nodes.forEach(n => body.appendChild(n));
-          slide.appendChild(body);
-          viewport.appendChild(slide);
-        });
+        // ── Split state (persisted) ───────────────────────────────────
+        var splitEnabled = localStorage.getItem('deck-split') !== 'false';
 
         // ── Auto-split overflowing slides ─────────────────────────────
-        // Reading scrollHeight forces a synchronous reflow so measurements
-        // are accurate even though slides are not yet visible.
-        (function splitOverflow() {
+        function splitOverflow() {
           const toCheck = [...viewport.querySelectorAll('.slide:not(.title-slide)')];
           for (const slide of toCheck) {
             const body = slide.querySelector('.slide-body');
@@ -174,14 +169,16 @@ const formattedDate = post.data.date.toLocaleDateString("en-US", {
             for (const child of children) {
               const hadChildren = currentBody.children.length > 0;
               currentBody.appendChild(child);
-              // Force reflow before measuring
               if (hadChildren && currentBody.scrollHeight > currentBody.clientHeight) {
-                // Move the child that caused overflow into a new continuation slide
                 currentBody.removeChild(child);
+
+                // Mark the slide that overflows as having a continuation
+                currentSlide.dataset.hasMore = 'true';
 
                 const contSlide = document.createElement('div');
                 contSlide.className = 'slide';
                 contSlide.dataset.heading = heading;
+                contSlide.dataset.continuation = 'true';
                 const contBody = document.createElement('div');
                 contBody.className = 'slide-body';
                 contSlide.appendChild(contBody);
@@ -193,14 +190,44 @@ const formattedDate = post.data.date.toLocaleDateString("en-US", {
               }
             }
           }
-        })();
 
-        source.remove();
+          // Inject continuation badges outside slide-body so they don't scroll
+          viewport.querySelectorAll('.slide[data-has-more]').forEach(function (slide) {
+            const badge = document.createElement('div');
+            badge.className = 'slide-badge slide-badge--more';
+            badge.textContent = 'cont\u2019d \u2192';
+            slide.appendChild(badge);
+          });
+          viewport.querySelectorAll('.slide[data-continuation]').forEach(function (slide) {
+            const badge = document.createElement('div');
+            badge.className = 'slide-badge slide-badge--from';
+            badge.textContent = '\u2190 cont\u2019d';
+            slide.insertBefore(badge, slide.querySelector('.slide-body'));
+          });
+        }
+
+        // ── Build / rebuild content slides ────────────────────────────
+        function buildContentSlides() {
+          [...viewport.querySelectorAll('.slide:not(.title-slide)')].forEach(function (s) { s.remove(); });
+
+          groups.forEach(function ({ heading, htmls }) {
+            const slide = document.createElement('div');
+            slide.className = 'slide';
+            slide.dataset.heading = heading;
+
+            const body = document.createElement('div');
+            body.className = 'slide-body';
+            body.innerHTML = htmls.join('');
+            slide.appendChild(body);
+            viewport.appendChild(slide);
+          });
+
+          if (splitEnabled) splitOverflow();
+        }
 
         // ── Navigation ───────────────────────────────────────────────
-        const slides = [...viewport.querySelectorAll('.slide')];
-        let idx = 0;
-        slides[0].classList.add('active');
+        var slides = [];
+        var idx = 0;
 
         function goTo(i) {
           const from = slides[idx];
@@ -225,7 +252,17 @@ const formattedDate = post.data.date.toLocaleDateString("en-US", {
           nextBtn.disabled = idx === slides.length - 1;
         }
 
-        goTo(0);
+        function initNav() {
+          slides = [...viewport.querySelectorAll('.slide')];
+          slides.forEach(function (s) { s.classList.remove('active'); });
+          idx = 0;
+          slides[0].classList.add('active');
+          goTo(0);
+        }
+
+        // Initial build
+        buildContentSlides();
+        initNav();
 
         prevBtn.addEventListener('click', () => goTo(idx - 1));
         nextBtn.addEventListener('click', () => goTo(idx + 1));
@@ -307,6 +344,23 @@ const formattedDate = post.data.date.toLocaleDateString("en-US", {
             if (m.attributeName === 'data-theme') { renderMermaid(); break; }
           }
         }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+        // ── Split toggle ──────────────────────────────────────────────
+        var splitBtn = document.getElementById('deck-split-toggle');
+        if (splitBtn) {
+          splitBtn.setAttribute('aria-pressed', splitEnabled ? 'true' : 'false');
+          splitBtn.dataset.active = splitEnabled ? 'true' : 'false';
+          splitBtn.addEventListener('click', function () {
+            splitEnabled = !splitEnabled;
+            localStorage.setItem('deck-split', splitEnabled ? 'true' : 'false');
+            splitBtn.setAttribute('aria-pressed', splitEnabled ? 'true' : 'false');
+            splitBtn.dataset.active = splitEnabled ? 'true' : 'false';
+            originals.clear();
+            buildContentSlides();
+            initNav();
+            renderMermaid();
+          });
+        }
 
         // ── Theme toggle ─────────────────────────────────────────────
         var themeBtn = document.getElementById('deck-theme-toggle');
@@ -692,4 +746,34 @@ const formattedDate = post.data.date.toLocaleDateString("en-US", {
   @keyframes slide-mermaid-spin { to { transform: rotate(360deg); } }
 
   .slide-body .mermaid svg { max-width: 100%; height: auto; }
+
+  /* ── Continuation badges ──────────────────── */
+  .slide-badge {
+    flex-shrink: 0;
+    font-family: var(--font-heading);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+    padding: 0.3rem clamp(2rem, 10vw, 8rem);
+    border-top: 1px dashed var(--color-border);
+    user-select: none;
+  }
+
+  .slide-badge--from {
+    border-top: none;
+    border-bottom: 1px dashed var(--color-border);
+    text-align: left;
+  }
+
+  .slide-badge--more {
+    text-align: right;
+  }
+
+  /* ── Split toggle button active state ─────── */
+  #deck-split-toggle[data-active="true"] {
+    background: var(--color-border);
+    border-color: var(--color-text-tertiary);
+  }
 </style>
