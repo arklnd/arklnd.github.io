@@ -159,35 +159,61 @@ const formattedDate = post.data.date.toLocaleDateString("en-US", {
             const body = slide.querySelector('.slide-body');
             if (!body || body.scrollHeight <= body.clientHeight) continue;
 
-            const heading = slide.dataset.heading || '';
+            const sectionHeading = slide.dataset.heading || '';
             const children = [...body.children];
             body.innerHTML = '';
 
             let currentSlide = slide;
             let currentBody = body;
 
-            for (const child of children) {
-              const hadChildren = currentBody.children.length > 0;
+            for (let i = 0; i < children.length; i++) {
+              const child = children[i];
+              const isHeading = child.tagName === 'H3' || child.tagName === 'H4';
+              const hadContent = currentBody.children.length > 0;
               currentBody.appendChild(child);
-              if (hadChildren && currentBody.scrollHeight > currentBody.clientHeight) {
-                currentBody.removeChild(child);
 
-                // Mark the slide that overflows as having a continuation
-                currentSlide.dataset.hasMore = 'true';
-
-                const contSlide = document.createElement('div');
-                contSlide.className = 'slide';
-                contSlide.dataset.heading = heading;
-                contSlide.dataset.continuation = 'true';
-                const contBody = document.createElement('div');
-                contBody.className = 'slide-body';
-                contSlide.appendChild(contBody);
-                currentSlide.after(contSlide);
-
-                currentSlide = contSlide;
-                currentBody = contBody;
-                currentBody.appendChild(child);
+              if (!hadContent || currentBody.scrollHeight <= currentBody.clientHeight) {
+                continue; // fits fine, nothing to do
               }
+
+              // Overflow detected. Find the best split point (a heading boundary).
+              currentBody.removeChild(child);
+
+              let toMove = [];
+              if (isHeading) {
+                // The overflowing child itself is a heading — split right before it.
+                // toMove stays empty; new slide will start with this child.
+              } else {
+                // Backtrack: find the last H3/H4 in currentBody (at index >= 1 so the
+                // current slide doesn't end up empty) and split before it.
+                const inBody = [...currentBody.children];
+                for (let j = inBody.length - 1; j >= 1; j--) {
+                  if (inBody[j].tagName === 'H3' || inBody[j].tagName === 'H4') {
+                    toMove = inBody.slice(j);
+                    toMove.forEach(n => currentBody.removeChild(n));
+                    break;
+                  }
+                }
+                // If no heading found to backtrack to, toMove stays empty and we
+                // split at the overflow element (fallback, avoids orphaned heading).
+              }
+
+              // Mark current slide and create continuation
+              currentSlide.dataset.hasMore = 'true';
+              const contSlide = document.createElement('div');
+              contSlide.className = 'slide';
+              contSlide.dataset.heading = sectionHeading;
+              contSlide.dataset.continuation = 'true';
+              const contBody = document.createElement('div');
+              contBody.className = 'slide-body';
+              contSlide.appendChild(contBody);
+              currentSlide.after(contSlide);
+              currentSlide = contSlide;
+              currentBody = contBody;
+
+              // Move backtracked elements (heading + its siblings) then the overflow child
+              toMove.forEach(n => currentBody.appendChild(n));
+              currentBody.appendChild(child);
             }
           }
 
