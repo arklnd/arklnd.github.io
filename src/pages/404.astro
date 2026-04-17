@@ -1,0 +1,40 @@
+---
+import Layout from "../components/Layout.astro";
+import Heading from "../components/Heading.astro";
+---
+
+<Layout title="404 — Page Not Found" description="The page you're looking for doesn't exist.">
+  <section class="not-found">
+    <Heading as="h1">Error 404</Heading>
+    <b>Page (<code>{Astro.url.pathname}</code>) Not Found</b>
+    <p>The page you're looking for doesn't exist.</p>
+    <a href="/">← Back to home</a>
+  </section>
+</Layout>
+
+<style>
+  .not-found {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    text-align: center;
+    gap: 1rem;
+  }
+
+  .not-found p {
+    font-size: 1.2rem;
+    color: var(--text-muted, #888);
+  }
+
+  .not-found a {
+    color: var(--accent, #3d6aa8);
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .not-found a:hover {
+    text-decoration: underline;
+  }
+</style>
