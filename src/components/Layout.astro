@@ -128,7 +128,7 @@ const googleVerification = import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION;
 
         // Store original text on first run
         diagrams.forEach((el) => {
-          if (!originals.has(el)) originals.set(el, el.textContent || "");
+          if (!originals.has(el)) originals.set(el, el.innerHTML || "");
         });
 
         // Show loading state immediately
@@ -156,6 +156,9 @@ const googleVerification = import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION;
           startOnLoad: false,
           theme: isDark ? "dark" : "base",
           fontFamily: "var(--font-body)",
+          flowchart: {
+            wrappingWidth: 300,
+          },
           themeVariables: isDark
             ? {}
             : {
