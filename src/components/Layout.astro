@@ -97,6 +97,9 @@ const googleVerification = import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION;
     />
   </head>
   <body>
+    <!-- Skip to content link for keyboard users -->
+    <a href="#main-content" class="skip-link">Skip to content</a>
+
     <!-- Full-page theme transition loader -->
     <div id="theme-loader" class="theme-loader" aria-hidden="true">
       <div class="theme-loader-spinner"></div>
@@ -104,7 +107,7 @@ const googleVerification = import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION;
 
     <div class="page">
       <Nav />
-      <main>
+      <main id="main-content">
         <slot />
       </main>
       <Footer />
@@ -138,6 +141,7 @@ const googleVerification = import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION;
         await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
 
         if (!mermaidModule) {
+          // @ts-ignore — runtime CDN import, no type declarations available
           mermaidModule = (await import("https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs")).default;
         }
         const mermaid = mermaidModule;
@@ -208,6 +212,15 @@ const googleVerification = import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION;
               },
         });
         await mermaid.run({ nodes: diagrams });
+
+        // Make rendered SVGs accessible
+        diagrams.forEach((el) => {
+          const svg = el.querySelector("svg");
+          if (svg) {
+            svg.setAttribute("role", "img");
+            svg.setAttribute("aria-label", "Diagram");
+          }
+        });
 
         // Remove loading state
         diagrams.forEach((el) => el.classList.remove("mermaid-loading"));

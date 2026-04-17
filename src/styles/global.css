@@ -78,6 +78,57 @@ img {
   background-color: #7fd4e1;
 }
 
+/* ── Focus styles (WCAG 2.4.7) ─────────────── */
+:focus-visible {
+  outline: 2px solid var(--color-link);
+  outline-offset: 2px;
+}
+
+/* ── Skip-to-content link ──────────────────── */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: var(--space-md);
+  z-index: 10000;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--color-bg);
+  color: var(--color-link);
+  font-family: var(--font-heading);
+  font-size: 0.875rem;
+  text-decoration: none;
+  border: 2px solid var(--color-link);
+  border-radius: 4px;
+}
+
+.skip-link:focus {
+  top: var(--space-sm);
+}
+
+/* ── Screen-reader only utility ────────────── */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── Reduced motion ────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 /* ── Scrollbar ─────────────────────────────── */
 * {
   scrollbar-width: thin;

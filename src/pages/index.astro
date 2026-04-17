@@ -21,7 +21,7 @@ const posts = (await getCollection("posts")).sort(
       <Heading as="h1">Arijit's Blog</Heading>
       <p class="home-tagline">A tech blog about systems, tools, and ideas.</p>
     </header>
-    <ul class="post-grid">
+    <ul class="post-grid" role="list">
       {
         posts.map((post) => {
           const formattedDate = post.data.date.toLocaleDateString("en-US", {
@@ -31,15 +31,15 @@ const posts = (await getCollection("posts")).sort(
           });
           return (
             <li class="post-card">
-              <a href={`/posts/${post.id}`}>
+              <a href={`/posts/${post.id}`} aria-label={post.data.title}>
                 <div class="card-body">
                   <span class="post-title" transition:name={`post-title-${post.id}`}>{post.data.title}</span>
                   <span class="post-description">{post.data.description}</span>
                 </div>
-                <footer class="card-footer">
+                <div class="card-footer">
                   <time datetime={post.data.date.toISOString()} transition:name={`post-date-${post.id}`}>{formattedDate}</time>
                   <span class="card-arrow" aria-hidden="true">→</span>
-                </footer>
+                </div>
               </a>
             </li>
           );

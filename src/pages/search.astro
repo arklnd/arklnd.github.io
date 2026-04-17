@@ -6,22 +6,23 @@ import Heading from "../components/Heading.astro";
 <Layout title="Search — Arijit's Blog" description="Search posts on Arijit's Blog.">
   <section class="search-page">
     <Heading as="h1">Search</Heading>
-    <div class="search-input-wrap">
+    <div class="search-input-wrap" role="search">
       <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <circle cx="11" cy="11" r="8"/>
         <line x1="21" y1="21" x2="16.65" y2="16.65"/>
       </svg>
+      <label for="search-input" class="sr-only">Search posts</label>
       <input
-        type="text"
+        type="search"
         id="search-input"
         placeholder="Search posts..."
         autocomplete="off"
         autofocus
       />
     </div>
-    <p id="result-count" class="result-count" hidden></p>
-    <ul id="search-results" class="search-results"></ul>
-    <p id="search-empty" class="search-empty" hidden>
+    <p id="result-count" class="result-count" aria-live="polite" aria-atomic="true" hidden></p>
+    <ul id="search-results" class="search-results" aria-label="Search results"></ul>
+    <p id="search-empty" class="search-empty" aria-live="polite" hidden>
       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
         <line x1="8" y1="11" x2="14" y2="11"/>
@@ -197,6 +198,11 @@ import Heading from "../components/Heading.astro";
     color: var(--color-text);
     outline: none;
     transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  #search-input:focus-visible {
+    outline: 2px solid var(--color-link);
+    outline-offset: -1px;
   }
 
   #search-input:focus {
