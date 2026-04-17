@@ -5,6 +5,9 @@ import { remarkMermaid } from "./src/utils/remarkMermaid";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import AstroPWA from "@vite-pwa/astro";
+import { execSync } from "child_process";
+
+const commitHash = execSync("git rev-parse --short HEAD").toString().trim();
 
 export default defineConfig({
   site: "https://arklnd.github.io",
@@ -48,14 +51,27 @@ export default defineConfig({
         ],
       },
       workbox: {
-        navigateFallback: "/",
-        globPatterns: ["**/*.{css,js,html,svg,png,ico,txt,xml}"],
+        skipWaiting: true,
+        clientsClaim: true,
+        cleanupOutdatedCaches: true,
+        globPatterns: ["**/*.{css,js,svg,png,ico,txt,xml}"],
         runtimeCaching: [
+          {
+            urlPattern: ({ request }) => request.mode === "navigate",
+            handler: "NetworkFirst",
+            options: {
+              cacheName: `pages-${commitHash}`,
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 60 * 60 * 24 * 30,
+              },
+            },
+          },
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
             handler: "CacheFirst",
             options: {
-              cacheName: "google-fonts-cache",
+              cacheName: `google-fonts-cache-${commitHash}`,
               expiration: {
                 maxEntries: 10,
                 maxAgeSeconds: 60 * 60 * 24 * 365,
@@ -67,7 +83,7 @@ export default defineConfig({
             urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
             handler: "CacheFirst",
             options: {
-              cacheName: "gstatic-fonts-cache",
+              cacheName: `gstatic-fonts-cache-${commitHash}`,
               expiration: {
                 maxEntries: 10,
                 maxAgeSeconds: 60 * 60 * 24 * 365,
@@ -79,7 +95,7 @@ export default defineConfig({
             urlPattern: /^https:\/\/cdn\.jsdelivr\.net\/.*/i,
             handler: "CacheFirst",
             options: {
-              cacheName: "jsdelivr-cache",
+              cacheName: `jsdelivr-cache-${commitHash}`,
               expiration: {
                 maxEntries: 10,
                 maxAgeSeconds: 60 * 60 * 24 * 30,
