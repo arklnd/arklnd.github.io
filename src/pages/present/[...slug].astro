@@ -399,34 +399,48 @@ const formattedDate = post.data.date.toLocaleDateString("en-US", {
 
         // ── Anchor link navigation ───────────────────────────────────
         function findSlideByAnchor(hash) {
-          if (!hash) return -1;
+          if (!hash) return { index: -1, el: null };
           var anchor = hash.replace(/^#/, '');
           for (var i = 0; i < slides.length; i++) {
             // Match slide's own anchor (from H2 id)
-            if (slides[i].dataset.anchor === anchor) return i;
+            if (slides[i].dataset.anchor === anchor) return { index: i, el: null };
             // Match any element with that id inside the slide
             var el = slides[i].querySelector('#' + CSS.escape(anchor));
-            if (el) return i;
+            if (el) return { index: i, el: el };
           }
-          return -1;
+          return { index: -1, el: null };
+        }
+
+        function goToAnchor(hash) {
+          var result = findSlideByAnchor(hash);
+          if (result.index < 0) return;
+          goTo(result.index);
+          // Scroll to the exact element inside the slide body
+          if (result.el) {
+            requestAnimationFrame(function () {
+              result.el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+          }
         }
 
         // Intercept clicks on anchor links within slides
         viewport.addEventListener('click', function (e) {
           var link = e.target.closest('a[href^="#"]');
           if (!link) return;
-          var target = findSlideByAnchor(link.getAttribute('href'));
-          if (target >= 0) {
+          var result = findSlideByAnchor(link.getAttribute('href'));
+          if (result.index >= 0) {
             e.preventDefault();
-            goTo(target);
+            goTo(result.index);
+            if (result.el) {
+              requestAnimationFrame(function () {
+                result.el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              });
+            }
           }
         });
 
         // Jump to slide matching URL hash on load
-        if (window.location.hash) {
-          var hashTarget = findSlideByAnchor(window.location.hash);
-          if (hashTarget >= 0) goTo(hashTarget);
-        }
+        if (window.location.hash) goToAnchor(window.location.hash);
 
         document.addEventListener('keydown', (e) => {
           const tag = (document.activeElement && document.activeElement.tagName) || '';
@@ -508,22 +522,14 @@ const formattedDate = post.data.date.toLocaleDateString("en-US", {
 
         renderMermaid().then(function () {
           if (!splitEnabled) {
-            // Re-check hash after mermaid renders (slides unchanged but IDs may now exist)
-            if (window.location.hash) {
-              var ht = findSlideByAnchor(window.location.hash);
-              if (ht >= 0) goTo(ht);
-            }
+            if (window.location.hash) goToAnchor(window.location.hash);
             return;
           }
           requestAnimationFrame(function () {
             requestAnimationFrame(function () {
               splitOverflow();
               initNav();
-              // Jump to hash target after slides are rebuilt
-              if (window.location.hash) {
-                var ht = findSlideByAnchor(window.location.hash);
-                if (ht >= 0) goTo(ht);
-              }
+              if (window.location.hash) goToAnchor(window.location.hash);
             });
           });
         });
