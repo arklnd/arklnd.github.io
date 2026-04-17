@@ -20,13 +20,17 @@ import Prose from "../components/Prose.astro";
   <section class="about-container">
     <Heading as="h1">About Me</Heading>
 
+    <img src="/images/arijit.kundu.jpg" alt="Arijit Kundu" class="profile-photo" width="180" height="180" />
+
     <Prose>
 
       <div class="experience-section">
         <!-- <Heading as="h2">Experience</Heading> -->
         <div class="experience-item">
-          <p>Usually I create stuff with .NET and Angular. I would not say I am an expert, there are more experts in .NET and Angular out there. These are the technologies I work with daily from the start of my professional career. That's why these technologies became my default choice gradually. There are few other technologies I dabble with occasionally, sometimes it's Python, C or C++, when it suits the topic I am engage with.</p>
-          <p>Being empty-handed is very frustrating for me, it's better to do something than nothing. That's why after finishing my study, I took a job at corporate. But the thing is, I am very lazy as well, I prefer to sit on my chair or lie down on my couch, and try to reduce the burden put on my head by corporates. And obviously for that corporate pays me well.</p>
+          <p>I am Arijit Kundu. Being empty-handed is very frustrating for me, it's better to do something than nothing. During my high school years, I discovered that I am loving creating software in C & C++, and websites in PHP. I did few freelancing web developement in my locality during my school and college days. That's why after finishing my study, I took a job in the software industry. But the thing is, I am very lazy as well, That's why, I prefer to sit on my chair or lie down on my couch, and try to reduce the burden put on my head by the corporate. And obviously for that corporate pays me well.</p>
+          <p>
+            Nowadays I usually create stuffs with .NET and Angular. I would not say I am an expert of these, there are more experts in .NET and Angular out there. These are the technologies I am working with daily from the beginning of my professional career. That's why these technologies gradually became my default choice and i gained significant experience in them. There are few other technologies I dabble with occasionally, sometimes it's Python, C or C++, when it suits the topic I am engage with.
+          </p>
           <p>
             At Hyland Software, I am involved in developing and maintaining enterprise software solutions using C# .NET and Angular. 
             Collaborating with cross-functional teams to deliver high-quality applications that serve 
@@ -58,6 +62,12 @@ import Prose from "../components/Prose.astro";
 </Layout>
 
 <style>
+  .profile-photo {
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+    margin: 0 auto 1.5rem;
+  }
   .experience-item h3 {
     margin-bottom: 0.25rem;
   }
