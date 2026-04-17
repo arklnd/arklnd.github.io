@@ -27,6 +27,8 @@ date: 2026-04-14T11:30:00
     4. [Where is a patch release actually deployed from?](#4-where-is-a-patch-release-actually-deployed-from)
     5. [If a release branch passes QA with zero fixes, do we still merge it into `develop` and `main`?](#5-if-a-release-branch-passes-qa-with-zero-fixes-do-we-still-merge-it-into-develop-and-main)
     6. [What is the difference between `release/vX.X` and `hotfix/vX.X.X` (patch) branches?](#6-what-is-the-difference-between-releasevxx-and-hotfixvxxx-patch-branches)
+    7. [Why maintain both `main` and `develop` if they contain almost the same code?](#7-why-maintain-both-main-and-develop-if-they-contain-almost-the-same-code)
+    8. [When to do a Major, Minor, or Patch release?](#8-when-to-do-a-major-minor-or-patch-release)
 
 ---
 
@@ -1027,3 +1029,127 @@ gitGraph
 - A **hotfix/patch branch** is an **unplanned emergency response**. Something broke in production. You branch from `main` (the exact code running in production), fix only the broken thing, and ship it immediately. There is no feature freeze because there were never any features — just a targeted repair.
 
 > **Think of it this way:** A release branch is a *planned departure* — you pack your bags, go through security, and board the plane. A hotfix branch is an *emergency landing* — something went wrong mid-flight, and you fix it as fast as possible with minimal disruption.
+
+---
+
+### 7. Why maintain both `main` and `develop` if they contain almost the same code?
+
+It is true that right after a release, `main` and `develop` are nearly identical — the release branch was just merged into both. But that similarity is **temporary**. The moment the next sprint begins, the two branches diverge sharply and serve completely different purposes.
+
+#### The Two Branches Have Different Jobs
+
+| Aspect | `main` | `develop` |
+|---|---|---|
+| **Represents** | What is **currently running in production** | What **will ship in the next release** |
+| **Stability** | Always stable and deployable | May contain half-finished or unstable work |
+| **Who deploys from it?** | CI/CD pipelines deploy to production from `main` | CI/CD pipelines deploy to staging/dev environments from `develop` |
+| **Who commits to it?** | Nobody directly — only receives merges from `release` and `hotfix` branches | Receives merges from `feature` branches |
+| **Hotfix source?** | Yes — hotfixes branch from `main` because it mirrors production | No — never hotfix from `develop` |
+
+#### When They Are in Sync vs. When They Diverge
+
+```mermaid
+gitGraph
+   commit id: "v2.0" tag: "v2.0"
+   branch develop
+   commit id: "feat/A"
+   commit id: "feat/B"
+   commit id: "feat/C"
+   checkout main
+   commit id: "hotfix" tag: "v2.0.1"
+```
+
+Immediately after the `v2.0` release, both branches point to the same commit. But within days:
+
+- `develop` has moved ahead with three new feature merges (`feat/A`, `feat/B`, `feat/C`) that are not yet tested or approved for production.
+- `main` received a hotfix (`v2.0.1`) that `develop` may not have yet (until the hotfix is backported).
+
+The branches are already out of sync. If you had only one branch, you would face an impossible choice: either deploy untested features to production, or block all new development until the hotfix is done.
+
+#### What Would Go Wrong With a Single Branch?
+
+1. **Cannot hotfix safely.** If `main` is also your development branch, it contains work-in-progress code. Deploying a hotfix would ship half-finished features alongside the fix.
+2. **Cannot freeze for QA.** A release branch is cut from `develop` and frozen. If `develop` and `main` were the same branch, freezing it would block all developers from committing — no new feature work could happen during the entire QA cycle.
+3. **No clear "what is in production?" answer.** With two branches, you can always `git diff main develop` to see exactly what has been developed but not yet released. With one branch, you lose that visibility entirely.
+
+#### The Analogy
+
+Think of `main` as the **published edition** of a book — it is the version readers (users) have in their hands. `develop` is the **author's working manuscript** — it contains new chapters, edits, and experiments that are not yet ready for print. Right after publishing, the manuscript and the book are identical. But the author immediately starts writing the next edition, and the two diverge within hours.
+
+You would never hand a reader the working manuscript and call it "the book." That is why you keep both.
+
+> **Key point:** `main` and `develop` look similar only at the moment of a release. Their purpose is fundamentally different — `main` is a deployment source, `develop` is an integration target. Merging them into one branch would force you to choose between stability and velocity, and you would lose both.
+
+---
+
+### 8. When to do a Major, Minor, or Patch release?
+
+The version number is not arbitrary — it communicates the **nature of the change** to every consumer of your software. The industry standard is **Semantic Versioning (SemVer)**, expressed as `MAJOR.MINOR.PATCH` (e.g., `v2.4.1`).
+
+#### The Three Version Bumps
+
+| Version Part | Bumped When | Signal to Consumers | Example |
+|---|---|---|---|
+| **MAJOR** (`X.0.0`) | You introduce **breaking changes** — existing APIs, behaviors, or contracts change in ways that are **not backward-compatible** | "You will need to update your code to work with this version" | `v1.0.0` → `v2.0.0` |
+| **MINOR** (`0.X.0`) | You add **new features** that are **backward-compatible** — existing functionality is untouched | "New capabilities are available, but your existing code still works" | `v2.0.0` → `v2.1.0` |
+| **PATCH** (`0.0.X`) | You fix **bugs** without adding features or breaking anything | "Something was broken, now it's fixed — safe to update immediately" | `v2.1.0` → `v2.1.1` |
+
+#### How This Maps to GitFlow Branches
+
+| Release Type | GitFlow Branch | Source | Typical Trigger |
+|---|---|---|---|
+| **Major Release** | `release/v3.0` | Cut from `develop` | Breaking API changes, major rewrites, platform upgrades |
+| **Minor Release** | `release/v2.1` | Cut from `develop` | New features accumulated over a sprint/cycle |
+| **Patch Release** | `hotfix/v2.1.1` | Cut from `main` (or `support/vX.x`) | Critical bug found in production |
+
+#### Real-World Examples
+
+**Major Release (`v1.0.0` → `v2.0.0`):**
+- Migrating from REST to GraphQL APIs — all client integrations must change.
+- Dropping support for an old authentication method (e.g., removing Basic Auth, requiring OAuth 2.0).
+- Upgrading the underlying framework in a way that changes public interfaces (e.g., .NET 6 → .NET 8 with breaking serialization changes).
+- Restructuring the database schema in a non-backward-compatible way.
+
+**Minor Release (`v2.0.0` → `v2.1.0`):**
+- Adding a new "Export to PDF" feature to a dashboard.
+- Introducing a new API endpoint (`/api/v2/reports`) while keeping all existing endpoints intact.
+- Adding dark mode support to the UI.
+- Performance improvements that do not change any public behavior.
+
+**Patch Release (`v2.1.0` → `v2.1.1`):**
+- Fixing a null reference exception that crashes the checkout page.
+- Correcting a calculation error in the tax module.
+- Patching a security vulnerability (e.g., SQL injection in a search endpoint).
+- Fixing a CSS bug where a button is invisible on mobile devices.
+
+#### Decision Flowchart
+
+```mermaid
+flowchart TD
+    A["What changed?"] --> B{"Does it break\nexisting behavior\nor APIs?"}
+    B -- Yes --> C["MAJOR release\n(vX.0.0)"]
+    B -- No --> D{"Does it add\nnew functionality?"}
+    D -- Yes --> E["MINOR release\n(v0.X.0)"]
+    D -- No --> F{"Is it a bug fix\nor security patch?"}
+    F -- Yes --> G["PATCH release\n(v0.0.X)"]
+    F -- No --> H["No version bump needed\n(docs, CI, refactors)"]
+```
+
+#### Common Mistakes
+
+- **Bumping MAJOR for every release.** If nothing is breaking, it should be MINOR. Overusing MAJOR versions erodes consumer trust — teams stop upgrading because every version "might break something."
+- **Shipping new features in a PATCH.** A patch should be safe to apply blindly. If it contains new behavior, consumers who auto-update patches may get unexpected changes.
+- **Forgetting to bump at all.** Deploying changes without updating the version makes it impossible to track which version a client is running or to reproduce bugs.
+
+#### The Pre-Release Convention
+
+During the QA hardening phase on a release branch, you can use **pre-release identifiers** to tag intermediate builds:
+
+| Tag | Meaning |
+|---|---|
+| `v2.1.0-alpha.1` | Early build, still under active development on the release branch |
+| `v2.1.0-beta.1` | Feature-complete, undergoing QA testing |
+| `v2.1.0-rc.1` | Release Candidate — believed to be final, pending last sign-off |
+| `v2.1.0` | Stable, production-ready release |
+
+> **Key point:** The version number is a **contract with your consumers**. MAJOR means "brace for changes," MINOR means "new goodies, no risk," and PATCH means "safe to update right now." If you follow this discipline, your users can make informed upgrade decisions without reading every changelog.
