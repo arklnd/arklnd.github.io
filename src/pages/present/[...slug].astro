@@ -164,12 +164,12 @@ const formattedDate = post.data.date.toLocaleDateString("en-US", {
         // ── Collect groups as HTML strings (enables rebuild on toggle) ──
         // Split content at every <h2>; skip bare <hr> separators
         const groups = [];
-        let cur = { heading: '', htmls: [] };
+        let cur = { heading: '', id: '', htmls: [] };
 
         for (const child of [...source.children]) {
           if (child.tagName === 'H2') {
             if (cur.heading || cur.htmls.length) groups.push(cur);
-            cur = { heading: child.textContent.trim(), htmls: [] };
+            cur = { heading: child.textContent.trim(), id: child.id || '', htmls: [] };
           } else if (child.tagName !== 'HR') {
             cur.htmls.push(child.outerHTML);
           }
@@ -300,10 +300,11 @@ const formattedDate = post.data.date.toLocaleDateString("en-US", {
         function buildContentSlides() {
           [...viewport.querySelectorAll('.slide:not(.title-slide)')].forEach(function (s) { s.remove(); });
 
-          groups.forEach(function ({ heading, htmls }) {
+          groups.forEach(function ({ heading, id, htmls }) {
             const slide = document.createElement('div');
             slide.className = 'slide';
             slide.dataset.heading = heading;
+            if (id) slide.dataset.anchor = id;
 
             const body = document.createElement('div');
             body.className = 'slide-body';
@@ -396,6 +397,37 @@ const formattedDate = post.data.date.toLocaleDateString("en-US", {
         prevBtn.addEventListener('click', () => goTo(idx - 1));
         nextBtn.addEventListener('click', () => goTo(idx + 1));
 
+        // ── Anchor link navigation ───────────────────────────────────
+        function findSlideByAnchor(hash) {
+          if (!hash) return -1;
+          var anchor = hash.replace(/^#/, '');
+          for (var i = 0; i < slides.length; i++) {
+            // Match slide's own anchor (from H2 id)
+            if (slides[i].dataset.anchor === anchor) return i;
+            // Match any element with that id inside the slide
+            var el = slides[i].querySelector('#' + CSS.escape(anchor));
+            if (el) return i;
+          }
+          return -1;
+        }
+
+        // Intercept clicks on anchor links within slides
+        viewport.addEventListener('click', function (e) {
+          var link = e.target.closest('a[href^="#"]');
+          if (!link) return;
+          var target = findSlideByAnchor(link.getAttribute('href'));
+          if (target >= 0) {
+            e.preventDefault();
+            goTo(target);
+          }
+        });
+
+        // Jump to slide matching URL hash on load
+        if (window.location.hash) {
+          var hashTarget = findSlideByAnchor(window.location.hash);
+          if (hashTarget >= 0) goTo(hashTarget);
+        }
+
         document.addEventListener('keydown', (e) => {
           const tag = (document.activeElement && document.activeElement.tagName) || '';
           if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
@@ -475,11 +507,23 @@ const formattedDate = post.data.date.toLocaleDateString("en-US", {
         }
 
         renderMermaid().then(function () {
-          if (!splitEnabled) return;
+          if (!splitEnabled) {
+            // Re-check hash after mermaid renders (slides unchanged but IDs may now exist)
+            if (window.location.hash) {
+              var ht = findSlideByAnchor(window.location.hash);
+              if (ht >= 0) goTo(ht);
+            }
+            return;
+          }
           requestAnimationFrame(function () {
             requestAnimationFrame(function () {
               splitOverflow();
               initNav();
+              // Jump to hash target after slides are rebuilt
+              if (window.location.hash) {
+                var ht = findSlideByAnchor(window.location.hash);
+                if (ht >= 0) goTo(ht);
+              }
             });
           });
         });
