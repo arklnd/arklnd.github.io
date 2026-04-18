@@ -682,7 +682,7 @@
                 anchor?.setAttribute('data-tip', 'Copy link');
                 anchor?.setAttribute('aria-label', 'Copy link to this section');
                 liveRegion!.textContent = '';
-                if (!heading.matches(':hover') && !anchor?.matches(':focus')) maybeRemove();
+                if (!heading.matches(':hover')) maybeRemove();
               }, 2000);
             });
             history.pushState(null, '', `#${id}`);
@@ -702,7 +702,6 @@
 
       function maybeRemove() {
         if (anchor?.classList.contains('copied')) return;
-        if (anchor?.matches(':focus')) return;
         removeTimer = window.setTimeout(() => {
           anchor?.remove();
           removeTimer = null;
