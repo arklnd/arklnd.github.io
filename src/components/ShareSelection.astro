@@ -1,0 +1,226 @@
+<!-- Floating popup to share selected text with AI tools -->
+<div id="share-selection-popup" class="share-selection-popup" role="toolbar" aria-label="Share selected text with AI">
+  <span class="share-label" aria-hidden="true">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M12 2v4m0 12v4M2 12h4m12 0h4"/>
+      <circle cx="12" cy="12" r="3"/>
+      <path d="M5.6 5.6l2.8 2.8m7.2 7.2l2.8 2.8M18.4 5.6l-2.8 2.8M8.4 15.6l-2.8 2.8"/>
+    </svg>
+    Ask AI
+  </span>
+  <div class="share-separator" role="separator" aria-orientation="vertical"></div>
+  <a id="share-chatgpt" class="share-btn" target="_blank" rel="noopener noreferrer" title="Ask ChatGPT about selected text" aria-label="Ask ChatGPT about selected text" role="link">
+    ChatGPT
+  </a>
+  <div class="share-separator" role="separator" aria-orientation="vertical"></div>
+  <a id="share-gemini" class="share-btn" target="_blank" rel="noopener noreferrer" title="Ask Gemini about selected text" aria-label="Ask Gemini about selected text" role="link">
+    Gemini
+  </a>
+  <div class="share-separator" role="separator" aria-orientation="vertical"></div>
+  <a id="share-perplexity" class="share-btn" target="_blank" rel="noopener noreferrer" title="Ask Perplexity about selected text" aria-label="Ask Perplexity about selected text" role="link">
+    Perplexity
+  </a>
+  <div class="share-separator" role="separator" aria-orientation="vertical"></div>
+  <a id="share-deepseek" class="share-btn" target="_blank" rel="noopener noreferrer" title="Ask DeepSeek about selected text" aria-label="Ask DeepSeek about selected text" role="link">
+    DeepSeek
+  </a>
+  <div class="share-separator" role="separator" aria-orientation="vertical"></div>
+  <a id="share-grok" class="share-btn" target="_blank" rel="noopener noreferrer" title="Ask Grok about selected text" aria-label="Ask Grok about selected text" role="link">
+    Grok
+  </a>
+</div>
+
+<script>
+  function initShareSelection() {
+    const popup = document.getElementById('share-selection-popup') as HTMLDivElement | null;
+    const prose = document.querySelector('.prose') as HTMLElement | null;
+    if (!popup || !prose) return;
+
+    const chatgptLink = document.getElementById('share-chatgpt') as HTMLAnchorElement;
+    const geminiLink = document.getElementById('share-gemini') as HTMLAnchorElement;
+    const perplexityLink = document.getElementById('share-perplexity') as HTMLAnchorElement;
+    const deepseekLink = document.getElementById('share-deepseek') as HTMLAnchorElement;
+    const grokLink = document.getElementById('share-grok') as HTMLAnchorElement;
+
+    const _popup = popup;
+    const _prose = prose;
+
+    let hideTimeout: ReturnType<typeof setTimeout> | null = null;
+
+    function showPopup(x: number, y: number, text: string) {
+      if (hideTimeout) { clearTimeout(hideTimeout); hideTimeout = null; }
+
+      const encoded = encodeURIComponent(text);
+      chatgptLink.href = `https://chatgpt.com/?q=${encoded}`;
+      geminiLink.href = `https://gemini.google.com/app?q=${encoded}`;
+      perplexityLink.href = `https://www.perplexity.ai/search?q=${encoded}`;
+      deepseekLink.href = `https://chat.deepseek.com/?q=${encoded}`;
+      grokLink.href = `https://grok.com/?q=${encoded}`;
+
+      _popup.style.display = 'flex';
+
+      // Position after display so we can measure
+      requestAnimationFrame(() => {
+        const rect = _popup.getBoundingClientRect();
+        let left = x - rect.width / 2;
+        let top = y + 10;
+
+        // Keep within viewport
+        const margin = 8;
+        if (left < margin) left = margin;
+        if (left + rect.width > window.innerWidth - margin) left = window.innerWidth - margin - rect.width;
+        if (top + rect.height > window.scrollY + window.innerHeight - margin) top = y - rect.height - 10; // show above if no room below
+
+        _popup.style.left = `${left}px`;
+        _popup.style.top = `${top}px`;
+        _popup.classList.add('visible');
+      });
+    }
+
+    function hidePopup() {
+      _popup.classList.remove('visible');
+      hideTimeout = setTimeout(() => {
+        _popup.style.display = 'none';
+      }, 150);
+    }
+
+    function handleSelectionChange() {
+      const sel = window.getSelection();
+      if (!sel || sel.isCollapsed || !sel.rangeCount) {
+        hidePopup();
+        return;
+      }
+
+      const text = sel.toString().trim();
+      if (text.length < 3) {
+        hidePopup();
+        return;
+      }
+
+      // Only show if selection is within the prose area
+      const range = sel.getRangeAt(0);
+      if (!_prose.contains(range.commonAncestorContainer)) {
+        hidePopup();
+        return;
+      }
+
+      const rangeRect = range.getBoundingClientRect();
+      const x = rangeRect.left + rangeRect.width / 2 + window.scrollX;
+      const y = rangeRect.bottom + window.scrollY;
+
+      showPopup(x, y, text);
+    }
+
+    // Debounce selection changes
+    let debounce: ReturnType<typeof setTimeout> | null = null;
+    document.addEventListener('selectionchange', () => {
+      if (debounce) clearTimeout(debounce);
+      debounce = setTimeout(handleSelectionChange, 300);
+    });
+
+    // Keep popup visible when hovering over it
+    _popup.addEventListener('mouseenter', () => {
+      if (hideTimeout) { clearTimeout(hideTimeout); hideTimeout = null; }
+    });
+
+    // Hide on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') hidePopup();
+    });
+
+    // Hide on scroll or resize
+    window.addEventListener('scroll', hidePopup, { passive: true });
+    window.addEventListener('resize', hidePopup, { passive: true });
+  }
+
+  // Run on initial load
+  initShareSelection();
+
+  // Re-run after Astro client-side navigations
+  document.addEventListener('astro:after-swap', initShareSelection);
+</script>
+
+<style>
+  .share-selection-popup {
+    display: none;
+    position: absolute;
+    z-index: 9000;
+    align-items: center;
+    gap: 0;
+    padding: 4px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    opacity: 0;
+    transform: translateY(4px) scale(0.96);
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    pointer-events: none;
+  }
+
+  .share-selection-popup.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+  }
+
+  .share-label {
+    font-family: var(--font-heading);
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--color-text-tertiary);
+    padding: 4px 8px;
+    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .share-separator {
+    width: 1px;
+    align-self: stretch;
+    margin: 4px 0;
+    background: var(--color-border);
+  }
+
+  .share-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    font-family: var(--font-heading);
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    border-radius: 6px;
+    white-space: nowrap;
+    transition: background 0.12s ease, color 0.12s ease;
+  }
+
+  .share-btn:hover {
+    background: var(--color-border);
+    color: var(--color-text);
+  }
+
+  .share-btn:focus-visible {
+    outline: 2px solid var(--color-link);
+    outline-offset: -2px;
+  }
+
+  [data-theme="dark"] .share-selection-popup {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  }
+
+  @media (max-width: 480px) {
+    .share-selection-popup {
+      flex-direction: column;
+    }
+
+    .share-separator {
+      width: auto;
+      height: 1px;
+      align-self: stretch;
+      margin: 0 4px;
+    }
+  }
+</style>

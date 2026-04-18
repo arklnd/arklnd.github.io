@@ -1,6 +1,7 @@
 ---
 import Heading from "./Heading.astro";
 import Prose from "./Prose.astro";
+import ShareSelection from "./ShareSelection.astro";
 
 interface Props {
   title: string;
@@ -97,6 +98,8 @@ const formattedDate = date.toLocaleDateString("en-US", {
     }
   </script>
 </article>
+
+<ShareSelection />
 
 <div class="floating-buttons" role="toolbar" aria-label="Page tools">
   <a href="/" class="float-btn" aria-label="Back to home" title="Back to home">
