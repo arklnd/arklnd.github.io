@@ -537,8 +537,15 @@
   }
 
   .prose :global(.heading-anchor:hover::after),
+  .prose :global(.heading-anchor:focus::after),
   .prose :global(.heading-anchor.copied::after) {
     opacity: 1;
+  }
+
+  .prose :global(.heading-anchor:focus-visible) {
+    outline: 2px solid var(--color-link);
+    outline-offset: 2px;
+    border-radius: 2px;
   }
 
   /* ── Mermaid diagrams ──────────────────── */
@@ -626,12 +633,28 @@
     const prose = document.querySelector('.prose');
     if (!prose) return;
 
+    // Live region for screen reader copy feedback
+    let liveRegion = document.getElementById('heading-copy-live');
+    if (!liveRegion) {
+      liveRegion = document.createElement('div');
+      liveRegion.id = 'heading-copy-live';
+      liveRegion.setAttribute('role', 'status');
+      liveRegion.setAttribute('aria-live', 'polite');
+      liveRegion.className = 'sr-only';
+      document.body.appendChild(liveRegion);
+    }
+
     const headings = prose.querySelectorAll('h2[id], h3[id], h4[id], h5[id], h6[id]');
 
     headings.forEach((heading) => {
       const id = heading.id;
       let anchor: HTMLAnchorElement | null = null;
       let removeTimer: number | null = null;
+
+      // Make headings focusable for keyboard access
+      if (!heading.hasAttribute('tabindex')) {
+        heading.setAttribute('tabindex', '-1');
+      }
 
       function ensureAnchor() {
         if (removeTimer) { clearTimeout(removeTimer); removeTimer = null; }
@@ -641,6 +664,7 @@
           anchor = document.createElement('a');
           anchor.href = `#${id}`;
           anchor.className = 'heading-anchor';
+          anchor.setAttribute('role', 'button');
           anchor.setAttribute('aria-label', 'Copy link to this section');
           anchor.setAttribute('data-tip', 'Copy link');
           anchor.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg><span class="sr-only">Copy link</span>`;
@@ -651,13 +675,25 @@
             navigator.clipboard.writeText(url).then(() => {
               anchor!.setAttribute('data-tip', 'Copied!');
               anchor!.classList.add('copied');
+              anchor!.setAttribute('aria-label', 'Link copied');
+              liveRegion!.textContent = 'Link copied to clipboard';
               setTimeout(() => {
                 anchor?.classList.remove('copied');
                 anchor?.setAttribute('data-tip', 'Copy link');
-                if (!heading.matches(':hover')) maybeRemove();
+                anchor?.setAttribute('aria-label', 'Copy link to this section');
+                liveRegion!.textContent = '';
+                if (!heading.matches(':hover') && !anchor?.matches(':focus')) maybeRemove();
               }, 2000);
             });
             history.pushState(null, '', `#${id}`);
+          });
+
+          // Allow Enter/Space to trigger copy (role=button convention)
+          anchor.addEventListener('keydown', (e) => {
+            if (e.key === ' ') {
+              e.preventDefault();
+              anchor?.click();
+            }
           });
         }
 
@@ -666,6 +702,7 @@
 
       function maybeRemove() {
         if (anchor?.classList.contains('copied')) return;
+        if (anchor?.matches(':focus')) return;
         removeTimer = window.setTimeout(() => {
           anchor?.remove();
           removeTimer = null;
