@@ -497,19 +497,16 @@
     align-items: center;
     margin-left: 0.4em;
     color: var(--color-text-tertiary);
-    opacity: 0;
-    transition: opacity 0.15s ease, color 0.15s ease;
+    animation: heading-anchor-in 0.15s ease;
+    transition: color 0.15s ease;
     text-decoration: none !important;
     vertical-align: middle;
     position: relative;
   }
 
-  .prose :global(h2:hover .heading-anchor),
-  .prose :global(h3:hover .heading-anchor),
-  .prose :global(h4:hover .heading-anchor),
-  .prose :global(h5:hover .heading-anchor),
-  .prose :global(h6:hover .heading-anchor) {
-    opacity: 1;
+  @keyframes heading-anchor-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
   }
 
   .prose :global(.heading-anchor:hover) {
@@ -633,28 +630,52 @@
 
     headings.forEach((heading) => {
       const id = heading.id;
-      const anchor = document.createElement('a');
-      anchor.href = `#${id}`;
-      anchor.className = 'heading-anchor';
-      anchor.setAttribute('aria-label', 'Copy link to this section');
-      anchor.setAttribute('data-tip', 'Copy link');
-      anchor.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg><span class="sr-only">Copy link</span>`;
+      let anchor: HTMLAnchorElement | null = null;
+      let removeTimer: number | null = null;
 
-      anchor.addEventListener('click', (e) => {
-        e.preventDefault();
-        const url = `${window.location.origin}${window.location.pathname}#${id}`;
-        navigator.clipboard.writeText(url).then(() => {
-          anchor.setAttribute('data-tip', 'Copied!');
-          anchor.classList.add('copied');
-          setTimeout(() => {
-            anchor.classList.remove('copied');
-            anchor.setAttribute('data-tip', 'Copy link');
-          }, 2000);
-        });
-        history.pushState(null, '', `#${id}`);
-      });
+      function ensureAnchor() {
+        if (removeTimer) { clearTimeout(removeTimer); removeTimer = null; }
+        if (anchor && heading.contains(anchor)) return;
 
-      heading.appendChild(anchor);
+        if (!anchor) {
+          anchor = document.createElement('a');
+          anchor.href = `#${id}`;
+          anchor.className = 'heading-anchor';
+          anchor.setAttribute('aria-label', 'Copy link to this section');
+          anchor.setAttribute('data-tip', 'Copy link');
+          anchor.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg><span class="sr-only">Copy link</span>`;
+
+          anchor.addEventListener('click', (e) => {
+            e.preventDefault();
+            const url = `${window.location.origin}${window.location.pathname}#${id}`;
+            navigator.clipboard.writeText(url).then(() => {
+              anchor!.setAttribute('data-tip', 'Copied!');
+              anchor!.classList.add('copied');
+              setTimeout(() => {
+                anchor?.classList.remove('copied');
+                anchor?.setAttribute('data-tip', 'Copy link');
+                if (!heading.matches(':hover')) maybeRemove();
+              }, 2000);
+            });
+            history.pushState(null, '', `#${id}`);
+          });
+        }
+
+        heading.appendChild(anchor);
+      }
+
+      function maybeRemove() {
+        if (anchor?.classList.contains('copied')) return;
+        removeTimer = window.setTimeout(() => {
+          anchor?.remove();
+          removeTimer = null;
+        }, 150);
+      }
+
+      heading.addEventListener('mouseenter', ensureAnchor);
+      heading.addEventListener('mouseleave', maybeRemove);
+      heading.addEventListener('focusin', ensureAnchor);
+      heading.addEventListener('focusout', maybeRemove);
     });
 
     // ── Copy buttons for code blocks ──────
