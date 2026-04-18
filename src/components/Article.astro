@@ -539,7 +539,9 @@ const formattedDate = date.toLocaleDateString("en-US", {
           crumb.appendChild(arrow);
         }
 
-        const text = document.createTextNode(h.el.textContent?.trim() ?? "");
+        const clone = h.el.cloneNode(true) as HTMLElement;
+        clone.querySelectorAll("a, .sr-only").forEach((el) => el.remove());
+        const text = document.createTextNode(clone.textContent?.trim() ?? "");
         crumb.appendChild(text);
 
         crumb.addEventListener("click", () => {
