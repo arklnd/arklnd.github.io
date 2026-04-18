@@ -249,6 +249,20 @@
     border-radius: 0;
     font-size: 0.8125rem;
     word-break: normal;
+    counter-reset: line;
+  }
+
+  .prose :global(pre code > .line::before) {
+    counter-increment: line;
+    content: counter(line);
+    display: inline-block;
+    width: 2ch;
+    margin-right: 1.5ch;
+    text-align: right;
+    color: var(--color-text-tertiary);
+    opacity: 0.45;
+    user-select: none;
+    font-size: inherit;
   }
 
   /* ── Horizontal rule ───────────────────── */

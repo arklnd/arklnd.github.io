@@ -1010,6 +1010,20 @@ const formattedDate = post.data.date.toLocaleDateString("en-US", {
     font-family: var(--font-mono);
     font-size: 0.85rem;
     line-height: 1.6;
+    counter-reset: line;
+  }
+
+  .slide-body pre code > .line::before {
+    counter-increment: line;
+    content: counter(line);
+    display: inline-block;
+    width: 2ch;
+    margin-right: 1.5ch;
+    text-align: right;
+    color: var(--color-text-tertiary);
+    opacity: 0.45;
+    user-select: none;
+    font-size: inherit;
   }
 
   .slide-body blockquote {
