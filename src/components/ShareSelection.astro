@@ -128,7 +128,7 @@
     let debounce: ReturnType<typeof setTimeout> | null = null;
     document.addEventListener('selectionchange', () => {
       if (debounce) clearTimeout(debounce);
-      debounce = setTimeout(handleSelectionChange, 300);
+      debounce = setTimeout(handleSelectionChange, 600);
     });
 
     // Keep popup visible when hovering over it
