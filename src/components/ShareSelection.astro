@@ -13,7 +13,7 @@
     ChatGPT
   </a>
   <div class="share-separator" role="separator" aria-orientation="vertical"></div>
-  <a id="share-gemini" class="share-btn" target="_blank" rel="noopener noreferrer" title="Ask Gemini about selected text" aria-label="Ask Gemini about selected text" role="link">
+  <a id="share-gemini" class="share-btn" target="_blank" rel="noopener noreferrer" title="Copy text & open Gemini" aria-label="Copy text and open Gemini" role="link">
     Gemini
   </a>
   <div class="share-separator" role="separator" aria-orientation="vertical"></div>
@@ -21,7 +21,7 @@
     Perplexity
   </a>
   <div class="share-separator" role="separator" aria-orientation="vertical"></div>
-  <a id="share-deepseek" class="share-btn" target="_blank" rel="noopener noreferrer" title="Ask DeepSeek about selected text" aria-label="Ask DeepSeek about selected text" role="link">
+  <a id="share-deepseek" class="share-btn" target="_blank" rel="noopener noreferrer" title="Copy text & open DeepSeek" aria-label="Copy text and open DeepSeek" role="link">
     DeepSeek
   </a>
   <div class="share-separator" role="separator" aria-orientation="vertical"></div>
@@ -46,15 +46,28 @@
     const _prose = prose;
 
     let hideTimeout: ReturnType<typeof setTimeout> | null = null;
+    let currentText = '';
+
+    // Gemini & DeepSeek don't support URL query params — copy text to clipboard instead
+    function copyAndOpen(e: MouseEvent, url: string) {
+      e.preventDefault();
+      navigator.clipboard.writeText(currentText).then(() => {
+        window.open(url, '_blank', 'noopener,noreferrer');
+      });
+    }
+
+    geminiLink.addEventListener('click', (e) => copyAndOpen(e, 'https://gemini.google.com/app'));
+    deepseekLink.addEventListener('click', (e) => copyAndOpen(e, 'https://chat.deepseek.com'));
 
     function showPopup(x: number, y: number, text: string) {
       if (hideTimeout) { clearTimeout(hideTimeout); hideTimeout = null; }
 
+      currentText = text;
       const encoded = encodeURIComponent(text);
       chatgptLink.href = `https://chatgpt.com/?q=${encoded}`;
-      geminiLink.href = `https://gemini.google.com/app?q=${encoded}`;
+      geminiLink.href = `https://gemini.google.com/app`;
       perplexityLink.href = `https://www.perplexity.ai/search?q=${encoded}`;
-      deepseekLink.href = `https://chat.deepseek.com/?q=${encoded}`;
+      deepseekLink.href = `https://chat.deepseek.com`;
       grokLink.href = `https://grok.com/?q=${encoded}`;
 
       _popup.style.display = 'flex';
