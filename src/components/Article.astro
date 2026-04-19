@@ -353,6 +353,14 @@ const formattedDate = date.toLocaleDateString("en-US", {
     border-color: var(--color-text-tertiary);
   }
 
+  .float-btn:focus,
+  .float-btn:focus-visible,
+  .float-btn:active {
+    outline: 2px solid var(--color-link);
+    outline-offset: 2px;
+    border-radius: 50%;
+  }
+
   /* Width toggle icons (floating) */
   :global(html[data-wide="true"]) #float-width-toggle .icon-expand { display: none; }
   :global(html[data-wide="true"]) #float-width-toggle .icon-compress { display: block; }
