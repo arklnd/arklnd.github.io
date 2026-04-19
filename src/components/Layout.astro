@@ -121,6 +121,16 @@ const googleVerification = import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION;
       }
     </script>
 
+    <!-- Clean up will-change after entrance animations to free GPU layers -->
+    <script is:inline>
+      document.addEventListener("animationend", function (e) {
+        var t = e.target;
+        if (t && t.classList && (t.classList.contains("post-card") || t.classList.contains("article") || t.classList.contains("home-header"))) {
+          t.classList.add("anim-done");
+        }
+      }, { passive: true });
+    </script>
+
     <script>
       let mermaidModule: any = null;
       const originals = new Map<HTMLElement, string>();
