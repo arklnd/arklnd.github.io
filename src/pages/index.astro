@@ -18,11 +18,8 @@ const posts = (await getCollection("posts")).sort(
   })} />
   <section class="home">
     <header class="home-header">
-      <div class="home-header-overlay"></div>
-      <div class="home-header-content">
-        <Heading as="h1">Arijit's Blog</Heading>
-        <p class="home-tagline">A tech blog about systems, tools, and ideas.</p>
-      </div>
+      <Heading as="h1">Arijit's Blog</Heading>
+      <p class="home-tagline">A tech blog about systems, tools, and ideas.</p>
     </header>
     <ul class="post-grid" role="list">
       {
@@ -54,43 +51,16 @@ const posts = (await getCollection("posts")).sort(
 
 <style>
   .home-header {
-    position: relative;
     margin-bottom: var(--space-2xl);
-    padding: var(--space-2xl) var(--space-xl);
-    border-radius: 14px;
-    overflow: hidden;
-    min-height: 260px;
-    display: flex;
-    align-items: flex-end;
-  }
-
-  .home-header-overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-      to top,
-      rgba(0, 0, 0, 0.34) 0%,
-      rgba(0, 0, 0, 0.15) 50%,
-      rgba(0, 0, 0, 0.05) 100%
-    );
-  }
-
-  .home-header-content {
-    position: relative;
-    z-index: 1;
-  }
-
-  .home-header-content :global(h1) {
-    color: #fff;
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    padding-bottom: var(--space-xl);
+    border-bottom: 1px solid var(--color-border);
   }
 
   .home-tagline {
     font-family: var(--font-body);
     font-size: 1rem;
-    color: rgba(255, 255, 255, 0.85);
+    color: var(--color-text-secondary);
     margin-top: var(--space-sm);
-    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
   }
 
   .post-grid {
