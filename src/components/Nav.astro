@@ -188,4 +188,11 @@ const currentPath = Astro.url.pathname;
   :global([data-theme="dark"]) #theme-toggle .icon-sun  { display: block; }
   :global([data-theme="light"]) #theme-toggle .icon-sun  { display: none; }
   :global([data-theme="light"]) #theme-toggle .icon-moon { display: block; }
+
+  /* Hide nav link icons on small screens to prevent breaking */
+  @media (max-width: 530px) {
+    .nav-links .icon {
+      display: none;
+    }
+  }
 </style>
