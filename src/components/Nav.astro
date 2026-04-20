@@ -4,25 +4,40 @@ const currentPath = Astro.url.pathname;
 
 <nav class="nav" aria-label="Main">
   <a href="/" class="nav-brand" aria-label="Arijit's Blog">
-    <svg width="120" height="28" viewBox="0 0 120 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <svg class="brand-logo" width="28" height="32" viewBox="0 0 38 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <defs>
         <linearGradient id="brand-grad" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stop-color="var(--color-link)" />
           <stop offset="100%" stop-color="var(--color-link-hover)" />
         </linearGradient>
       </defs>
-      <!-- Decorative pen nib icon -->
-      <g transform="translate(0, 4)" stroke="var(--color-link)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M2 18L10 2l3 6-3 6" opacity="0.85"/>
-        <path d="M10 14l5-2" opacity="0.5"/>
-        <circle cx="3" cy="17" r="1" fill="var(--color-link)" stroke="none" opacity="0.6"/>
-      </g>
-      <text x="22" y="19" font-family="var(--font-heading)" font-size="15" font-weight="700" letter-spacing="-0.3" fill="currentColor">
-        <tspan fill="url(#brand-grad)">A</tspan>rijit's Blog
-      </text>
-      <!-- Subtle underline accent -->
-      <line x1="22" y1="23" x2="58" y2="23" stroke="url(#brand-grad)" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+      <!-- V shape — varying stroke width via opacity for pen pressure feel -->
+      <path
+        d="M 5 28
+           C 6 34, 9 42, 13 46
+           C 15 42, 17 34, 22 8"
+        stroke="url(#brand-grad)" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" fill="none"
+      />
+      <!-- Pen pressure taper at V left entry -->
+      <path
+        d="M 3 26 C 4 27, 5 28, 5 28"
+        stroke="url(#brand-grad)" stroke-width="1.5" stroke-linecap="round" fill="none"
+      />
+      <!-- Bengali ৭ curve — one smooth flowing stroke -->
+      <path
+        d="M 18 10
+           C 14 1, 25 -3, 31 2
+           S 38 16, 34 32
+           C 33 38, 32 44, 34 44"
+        stroke="url(#brand-grad)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"
+      />
+      <!-- Middle crossbar — slight calligraphic wave -->
+      <path
+        d="M 9 29 C 14 26, 24 23, 35 22"
+        stroke="url(#brand-grad)" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.75"
+      />
     </svg>
+    <span class="brand-text">rijit's Blog</span>
   </a>
   <ul class="nav-links" role="list">
     <li>
@@ -129,6 +144,7 @@ const currentPath = Astro.url.pathname;
   .nav-brand {
     display: flex;
     align-items: center;
+    gap: 0.125rem;
     text-decoration: none;
     color: var(--color-text);
     transition: color 0.15s ease;
@@ -138,17 +154,17 @@ const currentPath = Astro.url.pathname;
     color: var(--color-link);
   }
 
-  .nav-brand svg {
+  .brand-logo {
     display: block;
+    flex-shrink: 0;
   }
 
-  .nav-brand svg line {
-    transition: opacity 0.25s ease, x2 0.3s ease;
-  }
-
-  .nav-brand:hover svg line {
-    opacity: 0.8;
-    x2: 72;
+  .brand-text {
+    font-family: var(--font-heading);
+    font-size: 0.9375rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1;
   }
 
   .nav-links {
