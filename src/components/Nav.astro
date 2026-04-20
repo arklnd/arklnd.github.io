@@ -3,7 +3,27 @@ const currentPath = Astro.url.pathname;
 ---
 
 <nav class="nav" aria-label="Main">
-  <a href="/" class="nav-brand">Arijit's Blog</a>
+  <a href="/" class="nav-brand" aria-label="Arijit's Blog">
+    <svg width="120" height="28" viewBox="0 0 120 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <defs>
+        <linearGradient id="brand-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="var(--color-link)" />
+          <stop offset="100%" stop-color="var(--color-link-hover)" />
+        </linearGradient>
+      </defs>
+      <!-- Decorative pen nib icon -->
+      <g transform="translate(0, 4)" stroke="var(--color-link)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 18L10 2l3 6-3 6" opacity="0.85"/>
+        <path d="M10 14l5-2" opacity="0.5"/>
+        <circle cx="3" cy="17" r="1" fill="var(--color-link)" stroke="none" opacity="0.6"/>
+      </g>
+      <text x="22" y="19" font-family="var(--font-heading)" font-size="15" font-weight="700" letter-spacing="-0.3" fill="currentColor">
+        <tspan fill="url(#brand-grad)">A</tspan>rijit's Blog
+      </text>
+      <!-- Subtle underline accent -->
+      <line x1="22" y1="23" x2="58" y2="23" stroke="url(#brand-grad)" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+    </svg>
+  </a>
   <ul class="nav-links" role="list">
     <li>
       <a href="/" class:list={[{ active: currentPath === "/" || currentPath === "/"}]} aria-current={currentPath === "/" || currentPath === "/" ? "page" : undefined}> 
@@ -107,10 +127,8 @@ const currentPath = Astro.url.pathname;
   }
 
   .nav-brand {
-    font-family: var(--font-heading);
-    font-size: 0.9375rem;
-    font-weight: 700;
-    letter-spacing: -0.02em;
+    display: flex;
+    align-items: center;
     text-decoration: none;
     color: var(--color-text);
     transition: color 0.15s ease;
@@ -118,6 +136,19 @@ const currentPath = Astro.url.pathname;
 
   .nav-brand:hover {
     color: var(--color-link);
+  }
+
+  .nav-brand svg {
+    display: block;
+  }
+
+  .nav-brand svg line {
+    transition: opacity 0.25s ease, x2 0.3s ease;
+  }
+
+  .nav-brand:hover svg line {
+    opacity: 0.8;
+    x2: 72;
   }
 
   .nav-links {
