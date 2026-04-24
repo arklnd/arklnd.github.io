@@ -111,9 +111,7 @@ export default defineConfig({
     }),
   ],
   env: {
-    schema: {
-      HITS_KEY: envField.string({ context: "server", access: "public", default: "dev" }),
-    },
+    schema: {},
   },
   markdown: {
     remarkPlugins: [remarkMermaid, remarkMath],

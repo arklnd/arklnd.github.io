@@ -8,11 +8,10 @@ interface Props {
   date: Date;
   description: string;
   readingTime?: string;
-  postId?: string;
   slug?: string;
 }
 
-const { title, date, description, readingTime, postId, slug } = Astro.props;
+const { title, date, description, readingTime, slug } = Astro.props;
 
 const formattedDate = date.toLocaleDateString("en-US", {
   year: "numeric",
@@ -82,21 +81,6 @@ const formattedDate = date.toLocaleDateString("en-US", {
   <Prose>
     <slot />
   </Prose>
-  {postId && (
-    <div class="article-hits">
-      <img id="hits-badge" alt="Page view count" data-post-id={postId} />
-    </div>
-  )}
-  <script>
-    const badge = document.getElementById('hits-badge') as HTMLImageElement | null;
-    if (badge) {
-      const id = badge.dataset.postId;
-      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-      const color = isDark ? '6ba3f5' : '3d6aa8';
-      const label = isDark ? '333331' : '525d68';
-      badge.src = `https://hits.sh/knhs.in/${id}.svg?style=plastic&color=${color}&labelColor=${label}`;
-    }
-  </script>
 </article>
 
 <ShareSelection />
@@ -204,12 +188,6 @@ const formattedDate = date.toLocaleDateString("en-US", {
 
   .article-meta {
     justify-content: flex-start;
-  }
-
-  .article-hits {
-    margin-top: var(--space-xl);
-    display: flex;
-    justify-content: center;
   }
 
   /* ── Sticky scroll bar ─────────────────── */
