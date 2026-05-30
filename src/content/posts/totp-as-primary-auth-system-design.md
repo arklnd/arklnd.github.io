@@ -15,12 +15,13 @@ date: 2026-05-31
 3. [Why Identity Provider Integration Was Off the Table](#3-why-identity-provider-integration-was-off-the-table)
 4. [TOTP as a Primary Identity Mechanism](#4-totp-as-a-primary-identity-mechanism)
 5. [The Implementation — How It Actually Works](#5-the-implementation--how-it-actually-works)
-6. [Why Unauthorized Reads Are a Non-Issue](#6-why-unauthorized-reads-are-a-non-issue)
-7. [Why RBAC Is Overkill Here](#7-why-rbac-is-overkill-here)
-8. [Why Sessions and Token Management Are Overkill](#8-why-sessions-and-token-management-are-overkill)
-9. [The User Experience — Seamless and Hassle-Free](#9-the-user-experience--seamless-and-hassle-free)
-10. [Trade-offs and Honest Limitations](#10-trade-offs-and-honest-limitations)
-11. [Takeaways](#11-takeaways)
+6. [Workflow Demo — End-to-End Flows](#6-workflow-demo--end-to-end-flows)
+7. [Why Unauthorized Reads Are a Non-Issue](#7-why-unauthorized-reads-are-a-non-issue)
+8. [Why RBAC Is Overkill Here](#8-why-rbac-is-overkill-here)
+9. [Why Sessions and Token Management Are Overkill](#9-why-sessions-and-token-management-are-overkill)
+10. [The User Experience — Seamless and Hassle-Free](#10-the-user-experience--seamless-and-hassle-free)
+11. [Trade-offs and Honest Limitations](#11-trade-offs-and-honest-limitations)
+12. [Takeaways](#12-takeaways)
 
 ---
 
@@ -164,7 +165,225 @@ If the secret is *not* in `localStorage` (new device, cleared storage), a dialog
 
 ---
 
-## 6. Why Unauthorized Reads Are a Non-Issue
+## 6. Workflow Demo — End-to-End Flows
+
+The diagrams below trace the full lifecycle of the system — from team creation to daily seat booking — showing exactly where TOTP enters (and where it does not).
+
+### Manager Creates a Team
+
+The manager's TOTP secret is born entirely on the client. The server never generates it — it only receives and stores it after the manager proves they can produce a valid code.
+
+```mermaid
+sequenceDiagram
+    participant Auth as Authenticator App
+    participant Client as Browser / PWA
+    participant Server as OfficeAaschi API
+    participant DB as Database
+
+    Client->>Client: Generate 20-byte TOTP secret (client-side)
+    Client->>Client: Render QR code (otpauth:// URI)
+    Client->>Auth: User scans QR code
+    Auth-->>Auth: Secret stored in authenticator
+    Auth-->>Client: User reads 6-digit code
+    Client->>Server: POST /api/teams {name, secretKey, totpCode}
+    Server->>Server: Validate TOTP code against provided secret
+    alt Code valid
+        Server->>DB: Insert Team (name, managerTotpSecret)
+        Server-->>Client: 201 Created {teamId}
+        Client->>Client: Store secret in localStorage as totp_manager_{teamId}
+    else Code invalid
+        Server-->>Client: 401 Unauthorized
+    end
+```
+
+Notice that no session or token is returned in the `201` response. The secret in `localStorage` *is* the credential going forward.
+
+### Member Joins a Team
+
+The same pattern repeats: the member generates their own independent secret, proves it, and the server stores it. Each member has a distinct TOTP secret — there is no shared team credential.
+
+```mermaid
+sequenceDiagram
+    participant Auth as Authenticator App
+    participant Client as Browser / PWA
+    participant Server as OfficeAaschi API
+    participant DB as Database
+
+    Client->>Server: GET /api/teams?q=Platform (no auth)
+    Server-->>Client: [{id: 5, name: "Platform Team"}]
+    Client->>Client: Generate new TOTP secret
+    Client->>Client: Render QR code
+    Client->>Auth: User scans QR code
+    Auth-->>Client: User reads 6-digit code
+    Client->>Server: POST /api/teams/5/reportees {friendlyName: "Spiderman", secretKey, totpCode}
+    Server->>Server: Validate TOTP code against provided secret
+    alt Code valid
+        Server->>DB: Insert Reportee (friendlyName, totpSecret, isApproved=false)
+        Server-->>Client: 201 Created {reporteeId: 42}
+        Client->>Client: Store secret in localStorage as totp_reportee_42
+    else Code invalid
+        Server-->>Client: 401 Unauthorized
+    end
+    Note over Client,Server: Member is pending until the manager approves
+```
+
+The `friendlyName` can be anything — a nickname, a joke, whatever the team recognizes. No corporate identity required.
+
+### Manager Approves a Member
+
+This is the first flow where the TOTP middleware activates. The manager's stored secret is used silently by the HTTP interceptor.
+
+```mermaid
+sequenceDiagram
+    participant Auth as Authenticator App
+    participant Client as Browser / PWA
+    participant Interceptor as Angular HTTP Interceptor
+    participant Server as OfficeAaschi API
+    participant MW as TotpAuthMiddleware
+    participant DB as Database
+
+    Client->>Interceptor: PUT /api/teams/5/reportees/42/approve
+    Interceptor->>Interceptor: Lookup totp_manager_5 from localStorage
+    alt Secret found in localStorage
+        Interceptor->>Interceptor: Generate fresh TOTP code from secret + current time
+        Interceptor->>Server: PUT /approve (Authorization: TOTP manager:5:482910)
+    else Secret not in localStorage
+        Interceptor->>Auth: Prompt user for 6-digit code
+        Auth-->>Interceptor: User enters code manually
+        Interceptor->>Server: PUT /approve (Authorization: TOTP manager:5:482910)
+    end
+    MW->>DB: Lookup Team 5 → get managerTotpSecret
+    MW->>MW: Validate code 482910 against secret (±1 window)
+    alt Valid
+        MW->>MW: Set HttpContext.Items["TotpEntityType"] = "manager"
+        MW->>MW: Set HttpContext.Items["TotpEntityId"] = 5
+        Server->>DB: UPDATE Reportee 42 SET isApproved = true
+        Server-->>Client: 200 OK
+    else Invalid
+        MW-->>Client: 401 Unauthorized
+    end
+```
+
+The key observation: in the happy path (secret in `localStorage`), the user clicks one button. There is no login, no prompt, no delay. The interceptor silently handles everything.
+
+### Booking a Seat — The Daily Workflow
+
+This is the flow that happens most frequently. A member checks availability (no auth), then books a seat (TOTP auth, invisible).
+
+```mermaid
+sequenceDiagram
+    participant Client as Browser / PWA
+    participant Interceptor as Angular HTTP Interceptor
+    participant Server as OfficeAaschi API
+    participant MW as TotpAuthMiddleware
+    participant Cache as In-Memory Cache
+
+    Note over Client,Server: Step 1 — Check availability (no auth required)
+    Client->>Server: GET /api/bookings/availability/5?date=2026-06-02
+    Server->>Cache: Read seats, bookings for Team 5 on June 2
+    Cache-->>Server: 8 total seats, 5 booked, 3 available
+    Server-->>Client: {availableCount: 3, availableSeats: [...]}
+
+    Note over Client,Server: Step 2 — Book a seat (TOTP auth, invisible to user)
+    Client->>Interceptor: POST /api/bookings {reporteeId: 42, seatId: 7, date: "2026-06-02"}
+    Interceptor->>Interceptor: Lookup totp_reportee_42 from localStorage
+    Interceptor->>Interceptor: Generate TOTP code silently
+    Interceptor->>Server: POST /api/bookings (Authorization: TOTP reportee:42:739104)
+    MW->>Cache: Lookup Reportee 42 → get totpSecret
+    MW->>MW: Validate code 739104
+    Server->>Cache: Check: is Reportee 42 approved? Already booked on June 2?
+    Server->>DB: INSERT Booking (date, seatId, reporteeId, status=Confirmed)
+    Note over Server,Cache: WriteThroughInterceptor auto-updates cache
+    Server-->>Client: 201 Created {bookingId: 187, status: "Confirmed"}
+```
+
+From the user's perspective, this entire sequence is: open app, see 3 seats available, tap "Book", done. Two taps. Zero authentication prompts.
+
+### Cancellation and Waitlist Promotion
+
+When a booking is cancelled, the system automatically promotes the next person on the waitlist — demonstrating the write-through cache and the stateless auth working together.
+
+```mermaid
+sequenceDiagram
+    participant Client as Browser / PWA
+    participant Interceptor as Angular HTTP Interceptor
+    participant Server as OfficeAaschi API
+    participant MW as TotpAuthMiddleware
+    participant WS as WaitlistService
+    participant DB as Database
+    participant Cache as In-Memory Cache
+
+    Client->>Interceptor: DELETE /api/bookings/187
+    Interceptor->>Interceptor: Generate TOTP code for reportee 42
+    Interceptor->>Server: DELETE /api/bookings/187 (Authorization: TOTP reportee:42:193847)
+    MW->>Cache: Validate TOTP for Reportee 42
+    MW-->>Server: Authenticated
+    Server->>Server: Verify Reportee 42 owns Booking 187
+    Server->>DB: DELETE Booking 187 (Seat 7, June 2)
+    Server->>WS: PromoteWaitlist(teamId: 5, seatId: 7, date: June 2)
+    WS->>Cache: Any waitlisted booking for Seat 7 on June 2?
+    alt Seat-specific waitlister found
+        WS->>DB: UPDATE Booking SET status = Confirmed
+    else No seat-specific waitlister
+        WS->>Cache: Any waitlisted booking for Team 5 on June 2?
+        alt Global waitlister found
+            WS->>DB: UPDATE Booking SET seatId = 7, status = Confirmed
+        end
+    end
+    Note over DB,Cache: WriteThroughInterceptor syncs cache automatically
+    Server-->>Client: 204 No Content
+```
+
+### Contrast — What the Same Booking Would Look Like with Traditional Auth
+
+For comparison, here is the same "book a seat" action in a system using an IdP with OAuth 2.0 and session-based auth:
+
+```mermaid
+sequenceDiagram
+    participant Client as Browser
+    participant IdP as Corporate IdP (Azure AD)
+    participant Server as API Server
+    participant Session as Session Store (Redis)
+    participant DB as Database
+
+    Note over Client,IdP: Step 0 — Login (happens before anything else)
+    Client->>IdP: Redirect to /authorize
+    IdP->>IdP: User enters corporate credentials
+    IdP->>IdP: MFA prompt (SMS / push notification)
+    IdP-->>Client: Redirect back with authorization code
+    Client->>Server: POST /token (exchange code for tokens)
+    Server->>IdP: Validate authorization code
+    IdP-->>Server: {access_token, refresh_token, id_token}
+    Server->>Session: Store session {userId, roles, expiry}
+    Server-->>Client: Set-Cookie: session_id=abc123
+
+    Note over Client,Server: Step 1 — Check availability
+    Client->>Server: GET /api/availability (Cookie: session_id=abc123)
+    Server->>Session: Validate session abc123
+    Session-->>Server: {userId: U1, roles: ["member"]}
+    Server->>DB: Query availability
+    Server-->>Client: {availableCount: 3}
+
+    Note over Client,Server: Step 2 — Book a seat
+    Client->>Server: POST /api/bookings (Cookie: session_id=abc123)
+    Server->>Session: Validate session abc123
+    Server->>Server: Check RBAC: does "member" role have "booking:create" permission?
+    Server->>DB: INSERT Booking
+    Server-->>Client: 201 Created
+
+    Note over Client,Session: Step 3 — 30 minutes later, session expires
+    Client->>Server: GET /api/availability (Cookie: session_id=abc123)
+    Server->>Session: Validate session abc123
+    Session-->>Server: EXPIRED
+    Server-->>Client: 401 — redirect to IdP
+    Note over Client: "Your session has expired. Please log in again."
+```
+
+The difference is stark. The OfficeAaschi flow has **zero redirects, zero prompts, and zero expiry interruptions** during normal use. The traditional flow adds an IdP redirect, an MFA prompt, a session store dependency, and periodic "session expired" interruptions — all to protect data that could be written on a whiteboard.
+
+---
+
+## 7. Why Unauthorized Reads Are a Non-Issue
 
 Most authentication systems exist to protect *confidential* data. Medical records, financial transactions, personal communications — information that should only be visible to authorized parties.
 
@@ -200,7 +419,7 @@ This is a critical architectural insight: **the sensitivity of the data determin
 
 ---
 
-## 7. Why RBAC Is Overkill Here
+## 8. Why RBAC Is Overkill Here
 
 Role-Based Access Control is a powerful model. You define roles (Admin, Manager, Editor, Viewer), assign permissions to roles, assign roles to users, and the system enforces what each user can do. For a complex enterprise application with dozens of resource types and nuanced permission boundaries, RBAC is essential.
 
@@ -231,7 +450,7 @@ For a system with this shape, RBAC would be like using a CNC machine to cut a pi
 
 ---
 
-## 8. Why Sessions and Token Management Are Overkill
+## 9. Why Sessions and Token Management Are Overkill
 
 The conventional web authentication flow looks like this:
 
@@ -265,7 +484,7 @@ The trade-off is that the client needs to either store the TOTP secret locally o
 
 ---
 
-## 9. The User Experience — Seamless and Hassle-Free
+## 10. The User Experience — Seamless and Hassle-Free
 
 The proof of any authentication design is in the user experience. A system can be architecturally elegant and still be painful to use. Here is what the OfficeAaschi flow actually feels like from the user's perspective:
 
@@ -311,7 +530,7 @@ For a tool that people check once or twice a day to book a desk, the difference 
 
 ---
 
-## 10. Trade-offs and Honest Limitations
+## 11. Trade-offs and Honest Limitations
 
 This design is not universally applicable. It works for OfficeAaschi because of specific contextual factors. Here is where it would break down:
 
@@ -329,7 +548,7 @@ These are real limitations. They are also **irrelevant** for OfficeAaschi's spec
 
 ---
 
-## 11. Takeaways
+## 12. Takeaways
 
 The architecture of OfficeAaschi is not a pattern to blindly replicate. It is a case study in **matching the authentication investment to the actual sensitivity and lifespan of the system**. The core principles:
 
