@@ -18,29 +18,38 @@ export default defineConfig({
       registerType: "autoUpdate",
       includeAssets: ["favicon.ico", "icon.svg", "apple-touch-icon-180x180.png"],
       manifest: {
+        id: "/",
         name: "Arijit's Blog",
         short_name: "Arijit",
         description: "A quiet place to read.",
+        lang: "en",
+        dir: "ltr",
+        orientation: "any",
+        categories: ["blog", "education", "personalization"],
         theme_color: "#3d6aa8",
         background_color: "#e6e9ed",
         display: "standalone",
         scope: "/",
         start_url: "/",
+        prefer_related_applications: false,
         icons: [
           {
             src: "pwa-64x64.png",
             sizes: "64x64",
             type: "image/png",
+            purpose: "any",
           },
           {
             src: "pwa-192x192.png",
             sizes: "192x192",
             type: "image/png",
+            purpose: "any",
           },
           {
             src: "pwa-512x512.png",
             sizes: "512x512",
             type: "image/png",
+            purpose: "any",
           },
           {
             src: "maskable-icon-512x512.png",
@@ -54,7 +63,12 @@ export default defineConfig({
         skipWaiting: true,
         clientsClaim: true,
         cleanupOutdatedCaches: true,
+        navigationPreload: true,
+        navigateFallback: null,
         globPatterns: ["**/*.{css,js,svg,png,ico,txt,xml}"],
+        additionalManifestEntries: [
+          { url: "/offline", revision: commitHash },
+        ],
         runtimeCaching: [
           {
             urlPattern: ({ request }) => request.mode === "navigate",
@@ -64,6 +78,9 @@ export default defineConfig({
               expiration: {
                 maxEntries: 50,
                 maxAgeSeconds: 60 * 60 * 24 * 30,
+              },
+              precacheFallback: {
+                fallbackURL: "/offline",
               },
             },
           },

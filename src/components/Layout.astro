@@ -37,7 +37,9 @@ const googleVerification = import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION;
     <link rel="icon" href="/favicon.ico" sizes="48x48" />
     <link rel="icon" href="/icon.svg" sizes="any" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon-180x180.png" />
-    <meta name="theme-color" content="#3d6aa8" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="theme-color" content="#3d6aa8" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#1a1f26" media="(prefers-color-scheme: dark)" />
 
     <!-- Open Graph -->
     <meta property="og:type" content={ogType} />
@@ -113,10 +115,40 @@ const googleVerification = import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION;
       <Footer />
     </div>
 
+    <!-- PWA: Service Worker registration with auto-reload on new build -->
     <script is:inline>
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", function () {
-          navigator.serviceWorker.register("/sw.js");
+          var refreshing = false;
+
+          // When a new SW takes control, reload to show fresh content
+          navigator.serviceWorker.addEventListener("controllerchange", function () {
+            if (refreshing) return;
+            refreshing = true;
+            window.location.reload();
+          });
+
+          navigator.serviceWorker.register("/sw.js", { scope: "/" }).then(function (reg) {
+            // Check for updates periodically (every 60 minutes)
+            setInterval(function () { reg.update(); }, 60 * 60 * 1000);
+
+            // If a new SW is already waiting (e.g. user reopened tab), activate it
+            if (reg.waiting) {
+              reg.waiting.postMessage({ type: "SKIP_WAITING" });
+            }
+
+            // Detect when a new SW is installed and tell it to activate
+            reg.addEventListener("updatefound", function () {
+              var newSW = reg.installing;
+              if (!newSW) return;
+              newSW.addEventListener("statechange", function () {
+                if (newSW.state === "installed" && navigator.serviceWorker.controller) {
+                  // New content available — activate the new SW immediately
+                  newSW.postMessage({ type: "SKIP_WAITING" });
+                }
+              });
+            });
+          });
         });
       }
     </script>
