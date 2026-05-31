@@ -129,6 +129,7 @@ const formattedDate = date.toLocaleDateString("en-US", {
       </button>
       <span id="podcast-status" class="podcast-status">Ready</span>
       <div class="podcast-spacer"></div>
+      <select id="podcast-voice-select" class="podcast-voice-select" aria-label="Select voice"></select>
       <div class="podcast-speed-group">
         <button id="podcast-speed-down" class="podcast-btn podcast-btn-speed-adj" aria-label="Decrease speed" title="Decrease speed">
           <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true">
@@ -546,6 +547,42 @@ const formattedDate = date.toLocaleDateString("en-US", {
     min-width: 2rem;
     text-align: center;
     user-select: none;
+  }
+
+  :global(.podcast-voice-select) {
+    min-width: 0;
+    max-width: 8.5rem;
+    font-family: var(--font-heading);
+    font-size: 0.68rem;
+    color: var(--color-text);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    padding: 0.25rem 1.3rem 0.25rem 0.4rem;
+    cursor: pointer;
+    transition: border-color 0.15s ease;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23747e8a' stroke-width='3' stroke-linecap='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.35rem center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex-shrink: 1;
+  }
+
+  :global(.podcast-voice-select:hover) {
+    border-color: var(--color-text-tertiary);
+  }
+
+  :global(.podcast-voice-select:focus-visible) {
+    outline: 2px solid var(--color-link);
+    outline-offset: 1px;
+  }
+
+  :global([data-theme="dark"] .podcast-voice-select) {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23909090' stroke-width='3' stroke-linecap='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
   }
 
   /* Pulse animation when speaking */
@@ -966,8 +1003,9 @@ const formattedDate = date.toLocaleDateString("en-US", {
     const speedUpBtn = document.getElementById("podcast-speed-up");
     const speedDisplay = document.getElementById("podcast-speed-display");
     const lyricsEl = document.getElementById("podcast-lyrics");
+    const voiceSelect = document.getElementById("podcast-voice-select") as HTMLSelectElement | null;
 
-    if (!trigger || !dialog || !playBtn || !stopBtn || !statusEl || !speedDownBtn || !speedUpBtn || !speedDisplay || !lyricsEl) return;
+    if (!trigger || !dialog || !playBtn || !stopBtn || !statusEl || !speedDownBtn || !speedUpBtn || !speedDisplay || !lyricsEl || !voiceSelect) return;
 
     trigger.removeAttribute("hidden");
 
@@ -986,35 +1024,50 @@ const formattedDate = date.toLocaleDateString("en-US", {
     // Type assertions for elements that passed null checks
 
     // ── Voice selection ──
-    function pickVoice() {
+    function populateVoiceSelect() {
       const voices = synth.getVoices();
       if (voices.length === 0) return;
 
-      const preferred = [
-        "microsoft aria online", "microsoft jenny online",
-        "microsoft aria", "microsoft jenny",
-        "google uk english female",
-        "samantha", "karen", "moira", "tessa", "fiona",
-        "microsoft zira", "google us english", "female",
-      ];
+      // Sort: English first, then alphabetically by name
+      const sorted = [...voices].sort((a, b) => {
+        const aEn = a.lang.startsWith("en") ? 0 : 1;
+        const bEn = b.lang.startsWith("en") ? 0 : 1;
+        if (aEn !== bEn) return aEn - bEn;
+        return a.name.localeCompare(b.name);
+      });
 
-      for (const pref of preferred) {
-        const match = voices.find(
-          (v) => v.name.toLowerCase().includes(pref) && v.lang.startsWith("en")
-        );
-        if (match) { selectedVoice = match; return; }
-      }
+      voiceSelect.innerHTML = "";
+      sorted.forEach((voice, i) => {
+        const opt = document.createElement("option");
+        opt.value = String(i);
+        const local = voice.localService ? "" : "<ONLINE>";
+        opt.textContent = `${voice.name} [${voice.lang}]${local}`;
+        voiceSelect.appendChild(opt);
+      });
 
-      const englishVoices = voices.filter((v) => v.lang.startsWith("en"));
-      const femaleGuess = englishVoices.find((v) =>
-        /female|woman|samantha|zira|jenny|aria|karen|fiona|tessa|moira|victoria|allison|ava|susan|kate/i.test(v.name)
-      );
-      selectedVoice = femaleGuess || englishVoices[0] || voices[0] || null;
+      // Default to first voice (English voices are sorted first)
+      voiceSelect.value = "0";
+      selectedVoice = sorted[0] || null;
+
+      // Handle user voice change
+      voiceSelect.onchange = () => {
+        const idx = parseInt(voiceSelect.value, 10);
+        selectedVoice = sorted[idx] || null;
+
+        // If playing, restart current sentence with new voice
+        if (isPlaying && currentIndex >= 0 && !isPaused) {
+          synth.cancel();
+          stopResumeTimer();
+          setTimeout(() => {
+            if (currentIndex >= 0) speakIndex(currentIndex);
+          }, 50);
+        }
+      };
     }
 
-    pickVoice();
+    populateVoiceSelect();
     if (synth.onvoiceschanged !== undefined) {
-      synth.addEventListener("voiceschanged", pickVoice, { once: true });
+      synth.addEventListener("voiceschanged", populateVoiceSelect, { once: true });
     }
 
     // ── Extract readable text ──
