@@ -10,7 +10,7 @@ import { execSync } from "child_process";
 const commitHash = execSync("git rev-parse --short HEAD").toString().trim();
 
 export default defineConfig({
-  site: "https://arklnd.github.io",
+  site: "https://arijitk.in",
   integrations: [
     mdx(),
     sitemap(),
