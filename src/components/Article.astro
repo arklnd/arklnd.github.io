@@ -78,10 +78,74 @@ const formattedDate = date.toLocaleDateString("en-US", {
       }
     </p>
   </header>
+
+  <!-- Podcast trigger button — only shown when SpeechSynthesis API is available -->
+  <button id="podcast-trigger" class="podcast-trigger" aria-label="Listen to this post" title="Listen to this post" hidden>
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M3 18v-6a9 9 0 0 1 18 0v6"/>
+      <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>
+    </svg>
+    <span>Listen</span>
+  </button>
+
   <Prose>
     <slot />
   </Prose>
 </article>
+
+<!-- Podcast dialog modal -->
+<dialog id="podcast-dialog" class="podcast-dialog" aria-label="Podcast player">
+  <div class="podcast-dialog-inner">
+    <div class="podcast-dialog-header">
+      <div class="podcast-dialog-title">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M3 18v-6a9 9 0 0 1 18 0v6"/>
+          <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>
+        </svg>
+        <span>Listening Mode</span>
+      </div>
+      <button id="podcast-close" class="podcast-dialog-close" aria-label="Close" title="Close">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div id="podcast-lyrics" class="podcast-lyrics"></div>
+    <div class="podcast-dialog-controls">
+      <button id="podcast-play" class="podcast-btn podcast-btn-play" aria-label="Play" title="Play">
+        <svg class="icon-play" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true">
+          <polygon points="5 3 19 12 5 21 5 3"/>
+        </svg>
+        <svg class="icon-pause" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true">
+          <rect x="6" y="4" width="4" height="16"/>
+          <rect x="14" y="4" width="4" height="16"/>
+        </svg>
+      </button>
+      <button id="podcast-stop" class="podcast-btn" aria-label="Stop" title="Stop">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true">
+          <rect x="4" y="4" width="16" height="16" rx="2"/>
+        </svg>
+      </button>
+      <span id="podcast-status" class="podcast-status">Ready</span>
+      <div class="podcast-spacer"></div>
+      <div class="podcast-speed-group">
+        <button id="podcast-speed-down" class="podcast-btn podcast-btn-speed-adj" aria-label="Decrease speed" title="Decrease speed">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true">
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+        </button>
+        <span id="podcast-speed-display" class="podcast-speed-display">1x</span>
+        <button id="podcast-speed-up" class="podcast-btn podcast-btn-speed-adj" aria-label="Increase speed" title="Increase speed">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</dialog>
 
 <ShareSelection />
 
@@ -188,6 +252,326 @@ const formattedDate = date.toLocaleDateString("en-US", {
 
   .article-meta {
     justify-content: flex-start;
+  }
+
+  /* ── Podcast trigger button ──────────────── */
+  .podcast-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-top: var(--space-sm);
+    padding: 0.3rem 0.7rem;
+    font-family: var(--font-heading);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-link);
+    background: color-mix(in srgb, var(--color-link) 8%, transparent);
+    border: 1px solid color-mix(in srgb, var(--color-link) 25%, transparent);
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    letter-spacing: 0.01em;
+  }
+
+  .podcast-trigger:hover {
+    background: color-mix(in srgb, var(--color-link) 14%, transparent);
+    border-color: color-mix(in srgb, var(--color-link) 45%, transparent);
+    box-shadow: 0 2px 8px color-mix(in srgb, var(--color-link) 12%, transparent);
+  }
+
+  .podcast-trigger:focus-visible {
+    outline: 2px solid var(--color-link);
+    outline-offset: 2px;
+  }
+
+  /* ── Podcast dialog ────────────────────── */
+  :global(.podcast-dialog) {
+    position: fixed;
+    inset: 0;
+    margin: auto;
+    border: none;
+    border-radius: 16px;
+    padding: 0;
+    max-width: 520px;
+    max-height: 80dvh;
+    width: calc(100% - 2rem);
+    background: var(--color-bg);
+    color: var(--color-text);
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.25), 0 8px 24px rgba(0, 0, 0, 0.12);
+    overflow: hidden;
+  }
+
+  :global(.podcast-dialog[open]) {
+    display: flex;
+    flex-direction: column;
+  }
+
+  :global(.podcast-dialog::backdrop) {
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(6px);
+  }
+
+  :global([data-theme="dark"] .podcast-dialog) {
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6), 0 8px 24px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+
+  :global(.podcast-dialog-inner) {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  :global(.podcast-dialog-header) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem 0.75rem;
+    flex-shrink: 0;
+  }
+
+  :global(.podcast-dialog-title) {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-heading);
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--color-text);
+    letter-spacing: -0.01em;
+  }
+
+  :global(.podcast-dialog-close) {
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--color-text-tertiary);
+    cursor: pointer;
+    transition: all 0.12s ease;
+  }
+
+  :global(.podcast-dialog-close:hover) {
+    background: var(--color-surface);
+    color: var(--color-text);
+  }
+
+  /* ── Lyrics / transcript area ──────────── */
+  :global(.podcast-lyrics) {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.75rem 1.25rem 1rem;
+    scroll-behavior: smooth;
+    min-height: 0;
+  }
+
+  :global(.podcast-sentence) {
+    font-family: var(--font-body);
+    font-size: 0.92rem;
+    line-height: 1.7;
+    color: var(--color-text-tertiary);
+    cursor: pointer;
+    transition: color 0.25s ease, opacity 0.25s ease, background-color 0.25s ease;
+    display: block;
+    padding: 0.35rem 0.6rem;
+    margin-bottom: 0.15rem;
+    border-radius: 0px;
+    border-left: 3px solid transparent;
+  }
+
+  :global(.podcast-sentence:hover) {
+    color: var(--color-text-secondary);
+    background: color-mix(in srgb, var(--color-surface) 60%, transparent);
+  }
+
+  /* Already read */
+  :global(.podcast-sentence.read) {
+    color: var(--color-text-secondary);
+    opacity: 0.7;
+    border-left-color: color-mix(in srgb, var(--color-link) 25%, transparent);
+  }
+
+  /* Currently being spoken */
+  :global(.podcast-sentence.active) {
+    color: var(--color-text);
+    background: color-mix(in srgb, var(--color-link) 8%, transparent);
+    border-left-color: var(--color-link);
+    opacity: 1;
+  }
+
+  /* Unread — dimmed */
+  :global(.podcast-sentence.unread) {
+    color: var(--color-text-tertiary);
+    opacity: 0.45;
+  }
+
+  /* Word-level sweep highlight inside active sentence */
+  :global(.podcast-sentence.active .podcast-read) {
+    color: var(--color-link);
+    background: color-mix(in srgb, var(--color-link) 18%, transparent);
+    border-radius: 2px;
+    padding: 1px 0;
+  }
+
+  :global(.podcast-sentence.active .podcast-unread) {
+    color: var(--color-text);
+    opacity: 0.6;
+  }
+
+  /* CSS gradient sweep fallback when onboundary doesn't fire */
+  @keyframes podcast-sweep {
+    from { background-position: -100% 0; }
+    to { background-position: 200% 0; }
+  }
+
+  :global(.podcast-sentence.active.sweeping) {
+    background: linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--color-link) 18%, transparent) 0%,
+      color-mix(in srgb, var(--color-link) 18%, transparent) 40%,
+      color-mix(in srgb, var(--color-link) 5%, transparent) 60%,
+      color-mix(in srgb, var(--color-link) 5%, transparent) 100%
+    );
+    background-size: 200% 100%;
+    animation: podcast-sweep var(--sweep-duration, 4s) linear forwards;
+  }
+
+  /* ── Controls bar ──────────────────────── */
+  :global(.podcast-dialog-controls) {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    border-top: 1px solid var(--color-border);
+    flex-shrink: 0;
+    background: var(--color-bg);
+  }
+
+  :global(.podcast-spacer) {
+    flex: 1;
+  }
+
+  :global(.podcast-btn) {
+    width: 2.25rem;
+    height: 2.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--color-border);
+    border-radius: 50%;
+    background: var(--color-surface);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    flex-shrink: 0;
+  }
+
+  :global(.podcast-btn:hover) {
+    color: var(--color-text);
+    border-color: var(--color-text-tertiary);
+    background: color-mix(in srgb, var(--color-surface) 80%, var(--color-border));
+  }
+
+  :global(.podcast-btn:focus-visible) {
+    outline: 2px solid var(--color-link);
+    outline-offset: 2px;
+  }
+
+  :global(.podcast-btn-play) {
+    width: 2.75rem;
+    height: 2.75rem;
+    background: var(--color-link);
+    border-color: var(--color-link);
+    color: #fff;
+  }
+
+  :global(.podcast-btn-play:hover) {
+    background: var(--color-link-hover);
+    border-color: var(--color-link-hover);
+    color: #fff;
+  }
+
+  /* Play/pause icon toggling */
+  :global(.podcast-btn-play .icon-pause) { display: none; }
+  :global(.podcast-btn-play .icon-play) { display: block; }
+  :global(.podcast-btn-play.playing .icon-pause) { display: block; }
+  :global(.podcast-btn-play.playing .icon-play) { display: none; }
+
+  :global(.podcast-status) {
+    font-family: var(--font-heading);
+    font-size: 0.72rem;
+    color: var(--color-text-tertiary);
+    white-space: nowrap;
+  }
+
+  :global(.podcast-btn-speed) {
+    border-radius: 8px;
+    width: auto;
+    padding: 0.25rem 0.55rem;
+    font-family: var(--font-heading);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  :global(.podcast-speed-group) {
+    display: flex;
+    align-items: center;
+    gap: 0.15rem;
+    flex-shrink: 0;
+  }
+
+  :global(.podcast-btn-speed-adj) {
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    padding: 0;
+  }
+
+  :global(.podcast-btn-speed-adj:disabled) {
+    opacity: 0.3;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  :global(.podcast-speed-display) {
+    font-family: var(--font-heading);
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--color-text-secondary);
+    min-width: 2rem;
+    text-align: center;
+    user-select: none;
+  }
+
+  /* Pulse animation when speaking */
+  @keyframes podcast-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-link) 40%, transparent); }
+    50% { box-shadow: 0 0 0 5px color-mix(in srgb, var(--color-link) 0%, transparent); }
+  }
+
+  :global(.podcast-btn-play.playing) {
+    animation: podcast-pulse 2s ease-in-out infinite;
+  }
+
+  @media (max-width: 480px) {
+    :global(.podcast-dialog) {
+      max-height: 90dvh;
+      border-radius: 12px;
+    }
+    :global(.podcast-dialog-header) {
+      padding: 0.75rem 1rem 0.5rem;
+    }
+    :global(.podcast-lyrics) {
+      padding: 0.25rem 1rem 0.75rem;
+    }
+    :global(.podcast-dialog-controls) {
+      padding: 0.6rem 1rem;
+    }
   }
 
   /* ── Sticky scroll bar ─────────────────── */
@@ -562,4 +946,461 @@ const formattedDate = date.toLocaleDateString("en-US", {
   }
 
   document.addEventListener("astro:page-load", setup);
+</script>
+
+<script>
+  // ── Podcast / Text-to-Speech via SpeechSynthesis ──
+  // Lyrics-style reader with word-level sweep highlight.
+
+  function setupPodcast() {
+    if (!("speechSynthesis" in window)) return;
+
+    const synth = window.speechSynthesis;
+    const trigger = document.getElementById("podcast-trigger");
+    const dialog = document.getElementById("podcast-dialog") as HTMLDialogElement | null;
+    const closeBtn = document.getElementById("podcast-close");
+    const playBtn = document.getElementById("podcast-play");
+    const stopBtn = document.getElementById("podcast-stop");
+    const statusEl = document.getElementById("podcast-status");
+    const speedDownBtn = document.getElementById("podcast-speed-down");
+    const speedUpBtn = document.getElementById("podcast-speed-up");
+    const speedDisplay = document.getElementById("podcast-speed-display");
+    const lyricsEl = document.getElementById("podcast-lyrics");
+
+    if (!trigger || !dialog || !playBtn || !stopBtn || !statusEl || !speedDownBtn || !speedUpBtn || !speedDisplay || !lyricsEl) return;
+
+    trigger.removeAttribute("hidden");
+
+    // State
+    let sentences: string[] = [];
+    let sentenceEls: HTMLSpanElement[] = [];
+    let currentIndex = -1;
+    let isPlaying = false;
+    let isPaused = false;
+    let selectedVoice: SpeechSynthesisVoice | null = null;
+    let lyricsBuilt = false;
+    const speeds = [0.8, 0.9, 1, 1.1, 1.2, 1.5];
+    let speedIndex = 2;
+    let currentRate = speeds[speedIndex];
+
+    // Type assertions for elements that passed null checks
+
+    // ── Voice selection ──
+    function pickVoice() {
+      const voices = synth.getVoices();
+      if (voices.length === 0) return;
+
+      const preferred = [
+        "microsoft aria online", "microsoft jenny online",
+        "microsoft aria", "microsoft jenny",
+        "google uk english female",
+        "samantha", "karen", "moira", "tessa", "fiona",
+        "microsoft zira", "google us english", "female",
+      ];
+
+      for (const pref of preferred) {
+        const match = voices.find(
+          (v) => v.name.toLowerCase().includes(pref) && v.lang.startsWith("en")
+        );
+        if (match) { selectedVoice = match; return; }
+      }
+
+      const englishVoices = voices.filter((v) => v.lang.startsWith("en"));
+      const femaleGuess = englishVoices.find((v) =>
+        /female|woman|samantha|zira|jenny|aria|karen|fiona|tessa|moira|victoria|allison|ava|susan|kate/i.test(v.name)
+      );
+      selectedVoice = femaleGuess || englishVoices[0] || voices[0] || null;
+    }
+
+    pickVoice();
+    if (synth.onvoiceschanged !== undefined) {
+      synth.addEventListener("voiceschanged", pickVoice, { once: true });
+    }
+
+    // ── Extract readable text ──
+    function extractText(): string {
+      const prose = document.querySelector(".prose");
+      if (!prose) return "";
+      const clone = prose.cloneNode(true) as HTMLElement;
+      clone.querySelectorAll(
+        "pre, code, .astro-code, script, style, nav, .sr-only, .copy-btn, svg, .heading-anchor, sup.footnote-ref, .mermaid, .footnotes"
+      ).forEach((el) => el.remove());
+      let text = clone.textContent || "";
+      text = text.replace(/\n{3,}/g, "\n\n").trim();
+      return text;
+    }
+
+    // ── Split into sentences ──
+    function splitSentences(text: string): string[] {
+      const raw = text.split(/(?<=[.!?;:])\s+/);
+      const result: string[] = [];
+      let buf = "";
+
+      for (const part of raw) {
+        if (buf && (buf.length + part.length) < 120) {
+          buf += " " + part;
+        } else {
+          if (buf) result.push(buf.trim());
+          buf = part;
+        }
+      }
+      if (buf.trim()) result.push(buf.trim());
+      return result;
+    }
+
+    // ── Build lyrics UI ──
+    function buildLyrics() {
+      if (lyricsBuilt) return;
+      const text = extractText();
+      if (!text || !lyricsEl) return;
+
+      sentences = splitSentences(text);
+      lyricsEl.innerHTML = "";
+      sentenceEls = [];
+
+      sentences.forEach((sentence, i) => {
+        const div = document.createElement("div");
+        div.className = "podcast-sentence unread";
+        div.textContent = sentence;
+        div.dataset.index = String(i);
+        div.addEventListener("click", () => seekTo(i));
+        lyricsEl.appendChild(div);
+        sentenceEls.push(div);
+      });
+
+      lyricsBuilt = true;
+    }
+
+    // ── Update word-level sweep within the active sentence ──
+    function updateWordSweep(el: HTMLSpanElement, text: string, charIndex: number) {
+      // Remove CSS sweep fallback if we have real boundary data
+      el.classList.remove("sweeping");
+
+      if (charIndex <= 0) {
+        el.innerHTML = `<span class="podcast-unread">${escHtml(text)}</span>`;
+        return;
+      }
+      const readPart = text.slice(0, charIndex);
+      const unreadPart = text.slice(charIndex);
+      el.innerHTML =
+        `<span class="podcast-read">${escHtml(readPart)}</span>` +
+        `<span class="podcast-unread">${escHtml(unreadPart)}</span>`;
+    }
+
+    function escHtml(s: string): string {
+      return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    // ── Start CSS sweep animation fallback ──
+    function startCssSweep(el: HTMLSpanElement, durationSec: number) {
+      el.classList.remove("sweeping");
+      // Force reflow so animation restarts
+      void el.offsetWidth;
+      el.style.setProperty("--sweep-duration", `${durationSec}s`);
+      el.classList.add("sweeping");
+    }
+
+    // ── Clear sweep (restore plain text) ──
+    function clearSweep(el: HTMLSpanElement, text: string) {
+      el.classList.remove("sweeping");
+      el.textContent = text;
+    }
+
+    // ── Update visual state of all sentence elements ──
+    function updateLyricsHighlight(activeIdx: number) {
+      sentenceEls.forEach((el, i) => {
+        el.classList.remove("read", "active", "unread", "sweeping");
+        // Clear sweep markup from previously active elements
+        if (sentences[i] !== undefined && el.querySelector(".podcast-read, .podcast-unread")) {
+          clearSweep(el, sentences[i]);
+        }
+        if (i < activeIdx) {
+          el.classList.add("read");
+        } else if (i === activeIdx) {
+          el.classList.add("active");
+        } else {
+          el.classList.add("unread");
+        }
+      });
+
+      // Auto-scroll active sentence into view
+      const activeEl = sentenceEls[activeIdx];
+      if (activeEl && lyricsEl) {
+        const containerRect = lyricsEl.getBoundingClientRect();
+        const elRect = activeEl.getBoundingClientRect();
+        const relativeTop = elRect.top - containerRect.top;
+        const targetScroll = lyricsEl.scrollTop + relativeTop - containerRect.height * 0.35;
+        lyricsEl.scrollTo({ top: targetScroll, behavior: "smooth" });
+      }
+    }
+
+    // ── Reset lyrics ──
+    function resetLyrics() {
+      sentenceEls.forEach((el, i) => {
+        el.classList.remove("read", "active", "sweeping");
+        el.classList.add("unread");
+        if (sentences[i] !== undefined) clearSweep(el, sentences[i]);
+      });
+      if (lyricsEl) lyricsEl.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function markAllRead() {
+      sentenceEls.forEach((el, i) => {
+        el.classList.remove("active", "unread", "sweeping");
+        el.classList.add("read");
+        if (sentences[i] !== undefined) clearSweep(el, sentences[i]);
+      });
+    }
+
+    // ── Chrome workaround ──
+    let resumeTimer: ReturnType<typeof setInterval> | null = null;
+
+    function startResumeTimer() {
+      stopResumeTimer();
+      resumeTimer = setInterval(() => {
+        if (synth.speaking && !synth.paused) {
+          synth.pause();
+          synth.resume();
+        }
+      }, 10000);
+    }
+
+    function stopResumeTimer() {
+      if (resumeTimer) { clearInterval(resumeTimer); resumeTimer = null; }
+    }
+
+    // ── Create utterance ──
+    function makeUtterance(text: string): SpeechSynthesisUtterance {
+      const utt = new SpeechSynthesisUtterance(text);
+      if (selectedVoice) utt.voice = selectedVoice;
+      utt.rate = currentRate;
+      utt.pitch = 0.85;
+      utt.volume = 1.0;
+      return utt;
+    }
+
+    // ── Speak sentence at index ──
+    function speakIndex(index: number) {
+      if (index >= sentences.length) {
+        markAllRead();
+        isPlaying = false;
+        isPaused = false;
+        currentIndex = -1;
+        updatePlayBtn();
+        setStatus("Finished");
+        return;
+      }
+
+      currentIndex = index;
+      updateLyricsHighlight(index);
+
+      const pct = Math.round((index / sentences.length) * 100);
+      setStatus(`${pct}%`);
+
+      const text = sentences[index];
+      const el = sentenceEls[index];
+      const utt = makeUtterance(text);
+
+      // Track whether onboundary fires at all
+      let boundaryFired = false;
+
+      // Word-level boundary tracking for sweep highlight
+      utt.onboundary = (e) => {
+        if (e.name === "word" || e.name === "sentence") {
+          boundaryFired = true;
+          updateWordSweep(el, text, e.charIndex);
+        }
+      };
+
+      utt.onstart = () => {
+        startResumeTimer();
+        // Estimate duration: ~150ms per char at rate 1, adjusted by rate
+        const estimatedDuration = (text.length * 0.065) / currentRate;
+        // Start CSS sweep as fallback — will be removed if onboundary fires
+        startCssSweep(el, estimatedDuration);
+      };
+
+      utt.onend = () => {
+        stopResumeTimer();
+        // Ensure fully read state
+        el.classList.remove("sweeping");
+        if (boundaryFired) {
+          updateWordSweep(el, text, text.length);
+        } else {
+          clearSweep(el, text);
+        }
+        speakIndex(index + 1);
+      };
+
+      utt.onerror = (e) => {
+        if (e.error === "interrupted" || e.error === "canceled") return;
+        console.warn("SpeechSynthesis error:", e.error);
+        stopResumeTimer();
+        el.classList.remove("sweeping");
+        speakIndex(index + 1);
+      };
+
+      synth.speak(utt);
+    }
+
+    // ── Seek ──
+    function seekTo(index: number) {
+      synth.cancel();
+      stopResumeTimer();
+
+      if (!isPlaying) {
+        isPlaying = true;
+        isPaused = false;
+        updatePlayBtn();
+      }
+      if (isPaused) {
+        isPaused = false;
+        updatePlayBtn();
+      }
+
+      speakIndex(index);
+    }
+
+    // ── UI helpers ──
+    function updatePlayBtn() {
+      if (!playBtn) return;
+      playBtn.classList.toggle("playing", isPlaying && !isPaused);
+      playBtn.setAttribute("aria-label", isPlaying && !isPaused ? "Pause" : "Play");
+      playBtn.setAttribute("title", isPlaying && !isPaused ? "Pause" : "Play");
+    }
+
+    function setStatus(text: string) {
+      if (!statusEl) return;
+      statusEl.textContent = text;
+    }
+
+    function fullStop() {
+      synth.cancel();
+      stopResumeTimer();
+      isPlaying = false;
+      isPaused = false;
+      currentIndex = -1;
+      updatePlayBtn();
+    }
+
+    // ── Dialog ──
+    trigger.addEventListener("click", () => {
+      buildLyrics();
+      dialog.showModal();
+    });
+
+    closeBtn?.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      fullStop();
+      resetLyrics();
+      setStatus("Ready");
+      dialog.close();
+    });
+
+    dialog.addEventListener("click", (e) => {
+      // Close on backdrop click (click on the dialog element itself, not its children)
+      const rect = dialog.getBoundingClientRect();
+      const inside =
+        e.clientX >= rect.left &&
+        e.clientX <= rect.right &&
+        e.clientY >= rect.top &&
+        e.clientY <= rect.bottom;
+      if (!inside) {
+        fullStop();
+        resetLyrics();
+        setStatus("Ready");
+        dialog.close();
+      }
+    });
+
+    // Also handle Escape key via the close event
+    dialog.addEventListener("close", () => {
+      fullStop();
+      resetLyrics();
+      setStatus("Ready");
+    });
+
+    // ── Play / Pause ──
+    playBtn.addEventListener("click", () => {
+      if (isPlaying && !isPaused) {
+        synth.pause();
+        isPaused = true;
+        stopResumeTimer();
+        updatePlayBtn();
+        setStatus("Paused");
+        return;
+      }
+
+      if (isPlaying && isPaused) {
+        synth.resume();
+        isPaused = false;
+        startResumeTimer();
+        updatePlayBtn();
+        const pct = currentIndex >= 0 ? Math.round((currentIndex / sentences.length) * 100) : 0;
+        setStatus(`${pct}%`);
+        return;
+      }
+
+      buildLyrics();
+      if (sentences.length === 0) { setStatus("No content"); return; }
+
+      isPlaying = true;
+      isPaused = false;
+      updatePlayBtn();
+      speakIndex(0);
+    });
+
+    // ── Stop ──
+    stopBtn.addEventListener("click", () => {
+      fullStop();
+      resetLyrics();
+      setStatus("Ready");
+    });
+
+    // ── Speed controls ──
+    function updateSpeedUI() {
+      if (!speedDisplay) return;
+      speedDisplay.textContent = `${currentRate}x`;
+      (speedDownBtn as HTMLButtonElement).disabled = speedIndex <= 0;
+      (speedUpBtn as HTMLButtonElement).disabled = speedIndex >= speeds.length - 1;
+    }
+
+    function changeSpeed(newIndex: number) {
+      if (newIndex < 0 || newIndex >= speeds.length) return;
+      speedIndex = newIndex;
+      currentRate = speeds[speedIndex];
+      updateSpeedUI();
+
+      // If playing, restart current sentence with new speed after cancel settles
+      if (isPlaying && currentIndex >= 0 && !isPaused) {
+        synth.cancel();
+        stopResumeTimer();
+        // Delay to let cancel complete before speaking again
+        setTimeout(() => {
+          if (currentIndex >= 0) {
+            speakIndex(currentIndex);
+          }
+        }, 50);
+      }
+    }
+
+    updateSpeedUI();
+
+    speedDownBtn.addEventListener("click", () => changeSpeed(speedIndex - 1));
+    speedUpBtn.addEventListener("click", () => changeSpeed(speedIndex + 1));
+
+    // ── Cleanup on page navigation ──
+    document.addEventListener("astro:before-swap", () => {
+      synth.cancel();
+      stopResumeTimer();
+    }, { once: true });
+
+    window.addEventListener("beforeunload", () => {
+      synth.cancel();
+      stopResumeTimer();
+    });
+  }
+
+  document.addEventListener("astro:page-load", setupPodcast);
 </script>
