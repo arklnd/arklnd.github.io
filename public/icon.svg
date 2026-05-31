@@ -1,14 +1,33 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="96" fill="#3d6aa8"/>
-  <text
-    x="256"
-    y="365"
-    font-family="Georgia, 'Times New Roman', serif"
-    font-size="320"
-    font-weight="700"
-    fill="#ffffff"
-    text-anchor="middle"
-    dominant-baseline="auto"
-    letter-spacing="-8"
-  >A</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-6 -6 54 54" fill="none">
+  <defs>
+    <linearGradient id="brand-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3d6aa8" />
+      <stop offset="100%" stop-color="#2c4f82" />
+    </linearGradient>
+  </defs>
+  <!-- V shape -->
+  <path
+    d="M 5 28
+       C 6 34, 9 42, 13 46
+       C 15 42, 17 34, 22 8"
+    stroke="url(#brand-grad)" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" fill="none"
+  />
+  <!-- Pen pressure taper at V left entry -->
+  <path
+    d="M 3 26 C 4 27, 5 28, 5 28"
+    stroke="url(#brand-grad)" stroke-width="1.5" stroke-linecap="round" fill="none"
+  />
+  <!-- Bengali curve -->
+  <path
+    d="M 14 14
+       C 9 2, 28 -6, 36 -1
+       S 38 16, 34 32
+       C 33 38, 32 44, 34 44"
+    stroke="url(#brand-grad)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"
+  />
+  <!-- Middle crossbar -->
+  <path
+    d="M 9 29 C 14 26, 24 23, 35 22"
+    stroke="url(#brand-grad)" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.75"
+  />
 </svg>
