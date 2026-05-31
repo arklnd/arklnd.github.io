@@ -1218,20 +1218,23 @@ const formattedDate = date.toLocaleDateString("en-US", {
 
     function startResumeTimer() {
       stopResumeTimer();
-      // Pause/resume every 5s to prevent Chrome from killing long utterances
-      resumeTimer = setInterval(() => {
-        if (synth.speaking && !synth.paused) {
-          synth.pause();
-          synth.resume();
-        }
-      }, 5000);
-      // Watchdog: detect when speech died silently (no onend fired)
+      // Pause/resume only for online voices — local voices are killed by this
+      if (selectedVoice && !selectedVoice.localService) {
+        resumeTimer = setInterval(() => {
+          if (synth.speaking && !synth.paused) {
+            synth.pause();
+            synth.resume();
+          }
+        }, 10000);
+      }
+      // Watchdog for all voices: detect when speech died silently (no onend fired)
+      // Use 3s delay to avoid false positives right after pause/resume
       watchdogTimer = setInterval(() => {
         if (isPlaying && !isPaused && currentIndex >= 0 && !synth.speaking && !synth.paused) {
           console.warn("Podcast watchdog: speech died silently, re-speaking index", currentIndex);
           speakIndex(currentIndex);
         }
-      }, 2000);
+      }, 3000);
     }
 
     function stopResumeTimer() {
