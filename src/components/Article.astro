@@ -1036,13 +1036,13 @@ const formattedDate = date.toLocaleDateString("en-US", {
         return a.name.localeCompare(b.name);
       });
 
-      voiceSelect.innerHTML = "";
+      voiceSelect!.innerHTML = "";
       sorted.forEach((voice, i) => {
         const opt = document.createElement("option");
         opt.value = String(i);
         const local = voice.localService ? "" : "<ONLINE>";
         opt.textContent = `${voice.name} [${voice.lang}]${local}`;
-        voiceSelect.appendChild(opt);
+        voiceSelect!.appendChild(opt);
       });
 
       // Restore saved voice from localStorage, or default to first
@@ -1052,12 +1052,12 @@ const formattedDate = date.toLocaleDateString("en-US", {
         const found = sorted.findIndex((v) => v.name === savedVoiceName);
         if (found >= 0) defaultIdx = found;
       }
-      voiceSelect.value = String(defaultIdx);
+      voiceSelect!.value = String(defaultIdx);
       selectedVoice = sorted[defaultIdx] || null;
 
       // Handle user voice change
-      voiceSelect.onchange = () => {
-        const idx = parseInt(voiceSelect.value, 10);
+      voiceSelect!.onchange = () => {
+        const idx = parseInt(voiceSelect!.value, 10);
         selectedVoice = sorted[idx] || null;
         try { localStorage.setItem("podcast-voice", selectedVoice?.name || ""); } catch {}
 
