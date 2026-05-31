@@ -1045,14 +1045,21 @@ const formattedDate = date.toLocaleDateString("en-US", {
         voiceSelect.appendChild(opt);
       });
 
-      // Default to first voice (English voices are sorted first)
-      voiceSelect.value = "0";
-      selectedVoice = sorted[0] || null;
+      // Restore saved voice from localStorage, or default to first
+      const savedVoiceName = localStorage.getItem("podcast-voice");
+      let defaultIdx = 0;
+      if (savedVoiceName) {
+        const found = sorted.findIndex((v) => v.name === savedVoiceName);
+        if (found >= 0) defaultIdx = found;
+      }
+      voiceSelect.value = String(defaultIdx);
+      selectedVoice = sorted[defaultIdx] || null;
 
       // Handle user voice change
       voiceSelect.onchange = () => {
         const idx = parseInt(voiceSelect.value, 10);
         selectedVoice = sorted[idx] || null;
+        try { localStorage.setItem("podcast-voice", selectedVoice?.name || ""); } catch {}
 
         // If playing, restart current sentence with new voice
         if (isPlaying && currentIndex >= 0 && !isPaused) {
