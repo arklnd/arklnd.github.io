@@ -21,86 +21,622 @@ const supabaseKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
     </button>
   </div>
   <div class="reaction-picker" id="reaction-picker" hidden>
+    <input type="text" class="picker-search" id="picker-search" placeholder="Search emoji..." autocomplete="off" />
+    <div class="picker-scroll" id="picker-scroll">
     <div class="picker-grid" role="group" aria-label="Choose an emoji">
-      <button class="picker-emoji" data-emoji="👍" aria-label="thumbs up" title="Thumbs up">👍</button>
-      <button class="picker-emoji" data-emoji="👎" aria-label="thumbs down" title="Thumbs down">👎</button>
-      <button class="picker-emoji" data-emoji="❤️" aria-label="heart" title="Heart">❤️</button>
-      <button class="picker-emoji" data-emoji="🔥" aria-label="fire" title="Fire">🔥</button>
-      <button class="picker-emoji" data-emoji="🎉" aria-label="tada" title="Tada">🎉</button>
-      <button class="picker-emoji" data-emoji="👏" aria-label="clap" title="Clap">👏</button>
-      <button class="picker-emoji" data-emoji="💯" aria-label="hundred" title="100">💯</button>
-      <button class="picker-emoji" data-emoji="🚀" aria-label="rocket" title="Rocket">🚀</button>
-      <button class="picker-emoji" data-emoji="💡" aria-label="bulb" title="Idea">💡</button>
-      <button class="picker-emoji" data-emoji="🤔" aria-label="thinking" title="Thinking">🤔</button>
-      <button class="picker-emoji" data-emoji="👀" aria-label="eyes" title="Eyes">👀</button>
-      <button class="picker-emoji" data-emoji="🧠" aria-label="brain" title="Brain">🧠</button>
-      <button class="picker-emoji" data-emoji="😊" aria-label="smile" title="Smile">😊</button>
-      <button class="picker-emoji" data-emoji="😂" aria-label="joy" title="Joy">😂</button>
-      <button class="picker-emoji" data-emoji="😍" aria-label="heart eyes" title="Heart eyes">😍</button>
-      <button class="picker-emoji" data-emoji="🥳" aria-label="party" title="Party">🥳</button>
-      <button class="picker-emoji" data-emoji="😎" aria-label="cool" title="Cool">😎</button>
-      <button class="picker-emoji" data-emoji="🤯" aria-label="mind blown" title="Mind blown">🤯</button>
-      <button class="picker-emoji" data-emoji="😢" aria-label="sad" title="Sad">😢</button>
-      <button class="picker-emoji" data-emoji="😮" aria-label="surprised" title="Surprised">😮</button>
-      <button class="picker-emoji" data-emoji="🤩" aria-label="star struck" title="Star struck">🤩</button>
-      <button class="picker-emoji" data-emoji="🫡" aria-label="salute" title="Salute">🫡</button>
-      <button class="picker-emoji" data-emoji="⭐" aria-label="star" title="Star">⭐</button>
-      <button class="picker-emoji" data-emoji="✅" aria-label="check" title="Check">✅</button>
-      <button class="picker-emoji" data-emoji="❌" aria-label="cross" title="Cross">❌</button>
-      <button class="picker-emoji" data-emoji="📝" aria-label="memo" title="Memo">📝</button>
-      <button class="picker-emoji" data-emoji="💪" aria-label="muscle" title="Muscle">💪</button>
-      <button class="picker-emoji" data-emoji="🙌" aria-label="raised hands" title="Raised hands">🙌</button>
-      <button class="picker-emoji" data-emoji="🤝" aria-label="handshake" title="Handshake">🤝</button>
-      <button class="picker-emoji" data-emoji="🙏" aria-label="pray" title="Pray">🙏</button>
-      <button class="picker-emoji" data-emoji="💎" aria-label="gem" title="Gem">💎</button>
-      <button class="picker-emoji" data-emoji="🏆" aria-label="trophy" title="Trophy">🏆</button>
-      <button class="picker-emoji" data-emoji="🎯" aria-label="bullseye" title="Bullseye">🎯</button>
-      <button class="picker-emoji" data-emoji="🔑" aria-label="key" title="Key">🔑</button>
-      <button class="picker-emoji" data-emoji="⚡" aria-label="lightning" title="Lightning">⚡</button>
-      <button class="picker-emoji" data-emoji="🌟" aria-label="glowing star" title="Glowing star">🌟</button>
-      <button class="picker-emoji" data-emoji="💬" aria-label="speech" title="Speech">💬</button>
-      <button class="picker-emoji" data-emoji="📌" aria-label="pin" title="Pin">📌</button>
-      <button class="picker-emoji" data-emoji="🔗" aria-label="link" title="Link">🔗</button>
-      <button class="picker-emoji" data-emoji="📚" aria-label="books" title="Books">📚</button>
-      <button class="picker-emoji" data-emoji="🛠️" aria-label="tools" title="Tools">🛠️</button>
-      <button class="picker-emoji" data-emoji="⚙️" aria-label="gear" title="Gear">⚙️</button>
-      <button class="picker-emoji" data-emoji="🐛" aria-label="bug" title="Bug">🐛</button>
-      <button class="picker-emoji" data-emoji="🧪" aria-label="test tube" title="Test tube">🧪</button>
-      <button class="picker-emoji" data-emoji="🎨" aria-label="palette" title="Palette">🎨</button>
-      <button class="picker-emoji" data-emoji="🧩" aria-label="puzzle" title="Puzzle">🧩</button>
-      <button class="picker-emoji" data-emoji="💻" aria-label="laptop" title="Laptop">💻</button>
-      <button class="picker-emoji" data-emoji="☕" aria-label="coffee" title="Coffee">☕</button>
-      <button class="picker-emoji" data-emoji="🌍" aria-label="globe" title="Globe">🌍</button>
-      <button class="picker-emoji" data-emoji="💥" aria-label="boom" title="Boom">💥</button>
-      <button class="picker-emoji" data-emoji="💫" aria-label="dizzy" title="Dizzy">💫</button>
-      <button class="picker-emoji" data-emoji="🔮" aria-label="crystal ball" title="Crystal ball">🔮</button>
-      <button class="picker-emoji" data-emoji="🎵" aria-label="music" title="Music">🎵</button>
-      <button class="picker-emoji" data-emoji="📸" aria-label="camera" title="Camera">📸</button>
-      <button class="picker-emoji" data-emoji="📡" aria-label="satellite" title="Satellite">📡</button>
-      <button class="picker-emoji" data-emoji="🔒" aria-label="lock" title="Lock">🔒</button>
-      <button class="picker-emoji" data-emoji="🛡️" aria-label="shield" title="Shield">🛡️</button>
-      <button class="picker-emoji" data-emoji="🌈" aria-label="rainbow" title="Rainbow">🌈</button>
-      <button class="picker-emoji" data-emoji="🤖" aria-label="robot" title="Robot">🤖</button>
-      <button class="picker-emoji" data-emoji="👾" aria-label="alien" title="Alien">👾</button>
-      <button class="picker-emoji" data-emoji="🧬" aria-label="dna" title="DNA">🧬</button>
-      <button class="picker-emoji" data-emoji="📊" aria-label="chart" title="Chart">📊</button>
-      <button class="picker-emoji" data-emoji="📈" aria-label="chart up" title="Chart up">📈</button>
-      <button class="picker-emoji" data-emoji="🔍" aria-label="search" title="Search">🔍</button>
-      <button class="picker-emoji" data-emoji="💤" aria-label="zzz" title="Zzz">💤</button>
-      <button class="picker-emoji" data-emoji="⏰" aria-label="alarm" title="Alarm">⏰</button>
-      <button class="picker-emoji" data-emoji="📎" aria-label="paperclip" title="Paperclip">📎</button>
-      <button class="picker-emoji" data-emoji="📜" aria-label="scroll" title="Scroll">📜</button>
-      <button class="picker-emoji" data-emoji="📦" aria-label="package" title="Package">📦</button>
-      <button class="picker-emoji" data-emoji="🧱" aria-label="brick" title="Brick">🧱</button>
-      <button class="picker-emoji" data-emoji="🌱" aria-label="seedling" title="Seedling">🌱</button>
-      <button class="picker-emoji" data-emoji="✨" aria-label="sparkles" title="Sparkles">✨</button>
-      <button class="picker-emoji" data-emoji="💩" aria-label="poop" title="Poop">💩</button>
-      <button class="picker-emoji" data-emoji="💀" aria-label="skull" title="Skull">💀</button>
-      <button class="picker-emoji" data-emoji="🤡" aria-label="clown" title="Clown">🤡</button>
-      <button class="picker-emoji" data-emoji="🦋" aria-label="butterfly" title="Butterfly">🦋</button>
-      <button class="picker-emoji" data-emoji="🐢" aria-label="turtle" title="Turtle">🐢</button>
-      <button class="picker-emoji" data-emoji="🦉" aria-label="owl" title="Owl">🦉</button>
+      <!-- Smileys & Faces -->
+      <span class="picker-group-label">Smileys</span>
+      <button class="picker-emoji" data-emoji="😀">😀</button>
+      <button class="picker-emoji" data-emoji="😃">😃</button>
+      <button class="picker-emoji" data-emoji="😄">😄</button>
+      <button class="picker-emoji" data-emoji="😁">😁</button>
+      <button class="picker-emoji" data-emoji="😆">😆</button>
+      <button class="picker-emoji" data-emoji="😅">😅</button>
+      <button class="picker-emoji" data-emoji="🤣">🤣</button>
+      <button class="picker-emoji" data-emoji="😂">😂</button>
+      <button class="picker-emoji" data-emoji="🙂">🙂</button>
+      <button class="picker-emoji" data-emoji="😊">😊</button>
+      <button class="picker-emoji" data-emoji="😇">😇</button>
+      <button class="picker-emoji" data-emoji="🥰">🥰</button>
+      <button class="picker-emoji" data-emoji="😍">😍</button>
+      <button class="picker-emoji" data-emoji="🤩">🤩</button>
+      <button class="picker-emoji" data-emoji="😘">😘</button>
+      <button class="picker-emoji" data-emoji="😗">😗</button>
+      <button class="picker-emoji" data-emoji="😚">😚</button>
+      <button class="picker-emoji" data-emoji="😙">😙</button>
+      <button class="picker-emoji" data-emoji="🥲">🥲</button>
+      <button class="picker-emoji" data-emoji="😋">😋</button>
+      <button class="picker-emoji" data-emoji="😛">😛</button>
+      <button class="picker-emoji" data-emoji="😜">😜</button>
+      <button class="picker-emoji" data-emoji="🤪">🤪</button>
+      <button class="picker-emoji" data-emoji="😝">😝</button>
+      <button class="picker-emoji" data-emoji="🤑">🤑</button>
+      <button class="picker-emoji" data-emoji="🤗">🤗</button>
+      <button class="picker-emoji" data-emoji="🤭">🤭</button>
+      <button class="picker-emoji" data-emoji="🤫">🤫</button>
+      <button class="picker-emoji" data-emoji="🤔">🤔</button>
+      <button class="picker-emoji" data-emoji="🫡">🫡</button>
+      <button class="picker-emoji" data-emoji="🤐">🤐</button>
+      <button class="picker-emoji" data-emoji="🤨">🤨</button>
+      <button class="picker-emoji" data-emoji="😐">😐</button>
+      <button class="picker-emoji" data-emoji="😑">😑</button>
+      <button class="picker-emoji" data-emoji="😶">😶</button>
+      <button class="picker-emoji" data-emoji="🫥">🫥</button>
+      <button class="picker-emoji" data-emoji="😏">😏</button>
+      <button class="picker-emoji" data-emoji="😒">😒</button>
+      <button class="picker-emoji" data-emoji="🙄">🙄</button>
+      <button class="picker-emoji" data-emoji="😬">😬</button>
+      <button class="picker-emoji" data-emoji="😮‍💨">😮‍💨</button>
+      <button class="picker-emoji" data-emoji="🤥">🤥</button>
+      <button class="picker-emoji" data-emoji="😌">😌</button>
+      <button class="picker-emoji" data-emoji="😔">😔</button>
+      <button class="picker-emoji" data-emoji="😪">😪</button>
+      <button class="picker-emoji" data-emoji="🤤">🤤</button>
+      <button class="picker-emoji" data-emoji="😴">😴</button>
+      <button class="picker-emoji" data-emoji="😷">😷</button>
+      <button class="picker-emoji" data-emoji="🤒">🤒</button>
+      <button class="picker-emoji" data-emoji="🤕">🤕</button>
+      <button class="picker-emoji" data-emoji="🤢">🤢</button>
+      <button class="picker-emoji" data-emoji="🤮">🤮</button>
+      <button class="picker-emoji" data-emoji="🥴">🥴</button>
+      <button class="picker-emoji" data-emoji="😵">😵</button>
+      <button class="picker-emoji" data-emoji="😵‍💫">😵‍💫</button>
+      <button class="picker-emoji" data-emoji="🤯">🤯</button>
+      <button class="picker-emoji" data-emoji="🥳">🥳</button>
+      <button class="picker-emoji" data-emoji="🥸">🥸</button>
+      <button class="picker-emoji" data-emoji="😎">😎</button>
+      <button class="picker-emoji" data-emoji="🤓">🤓</button>
+      <button class="picker-emoji" data-emoji="🧐">🧐</button>
+      <button class="picker-emoji" data-emoji="😕">😕</button>
+      <button class="picker-emoji" data-emoji="🫤">🫤</button>
+      <button class="picker-emoji" data-emoji="😟">😟</button>
+      <button class="picker-emoji" data-emoji="🙁">🙁</button>
+      <button class="picker-emoji" data-emoji="😮">😮</button>
+      <button class="picker-emoji" data-emoji="😯">😯</button>
+      <button class="picker-emoji" data-emoji="😲">😲</button>
+      <button class="picker-emoji" data-emoji="😳">😳</button>
+      <button class="picker-emoji" data-emoji="🥺">🥺</button>
+      <button class="picker-emoji" data-emoji="🥹">🥹</button>
+      <button class="picker-emoji" data-emoji="😦">😦</button>
+      <button class="picker-emoji" data-emoji="😧">😧</button>
+      <button class="picker-emoji" data-emoji="😨">😨</button>
+      <button class="picker-emoji" data-emoji="😰">😰</button>
+      <button class="picker-emoji" data-emoji="😥">😥</button>
+      <button class="picker-emoji" data-emoji="😢">😢</button>
+      <button class="picker-emoji" data-emoji="😭">😭</button>
+      <button class="picker-emoji" data-emoji="😱">😱</button>
+      <button class="picker-emoji" data-emoji="😖">😖</button>
+      <button class="picker-emoji" data-emoji="😣">😣</button>
+      <button class="picker-emoji" data-emoji="😞">😞</button>
+      <button class="picker-emoji" data-emoji="😓">😓</button>
+      <button class="picker-emoji" data-emoji="😩">😩</button>
+      <button class="picker-emoji" data-emoji="😫">😫</button>
+      <button class="picker-emoji" data-emoji="🥱">🥱</button>
+      <button class="picker-emoji" data-emoji="😤">😤</button>
+      <button class="picker-emoji" data-emoji="😡">😡</button>
+      <button class="picker-emoji" data-emoji="😠">😠</button>
+      <button class="picker-emoji" data-emoji="🤬">🤬</button>
+      <button class="picker-emoji" data-emoji="😈">😈</button>
+      <button class="picker-emoji" data-emoji="👿">👿</button>
+      <button class="picker-emoji" data-emoji="💀">💀</button>
+      <button class="picker-emoji" data-emoji="☠️">☠️</button>
+      <button class="picker-emoji" data-emoji="💩">💩</button>
+      <button class="picker-emoji" data-emoji="🤡">🤡</button>
+      <button class="picker-emoji" data-emoji="👹">👹</button>
+      <button class="picker-emoji" data-emoji="👺">👺</button>
+      <button class="picker-emoji" data-emoji="👻">👻</button>
+      <button class="picker-emoji" data-emoji="👽">👽</button>
+      <button class="picker-emoji" data-emoji="👾">👾</button>
+      <button class="picker-emoji" data-emoji="🤖">🤖</button>
+
+      <!-- Gestures & Hands -->
+      <span class="picker-group-label">Gestures</span>
+      <button class="picker-emoji" data-emoji="👍">👍</button>
+      <button class="picker-emoji" data-emoji="👎">👎</button>
+      <button class="picker-emoji" data-emoji="👏">👏</button>
+      <button class="picker-emoji" data-emoji="🙌">🙌</button>
+      <button class="picker-emoji" data-emoji="🤝">🤝</button>
+      <button class="picker-emoji" data-emoji="🙏">🙏</button>
+      <button class="picker-emoji" data-emoji="💪">💪</button>
+      <button class="picker-emoji" data-emoji="✌️">✌️</button>
+      <button class="picker-emoji" data-emoji="🤞">🤞</button>
+      <button class="picker-emoji" data-emoji="🫰">🫰</button>
+      <button class="picker-emoji" data-emoji="🤟">🤟</button>
+      <button class="picker-emoji" data-emoji="🤘">🤘</button>
+      <button class="picker-emoji" data-emoji="🤙">🤙</button>
+      <button class="picker-emoji" data-emoji="👈">👈</button>
+      <button class="picker-emoji" data-emoji="👉">👉</button>
+      <button class="picker-emoji" data-emoji="👆">👆</button>
+      <button class="picker-emoji" data-emoji="👇">👇</button>
+      <button class="picker-emoji" data-emoji="☝️">☝️</button>
+      <button class="picker-emoji" data-emoji="🫵">🫵</button>
+      <button class="picker-emoji" data-emoji="✋">✋</button>
+      <button class="picker-emoji" data-emoji="🤚">🤚</button>
+      <button class="picker-emoji" data-emoji="🖐️">🖐️</button>
+      <button class="picker-emoji" data-emoji="🖖">🖖</button>
+      <button class="picker-emoji" data-emoji="👋">👋</button>
+      <button class="picker-emoji" data-emoji="🤏">🤏</button>
+      <button class="picker-emoji" data-emoji="✍️">✍️</button>
+      <button class="picker-emoji" data-emoji="🫶">🫶</button>
+      <button class="picker-emoji" data-emoji="👀">👀</button>
+      <button class="picker-emoji" data-emoji="👁️">👁️</button>
+      <button class="picker-emoji" data-emoji="👅">👅</button>
+      <button class="picker-emoji" data-emoji="👄">👄</button>
+      <button class="picker-emoji" data-emoji="🧠">🧠</button>
+
+      <!-- Hearts & Emotions -->
+      <span class="picker-group-label">Hearts</span>
+      <button class="picker-emoji" data-emoji="❤️">❤️</button>
+      <button class="picker-emoji" data-emoji="🧡">🧡</button>
+      <button class="picker-emoji" data-emoji="💛">💛</button>
+      <button class="picker-emoji" data-emoji="💚">💚</button>
+      <button class="picker-emoji" data-emoji="💙">💙</button>
+      <button class="picker-emoji" data-emoji="💜">💜</button>
+      <button class="picker-emoji" data-emoji="🖤">🖤</button>
+      <button class="picker-emoji" data-emoji="🤍">🤍</button>
+      <button class="picker-emoji" data-emoji="🤎">🤎</button>
+      <button class="picker-emoji" data-emoji="💔">💔</button>
+      <button class="picker-emoji" data-emoji="❤️‍🔥">❤️‍🔥</button>
+      <button class="picker-emoji" data-emoji="❤️‍🩹">❤️‍🩹</button>
+      <button class="picker-emoji" data-emoji="💕">💕</button>
+      <button class="picker-emoji" data-emoji="💞">💞</button>
+      <button class="picker-emoji" data-emoji="💓">💓</button>
+      <button class="picker-emoji" data-emoji="💗">💗</button>
+      <button class="picker-emoji" data-emoji="💖">💖</button>
+      <button class="picker-emoji" data-emoji="💘">💘</button>
+      <button class="picker-emoji" data-emoji="💝">💝</button>
+      <button class="picker-emoji" data-emoji="💟">💟</button>
+      <button class="picker-emoji" data-emoji="💯">💯</button>
+      <button class="picker-emoji" data-emoji="💢">💢</button>
+      <button class="picker-emoji" data-emoji="💥">💥</button>
+      <button class="picker-emoji" data-emoji="💫">💫</button>
+      <button class="picker-emoji" data-emoji="💦">💦</button>
+      <button class="picker-emoji" data-emoji="💨">💨</button>
+      <button class="picker-emoji" data-emoji="💬">💬</button>
+      <button class="picker-emoji" data-emoji="💤">💤</button>
+
+      <!-- Animals & Nature -->
+      <span class="picker-group-label">Animals & Nature</span>
+      <button class="picker-emoji" data-emoji="🐶">🐶</button>
+      <button class="picker-emoji" data-emoji="🐱">🐱</button>
+      <button class="picker-emoji" data-emoji="🐭">🐭</button>
+      <button class="picker-emoji" data-emoji="🐹">🐹</button>
+      <button class="picker-emoji" data-emoji="🐰">🐰</button>
+      <button class="picker-emoji" data-emoji="🦊">🦊</button>
+      <button class="picker-emoji" data-emoji="🐻">🐻</button>
+      <button class="picker-emoji" data-emoji="🐼">🐼</button>
+      <button class="picker-emoji" data-emoji="🐨">🐨</button>
+      <button class="picker-emoji" data-emoji="🐯">🐯</button>
+      <button class="picker-emoji" data-emoji="🦁">🦁</button>
+      <button class="picker-emoji" data-emoji="🐮">🐮</button>
+      <button class="picker-emoji" data-emoji="🐷">🐷</button>
+      <button class="picker-emoji" data-emoji="🐸">🐸</button>
+      <button class="picker-emoji" data-emoji="🐵">🐵</button>
+      <button class="picker-emoji" data-emoji="🙈">🙈</button>
+      <button class="picker-emoji" data-emoji="🙉">🙉</button>
+      <button class="picker-emoji" data-emoji="🙊">🙊</button>
+      <button class="picker-emoji" data-emoji="🐔">🐔</button>
+      <button class="picker-emoji" data-emoji="🐧">🐧</button>
+      <button class="picker-emoji" data-emoji="🐦">🐦</button>
+      <button class="picker-emoji" data-emoji="🦅">🦅</button>
+      <button class="picker-emoji" data-emoji="🦉">🦉</button>
+      <button class="picker-emoji" data-emoji="🦇">🦇</button>
+      <button class="picker-emoji" data-emoji="🐺">🐺</button>
+      <button class="picker-emoji" data-emoji="🐗">🐗</button>
+      <button class="picker-emoji" data-emoji="🐴">🐴</button>
+      <button class="picker-emoji" data-emoji="🦄">🦄</button>
+      <button class="picker-emoji" data-emoji="🐝">🐝</button>
+      <button class="picker-emoji" data-emoji="🪱">🪱</button>
+      <button class="picker-emoji" data-emoji="🐛">🐛</button>
+      <button class="picker-emoji" data-emoji="🦋">🦋</button>
+      <button class="picker-emoji" data-emoji="🐌">🐌</button>
+      <button class="picker-emoji" data-emoji="🐞">🐞</button>
+      <button class="picker-emoji" data-emoji="🐜">🐜</button>
+      <button class="picker-emoji" data-emoji="🪲">🪲</button>
+      <button class="picker-emoji" data-emoji="🐢">🐢</button>
+      <button class="picker-emoji" data-emoji="🐍">🐍</button>
+      <button class="picker-emoji" data-emoji="🦎">🦎</button>
+      <button class="picker-emoji" data-emoji="🦖">🦖</button>
+      <button class="picker-emoji" data-emoji="🐙">🐙</button>
+      <button class="picker-emoji" data-emoji="🦑">🦑</button>
+      <button class="picker-emoji" data-emoji="🦐">🦐</button>
+      <button class="picker-emoji" data-emoji="🐠">🐠</button>
+      <button class="picker-emoji" data-emoji="🐟">🐟</button>
+      <button class="picker-emoji" data-emoji="🐬">🐬</button>
+      <button class="picker-emoji" data-emoji="🐳">🐳</button>
+      <button class="picker-emoji" data-emoji="🦈">🦈</button>
+      <button class="picker-emoji" data-emoji="🐊">🐊</button>
+      <button class="picker-emoji" data-emoji="🐅">🐅</button>
+      <button class="picker-emoji" data-emoji="🐆">🐆</button>
+      <button class="picker-emoji" data-emoji="🦓">🦓</button>
+      <button class="picker-emoji" data-emoji="🦍">🦍</button>
+      <button class="picker-emoji" data-emoji="🦧">🦧</button>
+      <button class="picker-emoji" data-emoji="🐘">🐘</button>
+      <button class="picker-emoji" data-emoji="🦛">🦛</button>
+      <button class="picker-emoji" data-emoji="🦏">🦏</button>
+      <button class="picker-emoji" data-emoji="🐪">🐪</button>
+      <button class="picker-emoji" data-emoji="🦒">🦒</button>
+      <button class="picker-emoji" data-emoji="🦘">🦘</button>
+      <button class="picker-emoji" data-emoji="🦬">🦬</button>
+      <button class="picker-emoji" data-emoji="🐃">🐃</button>
+      <button class="picker-emoji" data-emoji="🦙">🦙</button>
+      <button class="picker-emoji" data-emoji="🦫">🦫</button>
+      <button class="picker-emoji" data-emoji="🐿️">🐿️</button>
+      <button class="picker-emoji" data-emoji="🦔">🦔</button>
+      <button class="picker-emoji" data-emoji="🌸">🌸</button>
+      <button class="picker-emoji" data-emoji="🌺">🌺</button>
+      <button class="picker-emoji" data-emoji="🌻">🌻</button>
+      <button class="picker-emoji" data-emoji="🌹">🌹</button>
+      <button class="picker-emoji" data-emoji="🌷">🌷</button>
+      <button class="picker-emoji" data-emoji="🌼">🌼</button>
+      <button class="picker-emoji" data-emoji="🪷">🪷</button>
+      <button class="picker-emoji" data-emoji="🌱">🌱</button>
+      <button class="picker-emoji" data-emoji="🪴">🪴</button>
+      <button class="picker-emoji" data-emoji="🌲">🌲</button>
+      <button class="picker-emoji" data-emoji="🌳">🌳</button>
+      <button class="picker-emoji" data-emoji="🌴">🌴</button>
+      <button class="picker-emoji" data-emoji="🌵">🌵</button>
+      <button class="picker-emoji" data-emoji="🍀">🍀</button>
+      <button class="picker-emoji" data-emoji="🍁">🍁</button>
+      <button class="picker-emoji" data-emoji="🍂">🍂</button>
+      <button class="picker-emoji" data-emoji="🍃">🍃</button>
+      <button class="picker-emoji" data-emoji="🪺">🪺</button>
+      <button class="picker-emoji" data-emoji="🍄">🍄</button>
+
+      <!-- Food & Drink -->
+      <span class="picker-group-label">Food & Drink</span>
+      <button class="picker-emoji" data-emoji="🍎">🍎</button>
+      <button class="picker-emoji" data-emoji="🍐">🍐</button>
+      <button class="picker-emoji" data-emoji="🍊">🍊</button>
+      <button class="picker-emoji" data-emoji="🍋">🍋</button>
+      <button class="picker-emoji" data-emoji="🍌">🍌</button>
+      <button class="picker-emoji" data-emoji="🍉">🍉</button>
+      <button class="picker-emoji" data-emoji="🍇">🍇</button>
+      <button class="picker-emoji" data-emoji="🍓">🍓</button>
+      <button class="picker-emoji" data-emoji="🫐">🫐</button>
+      <button class="picker-emoji" data-emoji="🍒">🍒</button>
+      <button class="picker-emoji" data-emoji="🍑">🍑</button>
+      <button class="picker-emoji" data-emoji="🥭">🥭</button>
+      <button class="picker-emoji" data-emoji="🍍">🍍</button>
+      <button class="picker-emoji" data-emoji="🥥">🥥</button>
+      <button class="picker-emoji" data-emoji="🥝">🥝</button>
+      <button class="picker-emoji" data-emoji="🍅">🍅</button>
+      <button class="picker-emoji" data-emoji="🥑">🥑</button>
+      <button class="picker-emoji" data-emoji="🌶️">🌶️</button>
+      <button class="picker-emoji" data-emoji="🌽">🌽</button>
+      <button class="picker-emoji" data-emoji="🥕">🥕</button>
+      <button class="picker-emoji" data-emoji="🥦">🥦</button>
+      <button class="picker-emoji" data-emoji="🧄">🧄</button>
+      <button class="picker-emoji" data-emoji="🧅">🧅</button>
+      <button class="picker-emoji" data-emoji="🥔">🥔</button>
+      <button class="picker-emoji" data-emoji="🍞">🍞</button>
+      <button class="picker-emoji" data-emoji="🥐">🥐</button>
+      <button class="picker-emoji" data-emoji="🥖">🥖</button>
+      <button class="picker-emoji" data-emoji="🧁">🧁</button>
+      <button class="picker-emoji" data-emoji="🍰">🍰</button>
+      <button class="picker-emoji" data-emoji="🎂">🎂</button>
+      <button class="picker-emoji" data-emoji="🍩">🍩</button>
+      <button class="picker-emoji" data-emoji="🍪">🍪</button>
+      <button class="picker-emoji" data-emoji="🍫">🍫</button>
+      <button class="picker-emoji" data-emoji="🍬">🍬</button>
+      <button class="picker-emoji" data-emoji="🍭">🍭</button>
+      <button class="picker-emoji" data-emoji="🍿">🍿</button>
+      <button class="picker-emoji" data-emoji="🍕">🍕</button>
+      <button class="picker-emoji" data-emoji="🍔">🍔</button>
+      <button class="picker-emoji" data-emoji="🍟">🍟</button>
+      <button class="picker-emoji" data-emoji="🌭">🌭</button>
+      <button class="picker-emoji" data-emoji="🌮">🌮</button>
+      <button class="picker-emoji" data-emoji="🌯">🌯</button>
+      <button class="picker-emoji" data-emoji="🍣">🍣</button>
+      <button class="picker-emoji" data-emoji="🍱">🍱</button>
+      <button class="picker-emoji" data-emoji="🍜">🍜</button>
+      <button class="picker-emoji" data-emoji="🍝">🍝</button>
+      <button class="picker-emoji" data-emoji="🍛">🍛</button>
+      <button class="picker-emoji" data-emoji="🍚">🍚</button>
+      <button class="picker-emoji" data-emoji="☕">☕</button>
+      <button class="picker-emoji" data-emoji="🍵">🍵</button>
+      <button class="picker-emoji" data-emoji="🧃">🧃</button>
+      <button class="picker-emoji" data-emoji="🥤">🥤</button>
+      <button class="picker-emoji" data-emoji="🧋">🧋</button>
+      <button class="picker-emoji" data-emoji="🍺">🍺</button>
+      <button class="picker-emoji" data-emoji="🍻">🍻</button>
+      <button class="picker-emoji" data-emoji="🥂">🥂</button>
+      <button class="picker-emoji" data-emoji="🍷">🍷</button>
+      <button class="picker-emoji" data-emoji="🍸">🍸</button>
+      <button class="picker-emoji" data-emoji="🍹">🍹</button>
+      <button class="picker-emoji" data-emoji="🧊">🧊</button>
+
+      <!-- Activities & Sports -->
+      <span class="picker-group-label">Activities</span>
+      <button class="picker-emoji" data-emoji="⚽">⚽</button>
+      <button class="picker-emoji" data-emoji="🏀">🏀</button>
+      <button class="picker-emoji" data-emoji="🏈">🏈</button>
+      <button class="picker-emoji" data-emoji="⚾">⚾</button>
+      <button class="picker-emoji" data-emoji="🥎">🥎</button>
+      <button class="picker-emoji" data-emoji="🎾">🎾</button>
+      <button class="picker-emoji" data-emoji="🏐">🏐</button>
+      <button class="picker-emoji" data-emoji="🏉">🏉</button>
+      <button class="picker-emoji" data-emoji="🥏">🥏</button>
+      <button class="picker-emoji" data-emoji="🎱">🎱</button>
+      <button class="picker-emoji" data-emoji="🏓">🏓</button>
+      <button class="picker-emoji" data-emoji="🏸">🏸</button>
+      <button class="picker-emoji" data-emoji="🥊">🥊</button>
+      <button class="picker-emoji" data-emoji="🥋">🥋</button>
+      <button class="picker-emoji" data-emoji="⛳">⛳</button>
+      <button class="picker-emoji" data-emoji="⛸️">⛸️</button>
+      <button class="picker-emoji" data-emoji="🎿">🎿</button>
+      <button class="picker-emoji" data-emoji="🛹">🛹</button>
+      <button class="picker-emoji" data-emoji="🛷">🛷</button>
+      <button class="picker-emoji" data-emoji="🏋️">🏋️</button>
+      <button class="picker-emoji" data-emoji="🤸">🤸</button>
+      <button class="picker-emoji" data-emoji="🧗">🧗</button>
+      <button class="picker-emoji" data-emoji="🚴">🚴</button>
+      <button class="picker-emoji" data-emoji="🏄">🏄</button>
+      <button class="picker-emoji" data-emoji="🏊">🏊</button>
+      <button class="picker-emoji" data-emoji="🧘">🧘</button>
+      <button class="picker-emoji" data-emoji="🎯">🎯</button>
+      <button class="picker-emoji" data-emoji="🎮">🎮</button>
+      <button class="picker-emoji" data-emoji="🕹️">🕹️</button>
+      <button class="picker-emoji" data-emoji="🎲">🎲</button>
+      <button class="picker-emoji" data-emoji="🧩">🧩</button>
+      <button class="picker-emoji" data-emoji="♟️">♟️</button>
+      <button class="picker-emoji" data-emoji="🎰">🎰</button>
+      <button class="picker-emoji" data-emoji="🎳">🎳</button>
+      <button class="picker-emoji" data-emoji="🎪">🎪</button>
+      <button class="picker-emoji" data-emoji="🎨">🎨</button>
+      <button class="picker-emoji" data-emoji="🎭">🎭</button>
+      <button class="picker-emoji" data-emoji="🎬">🎬</button>
+      <button class="picker-emoji" data-emoji="🎤">🎤</button>
+      <button class="picker-emoji" data-emoji="🎧">🎧</button>
+      <button class="picker-emoji" data-emoji="🎵">🎵</button>
+      <button class="picker-emoji" data-emoji="🎶">🎶</button>
+      <button class="picker-emoji" data-emoji="🎸">🎸</button>
+      <button class="picker-emoji" data-emoji="🎹">🎹</button>
+      <button class="picker-emoji" data-emoji="🥁">🥁</button>
+      <button class="picker-emoji" data-emoji="🎺">🎺</button>
+      <button class="picker-emoji" data-emoji="🎻">🎻</button>
+      <button class="picker-emoji" data-emoji="🎉">🎉</button>
+      <button class="picker-emoji" data-emoji="🎊">🎊</button>
+      <button class="picker-emoji" data-emoji="🎈">🎈</button>
+      <button class="picker-emoji" data-emoji="🎁">🎁</button>
+      <button class="picker-emoji" data-emoji="🎗️">🎗️</button>
+      <button class="picker-emoji" data-emoji="🏆">🏆</button>
+      <button class="picker-emoji" data-emoji="🏅">🏅</button>
+      <button class="picker-emoji" data-emoji="🥇">🥇</button>
+      <button class="picker-emoji" data-emoji="🥈">🥈</button>
+      <button class="picker-emoji" data-emoji="🥉">🥉</button>
+
+      <!-- Travel & Places -->
+      <span class="picker-group-label">Travel & Places</span>
+      <button class="picker-emoji" data-emoji="🚗">🚗</button>
+      <button class="picker-emoji" data-emoji="🚕">🚕</button>
+      <button class="picker-emoji" data-emoji="🚌">🚌</button>
+      <button class="picker-emoji" data-emoji="🚎">🚎</button>
+      <button class="picker-emoji" data-emoji="🏎️">🏎️</button>
+      <button class="picker-emoji" data-emoji="🚓">🚓</button>
+      <button class="picker-emoji" data-emoji="🚑">🚑</button>
+      <button class="picker-emoji" data-emoji="🚒">🚒</button>
+      <button class="picker-emoji" data-emoji="🛻">🛻</button>
+      <button class="picker-emoji" data-emoji="🚂">🚂</button>
+      <button class="picker-emoji" data-emoji="🚀">🚀</button>
+      <button class="picker-emoji" data-emoji="🛸">🛸</button>
+      <button class="picker-emoji" data-emoji="✈️">✈️</button>
+      <button class="picker-emoji" data-emoji="🚁">🚁</button>
+      <button class="picker-emoji" data-emoji="🛶">🛶</button>
+      <button class="picker-emoji" data-emoji="⛵">⛵</button>
+      <button class="picker-emoji" data-emoji="🚢">🚢</button>
+      <button class="picker-emoji" data-emoji="🚲">🚲</button>
+      <button class="picker-emoji" data-emoji="🛵">🛵</button>
+      <button class="picker-emoji" data-emoji="🏍️">🏍️</button>
+      <button class="picker-emoji" data-emoji="🏠">🏠</button>
+      <button class="picker-emoji" data-emoji="🏢">🏢</button>
+      <button class="picker-emoji" data-emoji="🏗️">🏗️</button>
+      <button class="picker-emoji" data-emoji="🏭">🏭</button>
+      <button class="picker-emoji" data-emoji="🏰">🏰</button>
+      <button class="picker-emoji" data-emoji="🗼">🗼</button>
+      <button class="picker-emoji" data-emoji="🗽">🗽</button>
+      <button class="picker-emoji" data-emoji="⛩️">⛩️</button>
+      <button class="picker-emoji" data-emoji="🕌">🕌</button>
+      <button class="picker-emoji" data-emoji="🛕">🛕</button>
+      <button class="picker-emoji" data-emoji="⛺">⛺</button>
+      <button class="picker-emoji" data-emoji="🏕️">🏕️</button>
+      <button class="picker-emoji" data-emoji="🌅">🌅</button>
+      <button class="picker-emoji" data-emoji="🌄">🌄</button>
+      <button class="picker-emoji" data-emoji="🌠">🌠</button>
+      <button class="picker-emoji" data-emoji="🎆">🎆</button>
+      <button class="picker-emoji" data-emoji="🎇">🎇</button>
+      <button class="picker-emoji" data-emoji="🌃">🌃</button>
+      <button class="picker-emoji" data-emoji="🌉">🌉</button>
+      <button class="picker-emoji" data-emoji="🌌">🌌</button>
+      <button class="picker-emoji" data-emoji="🌍">🌍</button>
+      <button class="picker-emoji" data-emoji="🌎">🌎</button>
+      <button class="picker-emoji" data-emoji="🌏">🌏</button>
+      <button class="picker-emoji" data-emoji="🗺️">🗺️</button>
+      <button class="picker-emoji" data-emoji="🌋">🌋</button>
+      <button class="picker-emoji" data-emoji="🏔️">🏔️</button>
+      <button class="picker-emoji" data-emoji="⛰️">⛰️</button>
+      <button class="picker-emoji" data-emoji="🏝️">🏝️</button>
+      <button class="picker-emoji" data-emoji="🏖️">🏖️</button>
+
+      <!-- Weather & Sky -->
+      <span class="picker-group-label">Weather</span>
+      <button class="picker-emoji" data-emoji="☀️">☀️</button>
+      <button class="picker-emoji" data-emoji="🌤️">🌤️</button>
+      <button class="picker-emoji" data-emoji="⛅">⛅</button>
+      <button class="picker-emoji" data-emoji="🌥️">🌥️</button>
+      <button class="picker-emoji" data-emoji="☁️">☁️</button>
+      <button class="picker-emoji" data-emoji="🌦️">🌦️</button>
+      <button class="picker-emoji" data-emoji="🌧️">🌧️</button>
+      <button class="picker-emoji" data-emoji="⛈️">⛈️</button>
+      <button class="picker-emoji" data-emoji="🌩️">🌩️</button>
+      <button class="picker-emoji" data-emoji="🌨️">🌨️</button>
+      <button class="picker-emoji" data-emoji="❄️">❄️</button>
+      <button class="picker-emoji" data-emoji="🌪️">🌪️</button>
+      <button class="picker-emoji" data-emoji="🌈">🌈</button>
+      <button class="picker-emoji" data-emoji="🌊">🌊</button>
+      <button class="picker-emoji" data-emoji="⚡">⚡</button>
+      <button class="picker-emoji" data-emoji="🔥">🔥</button>
+      <button class="picker-emoji" data-emoji="✨">✨</button>
+      <button class="picker-emoji" data-emoji="🌟">🌟</button>
+      <button class="picker-emoji" data-emoji="⭐">⭐</button>
+      <button class="picker-emoji" data-emoji="🌙">🌙</button>
+      <button class="picker-emoji" data-emoji="☄️">☄️</button>
+      <button class="picker-emoji" data-emoji="🪐">🪐</button>
+
+      <!-- Objects & Tools -->
+      <span class="picker-group-label">Objects</span>
+      <button class="picker-emoji" data-emoji="💻">💻</button>
+      <button class="picker-emoji" data-emoji="🖥️">🖥️</button>
+      <button class="picker-emoji" data-emoji="⌨️">⌨️</button>
+      <button class="picker-emoji" data-emoji="🖱️">🖱️</button>
+      <button class="picker-emoji" data-emoji="📱">📱</button>
+      <button class="picker-emoji" data-emoji="📲">📲</button>
+      <button class="picker-emoji" data-emoji="☎️">☎️</button>
+      <button class="picker-emoji" data-emoji="📞">📞</button>
+      <button class="picker-emoji" data-emoji="📟">📟</button>
+      <button class="picker-emoji" data-emoji="📠">📠</button>
+      <button class="picker-emoji" data-emoji="🔋">🔋</button>
+      <button class="picker-emoji" data-emoji="🔌">🔌</button>
+      <button class="picker-emoji" data-emoji="💡">💡</button>
+      <button class="picker-emoji" data-emoji="🔦">🔦</button>
+      <button class="picker-emoji" data-emoji="📷">📷</button>
+      <button class="picker-emoji" data-emoji="📸">📸</button>
+      <button class="picker-emoji" data-emoji="📹">📹</button>
+      <button class="picker-emoji" data-emoji="🎥">🎥</button>
+      <button class="picker-emoji" data-emoji="📡">📡</button>
+      <button class="picker-emoji" data-emoji="🔭">🔭</button>
+      <button class="picker-emoji" data-emoji="🔬">🔬</button>
+      <button class="picker-emoji" data-emoji="🧪">🧪</button>
+      <button class="picker-emoji" data-emoji="🧫">🧫</button>
+      <button class="picker-emoji" data-emoji="🧬">🧬</button>
+      <button class="picker-emoji" data-emoji="💊">💊</button>
+      <button class="picker-emoji" data-emoji="🩺">🩺</button>
+      <button class="picker-emoji" data-emoji="🩻">🩻</button>
+      <button class="picker-emoji" data-emoji="🔮">🔮</button>
+      <button class="picker-emoji" data-emoji="🪄">🪄</button>
+      <button class="picker-emoji" data-emoji="🛠️">🛠️</button>
+      <button class="picker-emoji" data-emoji="🔧">🔧</button>
+      <button class="picker-emoji" data-emoji="🔩">🔩</button>
+      <button class="picker-emoji" data-emoji="⚙️">⚙️</button>
+      <button class="picker-emoji" data-emoji="🗜️">🗜️</button>
+      <button class="picker-emoji" data-emoji="🔗">🔗</button>
+      <button class="picker-emoji" data-emoji="⛓️">⛓️</button>
+      <button class="picker-emoji" data-emoji="🪝">🪝</button>
+      <button class="picker-emoji" data-emoji="🔒">🔒</button>
+      <button class="picker-emoji" data-emoji="🔓">🔓</button>
+      <button class="picker-emoji" data-emoji="🔑">🔑</button>
+      <button class="picker-emoji" data-emoji="🗝️">🗝️</button>
+      <button class="picker-emoji" data-emoji="🛡️">🛡️</button>
+      <button class="picker-emoji" data-emoji="⚔️">⚔️</button>
+      <button class="picker-emoji" data-emoji="🗡️">🗡️</button>
+      <button class="picker-emoji" data-emoji="🏹">🏹</button>
+      <button class="picker-emoji" data-emoji="💣">💣</button>
+      <button class="picker-emoji" data-emoji="🧲">🧲</button>
+      <button class="picker-emoji" data-emoji="🪜">🪜</button>
+      <button class="picker-emoji" data-emoji="🧰">🧰</button>
+      <button class="picker-emoji" data-emoji="💎">💎</button>
+      <button class="picker-emoji" data-emoji="💰">💰</button>
+      <button class="picker-emoji" data-emoji="💳">💳</button>
+      <button class="picker-emoji" data-emoji="⏰">⏰</button>
+      <button class="picker-emoji" data-emoji="⏳">⏳</button>
+      <button class="picker-emoji" data-emoji="🧭">🧭</button>
+
+      <!-- Stationery & Documents -->
+      <span class="picker-group-label">Stationery</span>
+      <button class="picker-emoji" data-emoji="📝">📝</button>
+      <button class="picker-emoji" data-emoji="📄">📄</button>
+      <button class="picker-emoji" data-emoji="📃">📃</button>
+      <button class="picker-emoji" data-emoji="📜">📜</button>
+      <button class="picker-emoji" data-emoji="📋">📋</button>
+      <button class="picker-emoji" data-emoji="📑">📑</button>
+      <button class="picker-emoji" data-emoji="📊">📊</button>
+      <button class="picker-emoji" data-emoji="📈">📈</button>
+      <button class="picker-emoji" data-emoji="📉">📉</button>
+      <button class="picker-emoji" data-emoji="📌">📌</button>
+      <button class="picker-emoji" data-emoji="📍">📍</button>
+      <button class="picker-emoji" data-emoji="📎">📎</button>
+      <button class="picker-emoji" data-emoji="🖇️">🖇️</button>
+      <button class="picker-emoji" data-emoji="✂️">✂️</button>
+      <button class="picker-emoji" data-emoji="📏">📏</button>
+      <button class="picker-emoji" data-emoji="📐">📐</button>
+      <button class="picker-emoji" data-emoji="🖊️">🖊️</button>
+      <button class="picker-emoji" data-emoji="✏️">✏️</button>
+      <button class="picker-emoji" data-emoji="🖍️">🖍️</button>
+      <button class="picker-emoji" data-emoji="📚">📚</button>
+      <button class="picker-emoji" data-emoji="📖">📖</button>
+      <button class="picker-emoji" data-emoji="📓">📓</button>
+      <button class="picker-emoji" data-emoji="📔">📔</button>
+      <button class="picker-emoji" data-emoji="📒">📒</button>
+      <button class="picker-emoji" data-emoji="🗂️">🗂️</button>
+      <button class="picker-emoji" data-emoji="📁">📁</button>
+      <button class="picker-emoji" data-emoji="📂">📂</button>
+      <button class="picker-emoji" data-emoji="🗃️">🗃️</button>
+      <button class="picker-emoji" data-emoji="📦">📦</button>
+      <button class="picker-emoji" data-emoji="📫">📫</button>
+      <button class="picker-emoji" data-emoji="📬">📬</button>
+      <button class="picker-emoji" data-emoji="📧">📧</button>
+
+      <!-- Symbols & Signs -->
+      <span class="picker-group-label">Symbols</span>
+      <button class="picker-emoji" data-emoji="✅">✅</button>
+      <button class="picker-emoji" data-emoji="❌">❌</button>
+      <button class="picker-emoji" data-emoji="❓">❓</button>
+      <button class="picker-emoji" data-emoji="❗">❗</button>
+      <button class="picker-emoji" data-emoji="‼️">‼️</button>
+      <button class="picker-emoji" data-emoji="⁉️">⁉️</button>
+      <button class="picker-emoji" data-emoji="⚠️">⚠️</button>
+      <button class="picker-emoji" data-emoji="🚫">🚫</button>
+      <button class="picker-emoji" data-emoji="🔴">🔴</button>
+      <button class="picker-emoji" data-emoji="🟠">🟠</button>
+      <button class="picker-emoji" data-emoji="🟡">🟡</button>
+      <button class="picker-emoji" data-emoji="🟢">🟢</button>
+      <button class="picker-emoji" data-emoji="🔵">🔵</button>
+      <button class="picker-emoji" data-emoji="🟣">🟣</button>
+      <button class="picker-emoji" data-emoji="⚫">⚫</button>
+      <button class="picker-emoji" data-emoji="⚪">⚪</button>
+      <button class="picker-emoji" data-emoji="🟤">🟤</button>
+      <button class="picker-emoji" data-emoji="🔶">🔶</button>
+      <button class="picker-emoji" data-emoji="🔷">🔷</button>
+      <button class="picker-emoji" data-emoji="🔺">🔺</button>
+      <button class="picker-emoji" data-emoji="🔻">🔻</button>
+      <button class="picker-emoji" data-emoji="▶️">▶️</button>
+      <button class="picker-emoji" data-emoji="⏩">⏩</button>
+      <button class="picker-emoji" data-emoji="⏪">⏪</button>
+      <button class="picker-emoji" data-emoji="🔄">🔄</button>
+      <button class="picker-emoji" data-emoji="🔀">🔀</button>
+      <button class="picker-emoji" data-emoji="🔁">🔁</button>
+      <button class="picker-emoji" data-emoji="🔂">🔂</button>
+      <button class="picker-emoji" data-emoji="➕">➕</button>
+      <button class="picker-emoji" data-emoji="➖">➖</button>
+      <button class="picker-emoji" data-emoji="✖️">✖️</button>
+      <button class="picker-emoji" data-emoji="➗">➗</button>
+      <button class="picker-emoji" data-emoji="♾️">♾️</button>
+      <button class="picker-emoji" data-emoji="💲">💲</button>
+      <button class="picker-emoji" data-emoji="©️">©️</button>
+      <button class="picker-emoji" data-emoji="®️">®️</button>
+      <button class="picker-emoji" data-emoji="™️">™️</button>
+      <button class="picker-emoji" data-emoji="🔔">🔔</button>
+      <button class="picker-emoji" data-emoji="🔕">🔕</button>
+      <button class="picker-emoji" data-emoji="🔊">🔊</button>
+      <button class="picker-emoji" data-emoji="🔇">🔇</button>
+      <button class="picker-emoji" data-emoji="📣">📣</button>
+      <button class="picker-emoji" data-emoji="🏁">🏁</button>
+      <button class="picker-emoji" data-emoji="🚩">🚩</button>
+      <button class="picker-emoji" data-emoji="🏳️">🏳️</button>
+      <button class="picker-emoji" data-emoji="🏴">🏴</button>
+      <button class="picker-emoji" data-emoji="🔍">🔍</button>
+      <button class="picker-emoji" data-emoji="🔎">🔎</button>
+      <button class="picker-emoji" data-emoji="♻️">♻️</button>
+      <button class="picker-emoji" data-emoji="☮️">☮️</button>
+      <button class="picker-emoji" data-emoji="☯️">☯️</button>
+      <button class="picker-emoji" data-emoji="🕉️">🕉️</button>
+      <button class="picker-emoji" data-emoji="✡️">✡️</button>
+      <button class="picker-emoji" data-emoji="☪️">☪️</button>
+      <button class="picker-emoji" data-emoji="✝️">✝️</button>
+      <button class="picker-emoji" data-emoji="⚛️">⚛️</button>
     </div>
+    </div>
+    <div class="picker-no-results" id="picker-no-results" hidden>No emoji found</div>
   </div>
 </section>
 
@@ -239,6 +775,10 @@ const supabaseKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
     if (!picker) return;
     pickerOpen = !pickerOpen;
     picker.hidden = !pickerOpen;
+    if (pickerOpen) {
+      const search = document.getElementById("picker-search");
+      if (search) { search.value = ""; filterEmojis(""); search.focus(); }
+    }
   }
 
   function closePicker() {
@@ -246,6 +786,55 @@ const supabaseKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
     if (!picker) return;
     pickerOpen = false;
     picker.hidden = true;
+  }
+
+  const emojiNames = {
+    "😀":"grinning","😃":"smiley","😄":"smile big","😁":"beaming grin","😆":"laughing","😅":"sweat smile","🤣":"rofl rolling","😂":"joy tears","🙂":"slightly smiling","😊":"smiling blush","😇":"innocent halo angel","🥰":"smiling hearts love","😍":"heart eyes love","🤩":"star struck","😘":"kissing heart","😗":"kissing","😚":"kissing closed eyes","😙":"kissing smiling","🥲":"smiling tear","😋":"yum delicious","😛":"tongue out","😜":"wink tongue","🤪":"zany crazy","😝":"squinting tongue","🤑":"money mouth","🤗":"hugging","🤭":"hand over mouth","🤫":"shushing quiet","🤔":"thinking","🫡":"salute","🤐":"zipper mouth","🤨":"raised eyebrow","😐":"neutral","😑":"expressionless","😶":"no mouth silent","🫥":"dotted line face","😏":"smirking","😒":"unamused","🙄":"eye roll","😬":"grimacing","😮‍💨":"exhaling sigh","🤥":"lying pinocchio","😌":"relieved","😔":"pensive sad","😪":"sleepy","🤤":"drooling","😴":"sleeping zzz","😷":"mask sick","🤒":"thermometer sick","🤕":"bandage hurt","🤢":"nauseated","🤮":"vomiting","🥴":"woozy drunk","😵":"dizzy","😵‍💫":"spiral dizzy","🤯":"mind blown exploding","🥳":"party celebrate","🥸":"disguised","😎":"cool sunglasses","🤓":"nerd glasses","🧐":"monocle","😕":"confused","🫤":"diagonal mouth","😟":"worried","🙁":"frowning","😮":"surprised open mouth","😯":"hushed","😲":"astonished","😳":"flushed embarrassed","🥺":"pleading puppy","🥹":"holding back tears","😦":"frowning open mouth","😧":"anguished","😨":"fearful scared","😰":"anxious sweat","😥":"disappointed relieved","😢":"crying tear","😭":"sobbing loudly crying","😱":"screaming fear","😖":"confounded","😣":"persevering","😞":"disappointed","😓":"downcast sweat","😩":"weary tired","😫":"tired","🥱":"yawning bored","😤":"huffing angry","😡":"pouting angry red","😠":"angry","🤬":"swearing cursing","😈":"devil smile","👿":"angry devil","💀":"skull dead","☠️":"skull crossbones","💩":"poop poo","🤡":"clown","👹":"ogre","👺":"goblin","👻":"ghost","👽":"alien","👾":"space invader alien monster","🤖":"robot",
+    "👍":"thumbs up like","👎":"thumbs down dislike","👏":"clapping","🙌":"raised hands hooray","🤝":"handshake deal","🙏":"pray please thanks","💪":"muscle strong flex","✌️":"peace victory","🤞":"crossed fingers luck","🫰":"pinching","🤟":"love you gesture","🤘":"rock on","🤙":"call me hang loose","👈":"pointing left","👉":"pointing right","👆":"pointing up","👇":"pointing down","☝️":"index pointing up","🫵":"pointing at you","✋":"raised hand stop","🤚":"raised back hand","🖐️":"hand splayed","🖖":"vulcan spock","👋":"waving hello bye","🤏":"pinching small","✍️":"writing","🫶":"heart hands love","👀":"eyes looking","👁️":"eye","👅":"tongue","👄":"mouth lips","🧠":"brain smart",
+    "❤️":"red heart love","🧡":"orange heart","💛":"yellow heart","💚":"green heart","💙":"blue heart","💜":"purple heart","🖤":"black heart","🤍":"white heart","🤎":"brown heart","💔":"broken heart","❤️‍🔥":"heart fire passion","❤️‍🩹":"mending heart","💕":"two hearts","💞":"revolving hearts","💓":"beating heart","💗":"growing heart","💖":"sparkling heart","💘":"heart arrow cupid","💝":"heart ribbon gift","💟":"heart decoration","💯":"hundred perfect score","💢":"anger","💥":"boom collision explosion","💫":"dizzy stars","💦":"sweat droplets","💨":"dash wind","💬":"speech bubble comment","💤":"zzz sleep",
+    "🐶":"dog puppy","🐱":"cat kitty","🐭":"mouse","🐹":"hamster","🐰":"rabbit bunny","🦊":"fox","🐻":"bear","🐼":"panda","🐨":"koala","🐯":"tiger","🦁":"lion","🐮":"cow","🐷":"pig","🐸":"frog","🐵":"monkey","🙈":"see no evil monkey","🙉":"hear no evil monkey","🙊":"speak no evil monkey","🐔":"chicken","🐧":"penguin","🐦":"bird","🦅":"eagle","🦉":"owl","🦇":"bat","🐺":"wolf","🐗":"boar","🐴":"horse","🦄":"unicorn","🐝":"bee honey","🪱":"worm","🐛":"bug caterpillar","🦋":"butterfly","🐌":"snail","🐞":"ladybug","🐜":"ant","🪲":"beetle","🐢":"turtle","🐍":"snake","🦎":"lizard","🦖":"dinosaur t-rex","🐙":"octopus","🦑":"squid","🦐":"shrimp","🐠":"tropical fish","🐟":"fish","🐬":"dolphin","🐳":"whale","🦈":"shark","🐊":"crocodile","🐅":"tiger","🐆":"leopard","🦓":"zebra","🦍":"gorilla","🦧":"orangutan","🐘":"elephant","🦛":"hippo","🦏":"rhino","🐪":"camel","🦒":"giraffe","🦘":"kangaroo","🦬":"bison","🐃":"water buffalo","🦙":"llama alpaca","🦫":"beaver","🐿️":"chipmunk squirrel","🦔":"hedgehog","🌸":"cherry blossom sakura","🌺":"hibiscus flower","🌻":"sunflower","🌹":"rose","🌷":"tulip","🌼":"blossom flower","🪷":"lotus","🌱":"seedling sprout","🪴":"potted plant","🌲":"evergreen tree","🌳":"deciduous tree","🌴":"palm tree","🌵":"cactus","🍀":"four leaf clover luck","🍁":"maple leaf autumn","🍂":"fallen leaf","🍃":"leaf wind","🪺":"nest eggs","🍄":"mushroom",
+    "🍎":"apple red","🍐":"pear","🍊":"orange tangerine","🍋":"lemon","🍌":"banana","🍉":"watermelon","🍇":"grapes","🍓":"strawberry","🫐":"blueberries","🍒":"cherries","🍑":"peach","🥭":"mango","🍍":"pineapple","🥥":"coconut","🥝":"kiwi","🍅":"tomato","🥑":"avocado","🌶️":"hot pepper chili","🌽":"corn","🥕":"carrot","🥦":"broccoli","🧄":"garlic","🧅":"onion","🥔":"potato","🍞":"bread","🥐":"croissant","🥖":"baguette","🧁":"cupcake","🍰":"cake shortcake","🎂":"birthday cake","🍩":"donut doughnut","🍪":"cookie","🍫":"chocolate bar","🍬":"candy","🍭":"lollipop","🍿":"popcorn","🍕":"pizza","🍔":"hamburger burger","🍟":"french fries","🌭":"hot dog","🌮":"taco","🌯":"burrito","🍣":"sushi","🍱":"bento box","🍜":"ramen noodles","🍝":"spaghetti pasta","🍛":"curry rice","🍚":"rice","☕":"coffee tea hot","🍵":"teacup","🧃":"juice box","🥤":"cup straw soda","🧋":"bubble tea boba","🍺":"beer","🍻":"clinking beers cheers","🥂":"champagne toast","🍷":"wine","🍸":"cocktail martini","🍹":"tropical drink","🧊":"ice cube",
+    "⚽":"soccer football","🏀":"basketball","🏈":"american football","⚾":"baseball","🥎":"softball","🎾":"tennis","🏐":"volleyball","🏉":"rugby","🥏":"flying disc frisbee","🎱":"pool billiards","🏓":"ping pong table tennis","🏸":"badminton","🥊":"boxing glove","🥋":"martial arts","⛳":"golf","⛸️":"ice skating","🎿":"skiing","🛹":"skateboard","🛷":"sled","🏋️":"weight lifting gym","🤸":"cartwheel gymnastics","🧗":"climbing","🚴":"cycling bike","🏄":"surfing","🏊":"swimming","🧘":"yoga meditation","🎯":"bullseye target dart","🎮":"video game controller","🕹️":"joystick arcade","🎲":"dice game","🧩":"puzzle piece jigsaw","♟️":"chess pawn","🎰":"slot machine casino","🎳":"bowling","🎪":"circus tent","🎨":"art palette paint","🎭":"theater masks drama","🎬":"movie clapper cinema","🎤":"microphone karaoke","🎧":"headphone music","🎵":"music note","🎶":"music notes","🎸":"guitar rock","🎹":"piano keys keyboard","🥁":"drum","🎺":"trumpet","🎻":"violin","🎉":"party popper tada celebrate","🎊":"confetti ball","🎈":"balloon party","🎁":"gift present wrapped","🎗️":"ribbon awareness","🏆":"trophy winner champion","🏅":"medal sports","🥇":"gold medal first","🥈":"silver medal second","🥉":"bronze medal third",
+    "🚗":"car automobile","🚕":"taxi cab","🚌":"bus","🚎":"trolleybus","🏎️":"racing car","🚓":"police car","🚑":"ambulance","🚒":"fire engine truck","🛻":"pickup truck","🚂":"locomotive train","🚀":"rocket launch space","🛸":"ufo flying saucer","✈️":"airplane plane flight","🚁":"helicopter","🛶":"canoe","⛵":"sailboat","🚢":"ship cruise","🚲":"bicycle bike","🛵":"scooter vespa","🏍️":"motorcycle","🏠":"house home","🏢":"office building","🏗️":"construction building","🏭":"factory","🏰":"castle","🗼":"tokyo tower","🗽":"statue liberty","⛩️":"shinto shrine","🕌":"mosque","🛕":"hindu temple","⛺":"tent camping","🏕️":"camping","🌅":"sunrise","🌄":"sunrise mountains","🌠":"shooting star","🎆":"fireworks","🎇":"sparkler","🌃":"night stars city","🌉":"bridge night","🌌":"milky way galaxy","🌍":"globe earth africa europe","🌎":"globe earth americas","🌏":"globe earth asia","🗺️":"world map","🌋":"volcano","🏔️":"snow mountain","⛰️":"mountain","🏝️":"desert island","🏖️":"beach umbrella",
+    "☀️":"sun sunny","🌤️":"sun small cloud","⛅":"sun behind cloud","🌥️":"sun large cloud","☁️":"cloud cloudy","🌦️":"sun rain cloud","🌧️":"cloud rain","⛈️":"thunder storm","🌩️":"cloud lightning","🌨️":"cloud snow","❄️":"snowflake cold winter","🌪️":"tornado","🌈":"rainbow","🌊":"wave ocean water","⚡":"lightning zap electric","🔥":"fire flame hot","✨":"sparkles stars magic","🌟":"glowing star shine","⭐":"star","🌙":"crescent moon night","☄️":"comet","🪐":"ringed planet saturn",
+    "💻":"laptop computer","🖥️":"desktop computer monitor","⌨️":"keyboard typing","🖱️":"mouse computer","📱":"mobile phone smartphone","📲":"mobile arrow phone","☎️":"telephone","📞":"telephone receiver","📟":"pager","📠":"fax machine","🔋":"battery","🔌":"electric plug power","💡":"light bulb idea","🔦":"flashlight torch","📷":"camera","📸":"camera flash snapshot","📹":"video camera","🎥":"movie camera film","📡":"satellite antenna","🔭":"telescope","🔬":"microscope","🧪":"test tube experiment","🧫":"petri dish","🧬":"dna genetics","💊":"pill medicine","🩺":"stethoscope doctor","🩻":"x-ray","🔮":"crystal ball fortune","🪄":"magic wand","🛠️":"hammer wrench tools","🔧":"wrench","🔩":"nut bolt screw","⚙️":"gear settings cog","🗜️":"clamp compression","🔗":"link chain url","⛓️":"chains","🪝":"hook","🔒":"lock locked secure","🔓":"unlock unlocked","🔑":"key","🗝️":"old key","🛡️":"shield protection security","⚔️":"crossed swords","🗡️":"dagger knife","🏹":"bow arrow","💣":"bomb","🧲":"magnet","🪜":"ladder","🧰":"toolbox","💎":"gem diamond jewel","💰":"money bag","💳":"credit card","⏰":"alarm clock time","⏳":"hourglass timer","🧭":"compass navigation",
+    "📝":"memo note writing","📄":"page document","📃":"page curl","📜":"scroll parchment","📋":"clipboard","📑":"bookmark tabs","📊":"bar chart graph","📈":"chart increasing trending up","📉":"chart decreasing trending down","📌":"pushpin pin","📍":"round pushpin location","📎":"paperclip","🖇️":"linked paperclips","✂️":"scissors cut","📏":"ruler straight","📐":"ruler triangular","🖊️":"pen","✏️":"pencil","🖍️":"crayon","📚":"books stack","📖":"open book reading","📓":"notebook","📔":"notebook decorative","📒":"ledger","🗂️":"card index dividers","📁":"file folder","📂":"open file folder","🗃️":"card file box","📦":"package box","📫":"mailbox","📬":"mailbox raised flag","📧":"email envelope",
+    "✅":"check mark done yes","❌":"cross mark no wrong","❓":"question mark","❗":"exclamation mark warning","‼️":"double exclamation","⁉️":"exclamation question","⚠️":"warning caution","🚫":"prohibited forbidden","🔴":"red circle","🟠":"orange circle","🟡":"yellow circle","🟢":"green circle","🔵":"blue circle","🟣":"purple circle","⚫":"black circle","⚪":"white circle","🟤":"brown circle","🔶":"large orange diamond","🔷":"large blue diamond","🔺":"red triangle up","🔻":"red triangle down","▶️":"play button","⏩":"fast forward","⏪":"rewind","🔄":"counterclockwise arrows repeat","🔀":"shuffle twisted arrows","🔁":"repeat","🔂":"repeat single","➕":"plus add","➖":"minus subtract","✖️":"multiply","➗":"divide","♾️":"infinity","💲":"dollar sign money","©️":"copyright","®️":"registered","™️":"trademark","🔔":"bell notification","🔕":"bell slash muted","🔊":"speaker loud volume","🔇":"muted speaker silent","📣":"megaphone announcement","🏁":"checkered flag finish","🚩":"red flag","🏳️":"white flag surrender","🏴":"black flag","🔍":"magnifying glass search left","🔎":"magnifying glass search right","♻️":"recycling environment","☮️":"peace","☯️":"yin yang balance","🕉️":"om","✡️":"star of david","☪️":"star crescent","✝️":"latin cross","⚛️":"atom science"
+  };
+
+  function filterEmojis(query) {
+    const grid = document.getElementById("picker-scroll");
+    const noResults = document.getElementById("picker-no-results");
+    if (!grid) return;
+    const q = query.toLowerCase().trim();
+    const labels = grid.querySelectorAll(".picker-group-label");
+    const buttons = grid.querySelectorAll(".picker-emoji");
+    let anyVisible = false;
+
+    buttons.forEach(btn => {
+      if (!q) { btn.hidden = false; anyVisible = true; return; }
+      const emoji = btn.dataset.emoji;
+      const name = (emojiNames[emoji] || "").toLowerCase();
+      const match = name.includes(q) || emoji.includes(q);
+      btn.hidden = !match;
+      if (match) anyVisible = true;
+    });
+
+    // Show/hide group labels based on whether any emoji in the group is visible
+    labels.forEach(label => {
+      if (!q) { label.hidden = false; return; }
+      let sibling = label.nextElementSibling;
+      let groupHasVisible = false;
+      while (sibling && !sibling.classList.contains("picker-group-label")) {
+        if (sibling.classList.contains("picker-emoji") && !sibling.hidden) {
+          groupHasVisible = true;
+        }
+        sibling = sibling.nextElementSibling;
+      }
+      label.hidden = !groupHasVisible;
+    });
+
+    if (noResults) noResults.hidden = anyVisible;
   }
 
   function setup() {
@@ -263,6 +852,13 @@ const supabaseKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
     // Add button click
     const addBtn = document.getElementById("reaction-add-btn");
     if (addBtn) addBtn.addEventListener("click", togglePicker);
+
+    // Picker search input
+    const searchInput = document.getElementById("picker-search");
+    if (searchInput) {
+      searchInput.addEventListener("input", (e) => filterEmojis(e.target.value));
+      searchInput.addEventListener("keydown", (e) => e.stopPropagation());
+    }
 
     // Bar emoji clicks (delegation)
     const bar = document.getElementById("reactions-bar");
@@ -413,8 +1009,45 @@ const supabaseKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
     padding: var(--space-sm);
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
     z-index: 100;
-    max-height: 280px;
+    max-height: 350px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .picker-search {
+    width: 100%;
+    padding: 0.4rem 0.6rem;
+    margin-bottom: var(--space-sm);
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    color: var(--color-text);
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    outline: none;
+    flex-shrink: 0;
+  }
+
+  .picker-search:focus {
+    border-color: var(--color-link);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-link) 20%, transparent);
+  }
+
+  .picker-search::placeholder {
+    color: var(--color-text-tertiary);
+  }
+
+  .picker-scroll {
     overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+  }
+
+  .picker-no-results {
+    padding: 1rem;
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--color-text-tertiary);
   }
 
   [data-theme="dark"] .reaction-picker {
@@ -425,6 +1058,22 @@ const supabaseKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
     display: grid;
     grid-template-columns: repeat(8, 1fr);
     gap: 2px;
+  }
+
+  .picker-group-label {
+    grid-column: 1 / -1;
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-tertiary);
+    padding: 0.4rem 0.2rem 0.15rem;
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: 2px;
+  }
+
+  .picker-group-label:first-child {
+    padding-top: 0;
   }
 
   .picker-emoji {
@@ -444,6 +1093,14 @@ const supabaseKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
   .picker-emoji:hover {
     background: color-mix(in srgb, var(--color-link) 12%, transparent);
     transform: scale(1.15);
+  }
+
+  .picker-emoji[hidden] {
+    display: none;
+  }
+
+  .picker-group-label[hidden] {
+    display: none;
   }
 
   @media (max-width: 640px) {
