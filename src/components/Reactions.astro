@@ -646,6 +646,7 @@ const supabaseKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
   let serverCounts = [];
   let userReactions = [];
   let pickerOpen = false;
+  let cleanupController = null;
 
   async function supabaseRpc(fnName, params) {
     const res = await fetch(`${supabaseUrl}/rest/v1/rpc/${fnName}`, {
@@ -838,11 +839,17 @@ const supabaseKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
   }
 
   function setup() {
+    // Abort previous listeners to prevent duplicates on View Transition navigations
+    if (cleanupController) cleanupController.abort();
+    cleanupController = new AbortController();
+    const signal = cleanupController.signal;
+
     const section = document.querySelector(".reactions");
     if (!section) return;
 
     currentSlug = section.dataset.slug || "";
     userReactions = getLocalReactions(currentSlug);
+    pickerOpen = false;
 
     // Fetch server counts
     supabaseRpc("get_reactions", { p_slug: currentSlug })
@@ -851,13 +858,13 @@ const supabaseKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
 
     // Add button click
     const addBtn = document.getElementById("reaction-add-btn");
-    if (addBtn) addBtn.addEventListener("click", togglePicker);
+    if (addBtn) addBtn.addEventListener("click", togglePicker, { signal });
 
     // Picker search input
     const searchInput = document.getElementById("picker-search");
     if (searchInput) {
-      searchInput.addEventListener("input", (e) => filterEmojis(e.target.value));
-      searchInput.addEventListener("keydown", (e) => e.stopPropagation());
+      searchInput.addEventListener("input", (e) => filterEmojis(e.target.value), { signal });
+      searchInput.addEventListener("keydown", (e) => e.stopPropagation(), { signal });
     }
 
     // Bar emoji clicks (delegation)
@@ -873,7 +880,7 @@ const supabaseKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
           btn.addEventListener("animationend", () => btn.classList.remove("reaction-pop"), { once: true });
           handleToggle(emoji);
         }
-      });
+      }, { signal });
     }
 
     // Picker emoji clicks
@@ -887,7 +894,7 @@ const supabaseKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
           closePicker();
           handleToggle(emoji);
         }
-      });
+      }, { signal });
     }
 
     // Close picker on outside click
@@ -898,12 +905,12 @@ const supabaseKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
       if (picker && addBtn && !picker.contains(e.target) && !addBtn.contains(e.target)) {
         closePicker();
       }
-    });
+    }, { signal });
 
     // Close picker on Escape
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape" && pickerOpen) closePicker();
-    });
+    }, { signal });
 
     renderReactions();
   }
