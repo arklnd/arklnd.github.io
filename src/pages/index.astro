@@ -1,6 +1,7 @@
 ---
 import Layout from "../components/Layout.astro";
 import Heading from "../components/Heading.astro";
+import ReactionsBadge from "../components/ReactionsBadge.astro";
 import { getCollection } from "astro:content";
 
 const posts = (await getCollection("posts")).sort(
@@ -34,6 +35,7 @@ const posts = (await getCollection("posts")).sort(
               <a href={`/posts/${post.id}`} aria-label={post.data.title}>
                 <div class="card-body">
                   <span class="post-title" transition:name={`post-title-${post.id}`}>{post.data.title}</span>
+                  <ReactionsBadge slug={post.id} />
                   <span class="post-description">{post.data.description}</span>
                 </div>
                 <div class="card-footer">

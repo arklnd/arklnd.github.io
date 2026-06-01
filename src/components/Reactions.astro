@@ -1,0 +1,394 @@
+---
+interface Props {
+  slug: string;
+}
+
+const { slug } = Astro.props;
+
+const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
+const supabaseKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+---
+
+<section class="reactions" aria-label="Reactions" data-slug={slug}>
+  <div class="reactions-bar" id="reactions-bar">
+    <button class="reaction-add-btn" id="reaction-add-btn" aria-label="Add a reaction" title="Add a reaction">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="8" x2="12" y2="16"/>
+        <line x1="8" y1="12" x2="16" y2="12"/>
+      </svg>
+      <span class="reaction-add-label">React</span>
+    </button>
+  </div>
+  <div class="reaction-picker" id="reaction-picker" hidden>
+    <div class="picker-grid" role="group" aria-label="Choose an emoji">
+      <button class="picker-emoji" data-emoji="👍" aria-label="thumbs up" title="Thumbs up">👍</button>
+      <button class="picker-emoji" data-emoji="❤️" aria-label="heart" title="Heart">❤️</button>
+      <button class="picker-emoji" data-emoji="🔥" aria-label="fire" title="Fire">🔥</button>
+      <button class="picker-emoji" data-emoji="🎉" aria-label="tada" title="Tada">🎉</button>
+      <button class="picker-emoji" data-emoji="👏" aria-label="clap" title="Clap">👏</button>
+      <button class="picker-emoji" data-emoji="💯" aria-label="hundred" title="100">💯</button>
+      <button class="picker-emoji" data-emoji="💡" aria-label="bulb" title="Idea">💡</button>
+      <button class="picker-emoji" data-emoji="🤔" aria-label="thinking" title="Thinking">🤔</button>
+      <button class="picker-emoji" data-emoji="👀" aria-label="eyes" title="Eyes">👀</button>
+      <button class="picker-emoji" data-emoji="🧠" aria-label="brain" title="Brain">🧠</button>
+      <button class="picker-emoji" data-emoji="📝" aria-label="memo" title="Memo">📝</button>
+      <button class="picker-emoji" data-emoji="✅" aria-label="check" title="Check">✅</button>
+      <button class="picker-emoji" data-emoji="😊" aria-label="smile" title="Smile">😊</button>
+      <button class="picker-emoji" data-emoji="😂" aria-label="joy" title="Joy">😂</button>
+      <button class="picker-emoji" data-emoji="🚀" aria-label="rocket" title="Rocket">🚀</button>
+      <button class="picker-emoji" data-emoji="⭐" aria-label="star" title="Star">⭐</button>
+      <button class="picker-emoji" data-emoji="🙌" aria-label="raised hands" title="Raised hands">🙌</button>
+      <button class="picker-emoji" data-emoji="💪" aria-label="muscle" title="Muscle">💪</button>
+    </div>
+  </div>
+</section>
+
+<script define:vars={{ slug, supabaseUrl, supabaseKey }}>
+  // Module-level state — survives View Transitions
+  let currentSlug = "";
+  let serverCounts = [];
+  let userReactions = [];
+  let pickerOpen = false;
+
+  async function supabaseRpc(fnName, params) {
+    const res = await fetch(`${supabaseUrl}/rest/v1/rpc/${fnName}`, {
+      method: "POST",
+      headers: {
+        "apikey": supabaseKey,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(params),
+    });
+    if (!res.ok) throw new Error(`Supabase RPC ${fnName} failed: ${res.status}`);
+    return res.json();
+  }
+
+  function getLocalReactions(s) {
+    try {
+      return JSON.parse(localStorage.getItem(`reactions:${s}`) || "[]");
+    } catch { return []; }
+  }
+
+  function setLocalReactions(s, arr) {
+    localStorage.setItem(`reactions:${s}`, JSON.stringify(arr));
+  }
+
+  function renderReactions() {
+    const bar = document.getElementById("reactions-bar");
+    const addBtn = document.getElementById("reaction-add-btn");
+    if (!bar || !addBtn) return;
+
+    // Remove existing emoji buttons (keep add button)
+    bar.querySelectorAll(":scope > .reaction-btn").forEach(b => b.remove());
+
+    // Insert emoji buttons before the add button
+    for (const { emoji, count } of serverCounts) {
+      if (count <= 0) continue;
+      const btn = document.createElement("button");
+      btn.className = "reaction-btn";
+      if (userReactions.includes(emoji)) btn.classList.add("reaction-mine");
+      btn.setAttribute("aria-label", `${emoji} ${count}`);
+      btn.setAttribute("title", `${emoji} ${count}`);
+      btn.dataset.emoji = emoji;
+      btn.innerHTML = `<span class="reaction-emoji">${emoji}</span><span class="reaction-count">${count}</span>`;
+      bar.insertBefore(btn, addBtn);
+    }
+
+    // Hide add button when user already has a reaction
+    const hasReacted = userReactions.length > 0;
+    addBtn.hidden = hasReacted;
+  }
+
+  async function handleToggle(emoji) {
+    const isOwn = userReactions.includes(emoji);
+    const prevEmoji = userReactions.length > 0 ? userReactions[0] : null;
+
+    if (isOwn) {
+      // Un-react: remove the current reaction
+      userReactions = [];
+      const existing = serverCounts.find(r => r.emoji === emoji);
+      if (existing) {
+        existing.count = Math.max(existing.count - 1, 0);
+        if (existing.count === 0) serverCounts = serverCounts.filter(r => r.emoji !== emoji);
+      }
+      setLocalReactions(currentSlug, userReactions);
+      renderReactions();
+
+      try {
+        const updated = await supabaseRpc("toggle_reaction", {
+          p_slug: currentSlug, p_emoji: emoji, p_action: "remove",
+        });
+        serverCounts = updated;
+        renderReactions();
+      } catch {
+        userReactions = [emoji];
+        const ex = serverCounts.find(r => r.emoji === emoji);
+        if (ex) ex.count += 1; else serverCounts.push({ emoji, count: 1 });
+        setLocalReactions(currentSlug, userReactions);
+        renderReactions();
+      }
+    } else {
+      // Switch reaction: remove old (if any), then add new
+      // Optimistic UI — remove old
+      if (prevEmoji) {
+        const old = serverCounts.find(r => r.emoji === prevEmoji);
+        if (old) {
+          old.count = Math.max(old.count - 1, 0);
+          if (old.count === 0) serverCounts = serverCounts.filter(r => r.emoji !== prevEmoji);
+        }
+      }
+      // Optimistic UI — add new
+      userReactions = [emoji];
+      const existing = serverCounts.find(r => r.emoji === emoji);
+      if (existing) existing.count += 1;
+      else serverCounts.push({ emoji, count: 1 });
+      setLocalReactions(currentSlug, userReactions);
+      renderReactions();
+
+      try {
+        // Remove old reaction on server first
+        if (prevEmoji) {
+          await supabaseRpc("toggle_reaction", {
+            p_slug: currentSlug, p_emoji: prevEmoji, p_action: "remove",
+          });
+        }
+        // Add new reaction
+        const updated = await supabaseRpc("toggle_reaction", {
+          p_slug: currentSlug, p_emoji: emoji, p_action: "add",
+        });
+        serverCounts = updated;
+        renderReactions();
+      } catch {
+        // Revert: restore old, remove new
+        userReactions = prevEmoji ? [prevEmoji] : [];
+        const ex = serverCounts.find(r => r.emoji === emoji);
+        if (ex) { ex.count -= 1; if (ex.count <= 0) serverCounts = serverCounts.filter(r => r.emoji !== emoji); }
+        if (prevEmoji) {
+          const old = serverCounts.find(r => r.emoji === prevEmoji);
+          if (old) old.count += 1; else serverCounts.push({ emoji: prevEmoji, count: 1 });
+        }
+        setLocalReactions(currentSlug, userReactions);
+        renderReactions();
+      }
+    }
+  }
+
+  function togglePicker() {
+    const picker = document.getElementById("reaction-picker");
+    if (!picker) return;
+    pickerOpen = !pickerOpen;
+    picker.hidden = !pickerOpen;
+  }
+
+  function closePicker() {
+    const picker = document.getElementById("reaction-picker");
+    if (!picker) return;
+    pickerOpen = false;
+    picker.hidden = true;
+  }
+
+  function setup() {
+    const section = document.querySelector(".reactions");
+    if (!section) return;
+
+    currentSlug = section.dataset.slug || "";
+    userReactions = getLocalReactions(currentSlug);
+
+    // Fetch server counts
+    supabaseRpc("get_reactions", { p_slug: currentSlug })
+      .then(data => { serverCounts = data || []; renderReactions(); })
+      .catch(() => { serverCounts = []; renderReactions(); });
+
+    // Add button click
+    const addBtn = document.getElementById("reaction-add-btn");
+    if (addBtn) addBtn.addEventListener("click", togglePicker);
+
+    // Bar emoji clicks (delegation)
+    const bar = document.getElementById("reactions-bar");
+    if (bar) {
+      bar.addEventListener("click", (e) => {
+        const btn = e.target.closest(".reaction-btn");
+        if (!btn) return;
+        const emoji = btn.dataset.emoji;
+        if (emoji) {
+          // Animate
+          btn.classList.add("reaction-pop");
+          btn.addEventListener("animationend", () => btn.classList.remove("reaction-pop"), { once: true });
+          handleToggle(emoji);
+        }
+      });
+    }
+
+    // Picker emoji clicks
+    const picker = document.getElementById("reaction-picker");
+    if (picker) {
+      picker.addEventListener("click", (e) => {
+        const btn = e.target.closest(".picker-emoji");
+        if (!btn) return;
+        const emoji = btn.dataset.emoji;
+        if (emoji) {
+          closePicker();
+          handleToggle(emoji);
+        }
+      });
+    }
+
+    // Close picker on outside click
+    document.addEventListener("click", (e) => {
+      if (!pickerOpen) return;
+      const picker = document.getElementById("reaction-picker");
+      const addBtn = document.getElementById("reaction-add-btn");
+      if (picker && addBtn && !picker.contains(e.target) && !addBtn.contains(e.target)) {
+        closePicker();
+      }
+    });
+
+    // Close picker on Escape
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && pickerOpen) closePicker();
+    });
+
+    renderReactions();
+  }
+
+  document.addEventListener("astro:page-load", setup);
+</script>
+
+<style>
+  .reactions {
+    max-width: var(--width-content);
+    margin: var(--space-sm) 0 0;
+    position: relative;
+  }
+
+  .reactions-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    align-items: center;
+  }
+
+  .reaction-add-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.35rem 0.7rem;
+    font-family: var(--font-heading);
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+    background: transparent;
+    border: 1.5px dashed var(--color-border);
+    border-radius: 999px;
+    cursor: pointer;
+    transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+  }
+
+  .reaction-add-btn[hidden] {
+    display: none;
+  }
+
+  .reaction-add-btn:hover {
+    border-color: var(--color-link);
+    color: var(--color-link);
+    background: color-mix(in srgb, var(--color-link) 8%, transparent);
+  }
+
+  .reactions-bar :global(.reaction-btn) {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.35rem 0.65rem;
+    font-family: var(--font-heading);
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+    background: var(--color-surface);
+    border: 1.5px solid var(--color-border);
+    border-radius: 999px;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease, transform 0.1s ease;
+  }
+
+  .reactions-bar :global(.reaction-btn:hover) {
+    border-color: var(--color-link);
+    background: color-mix(in srgb, var(--color-link) 8%, transparent);
+  }
+
+  .reactions-bar :global(.reaction-btn.reaction-mine) {
+    border-color: var(--color-link);
+    background: color-mix(in srgb, var(--color-link) 12%, transparent);
+    color: var(--color-link);
+  }
+
+  .reactions-bar :global(.reaction-emoji) {
+    font-size: 1rem;
+    line-height: 1;
+  }
+
+  .reactions-bar :global(.reaction-count) {
+    font-size: 0.75rem;
+    font-weight: 600;
+    min-width: 0.8rem;
+    text-align: center;
+  }
+
+  .reactions-bar :global(.reaction-pop) {
+    animation: pop 0.25s ease;
+  }
+
+  @keyframes pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+  }
+
+  .reaction-picker {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    margin-bottom: var(--space-sm);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: var(--space-sm);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    z-index: 100;
+  }
+
+  [data-theme="dark"] .reaction-picker {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  }
+
+  .picker-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 2px;
+  }
+
+  .picker-emoji {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.2rem;
+    height: 2.2rem;
+    font-size: 1.15rem;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.1s ease, transform 0.1s ease;
+  }
+
+  .picker-emoji:hover {
+    background: color-mix(in srgb, var(--color-link) 12%, transparent);
+    transform: scale(1.15);
+  }
+
+  @media (max-width: 640px) {
+    .reaction-picker {
+      left: 0;
+      right: 0;
+      bottom: 100%;
+    }
+  }
+</style>
