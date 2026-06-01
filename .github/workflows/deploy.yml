@@ -27,6 +27,9 @@ jobs:
           # path: . # The root location of your Astro project inside the repository. (optional)
           node-version: 22 # The specific version of Node.js to use. (optional)
           package-manager: bun@latest # The specific version of bun to use. (optional)
+        env:
+          PUBLIC_SUPABASE_URL: ${{ secrets.PUBLIC_SUPABASE_URL }}
+          PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.PUBLIC_SUPABASE_ANON_KEY }}
 
   deploy:
     needs: build
