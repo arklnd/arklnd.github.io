@@ -917,6 +917,12 @@ const supabaseKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
       if (e.key === "Escape" && _rs.pickerOpen) closePicker();
     }, { signal });
 
+    // Add tooltip titles to emoji buttons from the emojiNames map
+    document.querySelectorAll(".picker-emoji").forEach(btn => {
+      const emoji = btn.dataset.emoji;
+      if (emoji && emojiNames[emoji]) btn.title = emojiNames[emoji];
+    });
+
     renderReactions();
   }
 
@@ -1134,6 +1140,7 @@ const supabaseKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
 
     .picker-grid {
       grid-template-columns: repeat(7, 1fr);
+      justify-items: center;
     }
   }
 </style>
