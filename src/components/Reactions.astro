@@ -23,23 +23,83 @@ const supabaseKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
   <div class="reaction-picker" id="reaction-picker" hidden>
     <div class="picker-grid" role="group" aria-label="Choose an emoji">
       <button class="picker-emoji" data-emoji="👍" aria-label="thumbs up" title="Thumbs up">👍</button>
+      <button class="picker-emoji" data-emoji="👎" aria-label="thumbs down" title="Thumbs down">👎</button>
       <button class="picker-emoji" data-emoji="❤️" aria-label="heart" title="Heart">❤️</button>
       <button class="picker-emoji" data-emoji="🔥" aria-label="fire" title="Fire">🔥</button>
       <button class="picker-emoji" data-emoji="🎉" aria-label="tada" title="Tada">🎉</button>
       <button class="picker-emoji" data-emoji="👏" aria-label="clap" title="Clap">👏</button>
       <button class="picker-emoji" data-emoji="💯" aria-label="hundred" title="100">💯</button>
+      <button class="picker-emoji" data-emoji="🚀" aria-label="rocket" title="Rocket">🚀</button>
       <button class="picker-emoji" data-emoji="💡" aria-label="bulb" title="Idea">💡</button>
       <button class="picker-emoji" data-emoji="🤔" aria-label="thinking" title="Thinking">🤔</button>
       <button class="picker-emoji" data-emoji="👀" aria-label="eyes" title="Eyes">👀</button>
       <button class="picker-emoji" data-emoji="🧠" aria-label="brain" title="Brain">🧠</button>
-      <button class="picker-emoji" data-emoji="📝" aria-label="memo" title="Memo">📝</button>
-      <button class="picker-emoji" data-emoji="✅" aria-label="check" title="Check">✅</button>
       <button class="picker-emoji" data-emoji="😊" aria-label="smile" title="Smile">😊</button>
       <button class="picker-emoji" data-emoji="😂" aria-label="joy" title="Joy">😂</button>
-      <button class="picker-emoji" data-emoji="🚀" aria-label="rocket" title="Rocket">🚀</button>
+      <button class="picker-emoji" data-emoji="😍" aria-label="heart eyes" title="Heart eyes">😍</button>
+      <button class="picker-emoji" data-emoji="🥳" aria-label="party" title="Party">🥳</button>
+      <button class="picker-emoji" data-emoji="😎" aria-label="cool" title="Cool">😎</button>
+      <button class="picker-emoji" data-emoji="🤯" aria-label="mind blown" title="Mind blown">🤯</button>
+      <button class="picker-emoji" data-emoji="😢" aria-label="sad" title="Sad">😢</button>
+      <button class="picker-emoji" data-emoji="😮" aria-label="surprised" title="Surprised">😮</button>
+      <button class="picker-emoji" data-emoji="🤩" aria-label="star struck" title="Star struck">🤩</button>
+      <button class="picker-emoji" data-emoji="🫡" aria-label="salute" title="Salute">🫡</button>
       <button class="picker-emoji" data-emoji="⭐" aria-label="star" title="Star">⭐</button>
-      <button class="picker-emoji" data-emoji="🙌" aria-label="raised hands" title="Raised hands">🙌</button>
+      <button class="picker-emoji" data-emoji="✅" aria-label="check" title="Check">✅</button>
+      <button class="picker-emoji" data-emoji="❌" aria-label="cross" title="Cross">❌</button>
+      <button class="picker-emoji" data-emoji="📝" aria-label="memo" title="Memo">📝</button>
       <button class="picker-emoji" data-emoji="💪" aria-label="muscle" title="Muscle">💪</button>
+      <button class="picker-emoji" data-emoji="🙌" aria-label="raised hands" title="Raised hands">🙌</button>
+      <button class="picker-emoji" data-emoji="🤝" aria-label="handshake" title="Handshake">🤝</button>
+      <button class="picker-emoji" data-emoji="🙏" aria-label="pray" title="Pray">🙏</button>
+      <button class="picker-emoji" data-emoji="💎" aria-label="gem" title="Gem">💎</button>
+      <button class="picker-emoji" data-emoji="🏆" aria-label="trophy" title="Trophy">🏆</button>
+      <button class="picker-emoji" data-emoji="🎯" aria-label="bullseye" title="Bullseye">🎯</button>
+      <button class="picker-emoji" data-emoji="🔑" aria-label="key" title="Key">🔑</button>
+      <button class="picker-emoji" data-emoji="⚡" aria-label="lightning" title="Lightning">⚡</button>
+      <button class="picker-emoji" data-emoji="🌟" aria-label="glowing star" title="Glowing star">🌟</button>
+      <button class="picker-emoji" data-emoji="💬" aria-label="speech" title="Speech">💬</button>
+      <button class="picker-emoji" data-emoji="📌" aria-label="pin" title="Pin">📌</button>
+      <button class="picker-emoji" data-emoji="🔗" aria-label="link" title="Link">🔗</button>
+      <button class="picker-emoji" data-emoji="📚" aria-label="books" title="Books">📚</button>
+      <button class="picker-emoji" data-emoji="🛠️" aria-label="tools" title="Tools">🛠️</button>
+      <button class="picker-emoji" data-emoji="⚙️" aria-label="gear" title="Gear">⚙️</button>
+      <button class="picker-emoji" data-emoji="🐛" aria-label="bug" title="Bug">🐛</button>
+      <button class="picker-emoji" data-emoji="🧪" aria-label="test tube" title="Test tube">🧪</button>
+      <button class="picker-emoji" data-emoji="🎨" aria-label="palette" title="Palette">🎨</button>
+      <button class="picker-emoji" data-emoji="🧩" aria-label="puzzle" title="Puzzle">🧩</button>
+      <button class="picker-emoji" data-emoji="💻" aria-label="laptop" title="Laptop">💻</button>
+      <button class="picker-emoji" data-emoji="☕" aria-label="coffee" title="Coffee">☕</button>
+      <button class="picker-emoji" data-emoji="🌍" aria-label="globe" title="Globe">🌍</button>
+      <button class="picker-emoji" data-emoji="💥" aria-label="boom" title="Boom">💥</button>
+      <button class="picker-emoji" data-emoji="💫" aria-label="dizzy" title="Dizzy">💫</button>
+      <button class="picker-emoji" data-emoji="🔮" aria-label="crystal ball" title="Crystal ball">🔮</button>
+      <button class="picker-emoji" data-emoji="🎵" aria-label="music" title="Music">🎵</button>
+      <button class="picker-emoji" data-emoji="📸" aria-label="camera" title="Camera">📸</button>
+      <button class="picker-emoji" data-emoji="📡" aria-label="satellite" title="Satellite">📡</button>
+      <button class="picker-emoji" data-emoji="🔒" aria-label="lock" title="Lock">🔒</button>
+      <button class="picker-emoji" data-emoji="🛡️" aria-label="shield" title="Shield">🛡️</button>
+      <button class="picker-emoji" data-emoji="🌈" aria-label="rainbow" title="Rainbow">🌈</button>
+      <button class="picker-emoji" data-emoji="🤖" aria-label="robot" title="Robot">🤖</button>
+      <button class="picker-emoji" data-emoji="👾" aria-label="alien" title="Alien">👾</button>
+      <button class="picker-emoji" data-emoji="🧬" aria-label="dna" title="DNA">🧬</button>
+      <button class="picker-emoji" data-emoji="📊" aria-label="chart" title="Chart">📊</button>
+      <button class="picker-emoji" data-emoji="📈" aria-label="chart up" title="Chart up">📈</button>
+      <button class="picker-emoji" data-emoji="🔍" aria-label="search" title="Search">🔍</button>
+      <button class="picker-emoji" data-emoji="💤" aria-label="zzz" title="Zzz">💤</button>
+      <button class="picker-emoji" data-emoji="⏰" aria-label="alarm" title="Alarm">⏰</button>
+      <button class="picker-emoji" data-emoji="📎" aria-label="paperclip" title="Paperclip">📎</button>
+      <button class="picker-emoji" data-emoji="📜" aria-label="scroll" title="Scroll">📜</button>
+      <button class="picker-emoji" data-emoji="📦" aria-label="package" title="Package">📦</button>
+      <button class="picker-emoji" data-emoji="🧱" aria-label="brick" title="Brick">🧱</button>
+      <button class="picker-emoji" data-emoji="🌱" aria-label="seedling" title="Seedling">🌱</button>
+      <button class="picker-emoji" data-emoji="✨" aria-label="sparkles" title="Sparkles">✨</button>
+      <button class="picker-emoji" data-emoji="💩" aria-label="poop" title="Poop">💩</button>
+      <button class="picker-emoji" data-emoji="💀" aria-label="skull" title="Skull">💀</button>
+      <button class="picker-emoji" data-emoji="🤡" aria-label="clown" title="Clown">🤡</button>
+      <button class="picker-emoji" data-emoji="🦋" aria-label="butterfly" title="Butterfly">🦋</button>
+      <button class="picker-emoji" data-emoji="🐢" aria-label="turtle" title="Turtle">🐢</button>
+      <button class="picker-emoji" data-emoji="🦉" aria-label="owl" title="Owl">🦉</button>
     </div>
   </div>
 </section>
@@ -344,15 +404,17 @@ const supabaseKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
 
   .reaction-picker {
     position: absolute;
-    bottom: 100%;
+    top: 100%;
     left: 0;
-    margin-bottom: var(--space-sm);
+    margin-top: var(--space-sm);
     background: var(--color-surface);
     border: 1px solid var(--color-border);
     border-radius: 12px;
     padding: var(--space-sm);
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
     z-index: 100;
+    max-height: 280px;
+    overflow-y: auto;
   }
 
   [data-theme="dark"] .reaction-picker {
@@ -361,7 +423,7 @@ const supabaseKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
 
   .picker-grid {
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(8, 1fr);
     gap: 2px;
   }
 
@@ -388,7 +450,7 @@ const supabaseKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
     .reaction-picker {
       left: 0;
       right: 0;
-      bottom: 100%;
+      top: 100%;
     }
   }
 </style>
