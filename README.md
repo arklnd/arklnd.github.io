@@ -25,12 +25,12 @@ Anyone who needs a visual builder, dynamic content, user accounts, or comments. 
 
 ### Prerequisites
 
-- Node.js 18 or later
+- [Bun](https://bun.sh/) runtime
 
 ### Install
 
 ```
-npm install
+bun install
 ```
 
 ### Start writing
@@ -51,7 +51,7 @@ Your content here.
 3. Run the dev server:
 
 ```
-npm run dev
+bun run dev
 ```
 
 4. Open `http://localhost:4321`
@@ -73,7 +73,7 @@ See `.env.example` for reference.
 ### Build for production
 
 ```
-npm run build
+bun run build
 ```
 
 Output is in the `dist/` directory. Deploy it anywhere that serves static files.
