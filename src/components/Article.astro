@@ -78,17 +78,18 @@ const formattedDate = date.toLocaleDateString("en-US", {
         )
       }
     </p>
-    <Reactions slug={slug || ""} />
+    <div class="article-actions">
+      <!-- Podcast trigger button — only shown when SpeechSynthesis API is available -->
+      <button id="podcast-trigger" class="podcast-trigger" aria-label="Listen to this post" title="Listen to this post" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M3 18v-6a9 9 0 0 1 18 0v6"/>
+          <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>
+        </svg>
+        <span>Listen</span>
+      </button>
+      <Reactions slug={slug || ""} />
+    </div>
   </header>
-
-  <!-- Podcast trigger button — only shown when SpeechSynthesis API is available -->
-  <button id="podcast-trigger" class="podcast-trigger" aria-label="Listen to this post" title="Listen to this post" hidden>
-    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <path d="M3 18v-6a9 9 0 0 1 18 0v6"/>
-      <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>
-    </svg>
-    <span>Listen</span>
-  </button>
 
   <Prose>
     <slot />
@@ -257,12 +258,19 @@ const formattedDate = date.toLocaleDateString("en-US", {
     justify-content: flex-start;
   }
 
+  /* ── Actions row (Listen + React) ──────── */
+  .article-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-top: var(--space-sm);
+  }
+
   /* ── Podcast trigger button ──────────────── */
   .podcast-trigger {
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
-    margin-top: var(--space-sm);
     padding: 0.3rem 0.7rem;
     font-family: var(--font-heading);
     font-size: 0.75rem;
