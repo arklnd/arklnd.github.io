@@ -3,6 +3,9 @@ import Heading from "./Heading.astro";
 import Prose from "./Prose.astro";
 import ShareSelection from "./ShareSelection.astro";
 import Reactions from "./Reactions.astro";
+import ProjectLink from "./ProjectLink.astro";
+import { getProjectById } from "../data/projects";
+import type { Project } from "../data/projects";
 
 interface Props {
   title: string;
@@ -10,9 +13,12 @@ interface Props {
   description: string;
   readingTime?: string;
   slug?: string;
+  /** Project ID from src/data/projects.ts — renders a repo card after the article */
+  projectId?: string;
 }
 
-const { title, date, description, readingTime, slug } = Astro.props;
+const { title, date, description, readingTime, slug, projectId } = Astro.props;
+const project: Project | undefined = projectId ? getProjectById(projectId) : undefined;
 
 const formattedDate = date.toLocaleDateString("en-US", {
   year: "numeric",
@@ -94,6 +100,8 @@ const formattedDate = date.toLocaleDateString("en-US", {
   <Prose>
     <slot />
   </Prose>
+
+  {project && <ProjectLink project={project} />}
 </article>
 
 <!-- Podcast dialog modal -->

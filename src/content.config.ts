@@ -7,6 +7,8 @@ const posts = defineCollection({
     title: z.string(),
     description: z.string(),
     date: z.coerce.date(),
+    /** ID from src/data/projects.ts — links this post to a project */
+    project: z.string().optional(),
   }),
 });
 

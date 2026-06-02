@@ -1,0 +1,136 @@
+---
+import type { Project } from "../data/projects";
+
+interface Props {
+  project: Project;
+}
+
+const { project } = Astro.props;
+
+/** Extract the user/repo portion from GitHub URLs for display */
+function shortLabel(url: string): string {
+  try {
+    const u = new URL(url);
+    return u.pathname.replace(/^\//, "").replace(/\.git$/, "");
+  } catch {
+    return url;
+  }
+}
+---
+
+<aside class="project-link-card" aria-label={`Source code: ${project.name}`}>
+  <div class="project-link-inner">
+    <svg class="project-link-icon" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+    </svg>
+    <div class="project-link-body">
+      <span class="project-link-name">{project.name}</span>
+      <span class="project-link-desc">{project.description}</span>
+    </div>
+    <a href={project.repoUrl} target="_blank" rel="noopener noreferrer" class="project-link-btn">
+      {shortLabel(project.repoUrl)}
+      <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+        <polyline points="15 3 21 3 21 9"/>
+        <line x1="10" y1="14" x2="21" y2="3"/>
+      </svg>
+      <span class="sr-only">(opens in a new tab)</span>
+    </a>
+  </div>
+</aside>
+
+<style>
+  .project-link-card {
+    margin-top: var(--space-xl);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    background: var(--color-surface);
+    overflow: hidden;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .project-link-card:hover {
+    border-color: color-mix(in srgb, var(--color-link) 40%, var(--color-border));
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  }
+
+  .project-link-inner {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-md);
+    padding: var(--space-lg);
+  }
+
+  .project-link-icon {
+    flex-shrink: 0;
+    color: var(--color-text-tertiary);
+    margin-top: 2px;
+  }
+
+  .project-link-body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .project-link-name {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--color-text);
+  }
+
+  .project-link-desc {
+    font-size: 0.82rem;
+    color: var(--color-text-secondary);
+    line-height: 1.45;
+  }
+
+  .project-link-btn {
+    flex-shrink: 0;
+    align-self: center;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.4rem 0.85rem;
+    font-family: var(--font-heading);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-link);
+    background: color-mix(in srgb, var(--color-link) 8%, transparent);
+    border: 1px solid color-mix(in srgb, var(--color-link) 25%, transparent);
+    border-radius: 20px;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: all 0.15s ease;
+  }
+
+  .project-link-btn:hover {
+    background: color-mix(in srgb, var(--color-link) 14%, transparent);
+    border-color: color-mix(in srgb, var(--color-link) 45%, transparent);
+    box-shadow: 0 2px 8px color-mix(in srgb, var(--color-link) 12%, transparent);
+    color: var(--color-link-hover);
+  }
+
+  .project-link-btn:focus-visible {
+    outline: 2px solid var(--color-link);
+    outline-offset: 2px;
+  }
+
+  @media (max-width: 600px) {
+    .project-link-inner {
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+
+    .project-link-icon {
+      display: none;
+    }
+
+    .project-link-btn {
+      align-self: flex-start;
+    }
+  }
+</style>

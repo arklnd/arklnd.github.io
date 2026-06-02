@@ -2,6 +2,7 @@
 title: "DaFitDesktop — Reverse-Engineering BLE Smart Bands from a Windows Terminal"
 description: "A deep dive into building a C++20 command-line tool that connects to Da Fit / MOYOUNG smart bands over Bluetooth LE, decodes the proprietary GATT protocol, and renders a health dashboard with ANSI art — all without the official app."
 date: 2026-04-15
+project: "dafit-desktop"
 ---
 
 ## Talking to a cheap smart band without the vendor's app — just C++ and raw Bluetooth packets.
@@ -517,6 +518,4 @@ The project is a compact example of what you can accomplish with modern C++ and 
 
 ---
 
-The full source code is on GitHub: **[arklnd/DaFitDesktop](https://github.com/arklnd/DaFitDesktop)**
-
-Feel free to fork it, hack on it, and have fun — whether you want to add new protocol commands, support a different band, or just poke around at raw BLE packets from your own wrist.
+The full source code is on GitHub, Feel free to fork it, hack on it, and have fun — whether you want to add new protocol commands, support a different band, or just poke around at raw BLE packets from your own wrist.

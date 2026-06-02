@@ -2,6 +2,7 @@
 import Layout from "../components/Layout.astro";
 import Heading from "../components/Heading.astro";
 import Prose from "../components/Prose.astro";
+import projects from "../data/projects";
 ---
 
 <Layout title="About — Arijit's Blog" description="About Arijit's Blog.">
@@ -49,6 +50,29 @@ import Prose from "../components/Prose.astro";
         </ul>
       </div>
 
+      <div class="projects-section">
+        <Heading as="h2">Projects</Heading>
+        <div class="projects-grid">
+          {projects.map((project) => (
+            <a href={project.repoUrl} target="_blank" rel="noopener noreferrer" class="project-card">
+              <div class="project-card-header">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" class="project-card-icon">
+                  <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+                </svg>
+                <span class="project-card-name">{project.name}</span>
+              </div>
+              <p class="project-card-desc">{project.description}</p>
+              <div class="project-card-tech">
+                {project.tech.map((t) => (
+                  <span class="tech-tag">{t}</span>
+                ))}
+              </div>
+              <span class="sr-only">(opens in a new tab)</span>
+            </a>
+          ))}
+        </div>
+      </div>
+
       <div class="contact-section">
         <Heading as="h2">Get In Touch</Heading>
         <p>I'm always open to discussing new opportunities, interesting projects, or just having a chat about technology.</p>
@@ -78,5 +102,76 @@ import Prose from "../components/Prose.astro";
   }
   .skills-section li, .contact-section li {
     margin-bottom: 0.5rem;
+  }
+
+  /* ── Projects grid ────────────────────── */
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--space-md);
+    margin-top: var(--space-md);
+  }
+
+  .project-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: var(--space-lg);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    background: var(--color-surface);
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+  }
+
+  .project-card:hover {
+    border-color: color-mix(in srgb, var(--color-link) 40%, var(--color-border));
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+    color: inherit;
+  }
+
+  .project-card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .project-card-icon {
+    color: var(--color-text-tertiary);
+    flex-shrink: 0;
+  }
+
+  .project-card-name {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--color-link);
+  }
+
+  .project-card-desc {
+    font-size: 0.82rem;
+    color: var(--color-text-secondary);
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  .project-card-tech {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-top: 0.25rem;
+  }
+
+  .tech-tag {
+    font-family: var(--font-heading);
+    font-size: 0.68rem;
+    font-weight: 600;
+    padding: 0.15rem 0.55rem;
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--color-link) 10%, transparent);
+    color: var(--color-link);
+    white-space: nowrap;
   }
 </style>

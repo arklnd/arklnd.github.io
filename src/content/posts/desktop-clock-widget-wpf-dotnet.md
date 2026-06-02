@@ -2,6 +2,7 @@
 title: "DesktopClockWidget — A Frameless, Always-On-Top WPF Clock for Windows"
 description: "A walkthrough of building a feature-rich desktop clock widget with WPF and .NET 10: analog + digital faces, full color customization, alarm, stopwatch, countdown timer, and zero taskbar footprint — all in pure vector graphics."
 date: 2026-04-16
+project: "desktop-clock-widget"
 ---
 
 ## A tiny, unobtrusive clock that lives on your desktop and stays out of your way.
@@ -353,5 +354,3 @@ The self-contained publish produces a single `.exe` you can drop anywhere — no
 ## 13. Fork It
 
 The project started as a weekend experiment and grew commit by commit — from a bare analog face, through color pickers and size modes, to alarm and timer dialogs. If you want a frameless WPF clock that gets out of your way, feel free to fork and make it yours:
-
-**[github.com/arklnd/DesktopClockWidget](https://github.com/arklnd/DesktopClockWidget.git)**
