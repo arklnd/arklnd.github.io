@@ -3,9 +3,18 @@ import Layout from "../components/Layout.astro";
 import Heading from "../components/Heading.astro";
 import ReactionsBadge from "../components/ReactionsBadge.astro";
 import { getCollection } from "astro:content";
+import { getReadingTime } from "../utils/readingTime";
 
 const posts = (await getCollection("posts")).sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+
+const postsWithReadingTime = await Promise.all(
+  posts.map(async (post) => {
+    const wordCount = post.body ? post.body.split(/\s+/g).filter(Boolean).length : 0;
+    const readingTime = getReadingTime(post.body ?? "");
+    return { ...post, wordCount, readingTime };
+  })
 );
 ---
 
@@ -38,7 +47,7 @@ const posts = (await getCollection("posts")).sort(
     </header>
     <ul class="post-grid" role="list">
       {
-        posts.map((post) => {
+        postsWithReadingTime.map((post) => {
           const formattedDate = post.data.date.toLocaleDateString("en-US", {
             year: "numeric",
             month: "long",
@@ -53,7 +62,10 @@ const posts = (await getCollection("posts")).sort(
                   <span class="post-description">{post.data.description}</span>
                 </div>
                 <div class="card-footer">
-                  <time datetime={post.data.date.toISOString()} transition:name={`post-date-${post.id}`}>{formattedDate}</time>
+                  <span class="card-meta">
+                    <time datetime={post.data.date.toISOString()} transition:name={`post-date-${post.id}`}>{formattedDate}</time>
+                    &mdash; {post.wordCount.toLocaleString()} words &mdash; {post.readingTime}
+                  </span>
                   <span class="card-arrow" aria-hidden="true">&rarr;</span>
                 </div>
                 {post.data.tags.length > 0 && (
@@ -170,7 +182,7 @@ const posts = (await getCollection("posts")).sort(
     border-top: 1px solid var(--color-border);
   }
 
-  .card-footer time {
+  .card-meta {
     font-family: var(--font-heading);
     font-size: 0.8125rem;
     color: var(--color-text-tertiary);
