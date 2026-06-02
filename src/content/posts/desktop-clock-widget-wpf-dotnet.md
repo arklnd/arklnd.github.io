@@ -2,6 +2,7 @@
 title: "DesktopClockWidget — A Frameless, Always-On-Top WPF Clock for Windows"
 description: "A walkthrough of building a feature-rich desktop clock widget with WPF and .NET 10: analog + digital faces, full color customization, alarm, stopwatch, countdown timer, and zero taskbar footprint — all in pure vector graphics."
 date: 2026-04-16
+tags: ["csharp", "dotnet", "wpf", "windows", "desktop-app", "ui", "vector-graphics"]
 project: "desktop-clock-widget"
 ---
 

@@ -1,0 +1,44 @@
+# Arijit's Blog
+
+> A technical blog by Arijit Kundu covering software engineering, system design, authentication, Git workflows, .NET, C++, reverse engineering, and developer tools.
+
+## About
+
+- Author: Arijit Kundu
+- Website: https://arijitk.in
+- GitHub: https://github.com/a1kundu
+- LinkedIn: https://linkedin.com/in/a1kundu
+- Role: Software Engineer at Hyland Software
+- Primary Technologies: C# .NET, Angular, Python, C++, TypeScript
+
+## Blog Posts
+
+- [Welcome to My New Blog](https://arijitk.in/posts/first-post/): Introduction to this Astro-powered tech blog.
+- [Trunk-Based Development vs Feature-Based Development](https://arijitk.in/posts/trunk-feature-based-development/): A comprehensive comparison of TBD and GitFlow covering workflows, release mechanisms, conflict management, and framework upgrade strategies.
+- [DaFitDesktop — Reverse-Engineering BLE Smart Bands](https://arijitk.in/posts/dafit-desktop-reverse-engineering-ble-smart-bands/): A deep dive into building a C++20 command-line tool that connects to Da Fit / MOYOUNG smart bands over Bluetooth LE, decodes the proprietary GATT protocol, and renders a health dashboard with ANSI art.
+- [Git Merge vs Fast-Forward vs Rebase — A Visual Guide](https://arijitk.in/posts/git-merge-rebase-strategies/): A deep dive into Git's merge strategies with ASCII graphs, pros and cons, and guidance on when to use each.
+- [DesktopClockWidget — A Frameless WPF Clock for Windows](https://arijitk.in/posts/desktop-clock-widget-wpf-dotnet/): Building a feature-rich desktop clock widget with WPF and .NET 10: analog + digital faces, full color customization, alarm, stopwatch, countdown timer.
+- [TOTP From Scratch — How Your 2FA Code Actually Works](https://arijitk.in/posts/totp-how-two-factor-auth-works/): A deep dive into RFC 6238 TOTP: the math behind the 6-digit code, how HMAC-SHA1 produces it, and a complete Python implementation.
+- [Trunk-Based Development with Release Branches](https://arijitk.in/posts/tbd-release-branch-strategy/): Deep-dive into TBD + Release Branch — the hybrid Git branching model combining trunk-based speed with release-grade stability.
+- [TOTP as Primary Auth — System Design Case Study](https://arijitk.in/posts/totp-as-primary-auth-system-design/): Using TOTP as the sole authentication mechanism for a short-lived internal tool: system design trade-offs and pragmatic architecture.
+
+## Topics Covered
+
+- Software Engineering: system design, architecture patterns, authentication, security
+- Git & DevOps: merge strategies, trunk-based development, GitFlow, release management, CI/CD
+- .NET & C#: WPF desktop apps, .NET 10, vector graphics
+- C++ & Systems: BLE Bluetooth, reverse engineering, GATT protocol, IoT
+- Python: cryptography, TOTP implementation, HMAC-SHA1
+- Security: two-factor authentication, TOTP, RFC 6238, one-time passwords
+
+## Projects
+
+- [DaFitDesktop](https://github.com/arklnd/DaFitDesktop): C++20 BLE smart band CLI tool for Windows
+- [DesktopClockWidget](https://github.com/arklnd/DesktopClockWidget): Frameless WPF clock widget for Windows
+
+## Additional Resources
+
+- [RSS Feed](https://arijitk.in/rss.xml)
+- [Sitemap](https://arijitk.in/sitemap-index.xml)
+- [About Page](https://arijitk.in/about/)
+- [Search](https://arijitk.in/search/)

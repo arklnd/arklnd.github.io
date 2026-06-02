@@ -2,6 +2,7 @@
 title: "Git Merge vs Fast-Forward vs Rebase — A Visual Guide"
 description: "A deep dive into Git's merge strategies — merge commits, fast-forward merges, and rebases — with ASCII graphs, pros and cons, and guidance on when to use each."
 date: 2026-04-15T10:00:00
+tags: ["git", "version-control", "merge", "rebase", "branching", "devops"]
 ---
 
 ## Understanding how your commits come together — and why it matters.

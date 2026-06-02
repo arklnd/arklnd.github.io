@@ -9,13 +9,27 @@ const posts = (await getCollection("posts")).sort(
 );
 ---
 
-<Layout title="Arijit's Blog">
+<Layout title="Arijit's Blog" description="Arijit Kundu's tech blog — articles on software engineering, system design, authentication, Git workflows, .NET, reverse engineering, and developer tools.">
   <script slot="head" type="application/ld+json" set:html={JSON.stringify({
     "@context": "https://schema.org",
     "@type": "WebSite",
     "name": "Arijit's Blog",
-    "description": "A tech blog.",
+    "description": "A tech blog by Arijit Kundu about software engineering, system design, and developer tools.",
     "url": Astro.site?.href,
+    "inLanguage": "en",
+    "author": {
+      "@type": "Person",
+      "name": "Arijit Kundu",
+      "url": Astro.site?.href,
+    },
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": `${Astro.site?.href}search?q={search_term_string}`,
+      },
+      "query-input": "required name=search_term_string",
+    },
   })} />
   <section class="home">
     <header class="home-header">
@@ -40,8 +54,17 @@ const posts = (await getCollection("posts")).sort(
                 </div>
                 <div class="card-footer">
                   <time datetime={post.data.date.toISOString()} transition:name={`post-date-${post.id}`}>{formattedDate}</time>
-                  <span class="card-arrow" aria-hidden="true">→</span>
+                  <span class="card-arrow" aria-hidden="true">&rarr;</span>
                 </div>
+                {post.data.tags.length > 0 && (
+                  <div class="card-tags">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="tags-icon" aria-hidden="true"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+                    {post.data.tags.slice(0, 3).map((tag: string) => (
+                      <span class="card-tag">{tag}</span>
+                    ))}
+                    {post.data.tags.length > 3 && <span class="card-tag card-tag-more">+{post.data.tags.length - 3}</span>}
+                  </div>
+                )}
               </a>
             </li>
           );
@@ -164,5 +187,34 @@ const posts = (await getCollection("posts")).sort(
   .post-card:hover .card-arrow {
     color: var(--color-link);
     transform: translateX(3px);
+  }
+
+  .card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem;
+    margin-top: var(--space-xs);
+  }
+
+  .tags-icon {
+    color: var(--color-text-tertiary);
+    flex-shrink: 0;
+  }
+
+  .card-tag {
+    font-family: var(--font-heading);
+    font-size: 0.625rem;
+    font-weight: 600;
+    padding: 0.1rem 0.45rem;
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--color-link) 8%, transparent);
+    color: var(--color-link);
+    white-space: nowrap;
+  }
+
+  .card-tag-more {
+    background: color-mix(in srgb, var(--color-text-tertiary) 10%, transparent);
+    color: var(--color-text-tertiary);
   }
 </style>

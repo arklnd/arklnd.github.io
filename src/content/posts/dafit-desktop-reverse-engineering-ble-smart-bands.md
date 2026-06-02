@@ -2,6 +2,7 @@
 title: "DaFitDesktop — Reverse-Engineering BLE Smart Bands from a Windows Terminal"
 description: "A deep dive into building a C++20 command-line tool that connects to Da Fit / MOYOUNG smart bands over Bluetooth LE, decodes the proprietary GATT protocol, and renders a health dashboard with ANSI art — all without the official app."
 date: 2026-04-15
+tags: ["cpp", "bluetooth", "ble", "reverse-engineering", "windows", "iot", "smart-band", "gatt"]
 project: "dafit-desktop"
 ---
 

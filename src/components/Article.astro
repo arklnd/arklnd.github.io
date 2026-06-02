@@ -15,9 +15,11 @@ interface Props {
   slug?: string;
   /** Project ID from src/data/projects.ts — renders a repo card after the article */
   projectId?: string;
+  /** Tags for this post */
+  tags?: string[];
 }
 
-const { title, date, description, readingTime, slug, projectId } = Astro.props;
+const { title, date, description, readingTime, slug, projectId, tags = [] } = Astro.props;
 const project: Project | undefined = projectId ? getProjectById(projectId) : undefined;
 
 const formattedDate = date.toLocaleDateString("en-US", {
@@ -84,6 +86,14 @@ const formattedDate = date.toLocaleDateString("en-US", {
         )
       }
     </p>
+    {tags.length > 0 && (
+      <div class="article-tags" aria-label="Post tags">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="tags-icon" aria-hidden="true"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+        {tags.map((tag) => (
+          <a href={`/tags/${tag}`} class="article-tag">{tag}</a>
+        ))}
+      </div>
+    )}
     <div class="article-actions">
       <!-- Podcast trigger button — only shown when SpeechSynthesis API is available -->
       <button id="podcast-trigger" class="podcast-trigger" aria-label="Listen to this post" title="Listen to this post" hidden>
@@ -264,6 +274,38 @@ const formattedDate = date.toLocaleDateString("en-US", {
 
   .article-meta {
     justify-content: flex-start;
+  }
+
+  /* ── Tags ──────────────────────────────── */
+  .article-tags {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem;
+    margin-top: var(--space-sm);
+  }
+
+  .tags-icon {
+    color: var(--color-text-tertiary);
+    flex-shrink: 0;
+  }
+
+  .article-tag {
+    font-family: var(--font-heading);
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.15rem 0.6rem;
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--color-link) 10%, transparent);
+    color: var(--color-link);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+
+  .article-tag:hover {
+    background: color-mix(in srgb, var(--color-link) 20%, transparent);
+    color: var(--color-link-hover, var(--color-link));
   }
 
   /* ── Actions row (Listen + React) ──────── */

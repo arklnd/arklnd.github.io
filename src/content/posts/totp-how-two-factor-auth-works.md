@@ -2,6 +2,7 @@
 title: "TOTP From Scratch — How Your 2FA Code Actually Works"
 description: "A deep dive into RFC 6238 Time-based One-Time Passwords: the math behind the 6-digit code, how HMAC-SHA1 produces it, and a complete Python implementation built without any TOTP library."
 date: 2026-04-17
+tags: ["totp", "two-factor-auth", "security", "python", "cryptography", "hmac", "rfc-6238"]
 ---
 
 ## How does your authenticator app generate a fresh code every 30 seconds with no network call? Pure math — and fewer than 15 lines of Python.

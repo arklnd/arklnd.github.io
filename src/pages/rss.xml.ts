@@ -9,13 +9,18 @@ export async function GET(context: APIContext) {
 
   return rss({
     title: "Arijit's Blog",
-    description: "A tech blog.",
+    description: "A tech blog by Arijit Kundu about software engineering, system design, authentication, Git workflows, .NET, and developer tools.",
     site: context.site!,
     items: posts.map((post) => ({
       title: post.data.title,
       pubDate: post.data.date,
       description: post.data.description,
       link: `/posts/${post.id}`,
+      author: post.data.author,
+      categories: post.data.tags,
     })),
+    customData: `<language>en-us</language>
+<managingEditor>Arijit Kundu</managingEditor>
+<webMaster>Arijit Kundu</webMaster>`,
   });
 }

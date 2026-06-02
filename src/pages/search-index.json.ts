@@ -11,6 +11,7 @@ export async function GET(context: APIContext) {
     title: post.data.title,
     description: post.data.description,
     date: post.data.date.toISOString(),
+    tags: post.data.tags,
     body: (post.body ?? "")
       .replace(/---[\s\S]*?---/, "")
       .replace(/[#*`\[\]()>_~|\\]/g, "")

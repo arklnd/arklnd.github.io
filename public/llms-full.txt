@@ -1,0 +1,97 @@
+# Arijit's Blog — Full Content Index
+
+> A technical blog by Arijit Kundu covering software engineering, system design, authentication, Git workflows, .NET, C++, reverse engineering, and developer tools. This file provides comprehensive content summaries for AI agents and language models.
+
+## About the Author
+
+Arijit Kundu is a software engineer at Hyland Software, specializing in enterprise software development with C# .NET and Angular. He has experience across multiple technology stacks including Python, Java, Kotlin, C, and C++. He started programming during high school with C/C++ and PHP, did freelance web development, and transitioned to professional software engineering.
+
+- Website: https://arijitk.in
+- GitHub: https://github.com/a1kundu
+- LinkedIn: https://linkedin.com/in/a1kundu
+- Primary Stack: C# .NET, Angular, TypeScript
+- Secondary: Python, Java, Kotlin, C, C++
+- Tools: Git, SQL Server, Docker, Azure
+
+---
+
+## Blog Posts (Detailed Summaries)
+
+### 1. Welcome to My New Blog
+- URL: https://arijitk.in/posts/first-post/
+- Date: 2026-03-08
+- Tags: blog, astro, introduction
+- Summary: The inaugural post introducing the Astro-powered blog. Covers the motivation behind starting a technical blog and the technology choices made.
+
+### 2. Trunk-Based Development vs Feature-Based Development
+- URL: https://arijitk.in/posts/trunk-feature-based-development/
+- Date: 2026-04-14
+- Tags: git, trunk-based-development, gitflow, branching, devops, ci-cd
+- Summary: A comprehensive comparison between Trunk-Based Development (TBD) and Feature-Based Development (GitFlow). Covers detailed workflows for both approaches, release mechanisms, conflict management strategies, and framework upgrade strategies. Includes visual diagrams and practical guidance for choosing between the two approaches based on team size, release cadence, and project requirements.
+
+### 3. DaFitDesktop — Reverse-Engineering BLE Smart Bands
+- URL: https://arijitk.in/posts/dafit-desktop-reverse-engineering-ble-smart-bands/
+- Date: 2026-04-15
+- Tags: cpp, bluetooth, ble, reverse-engineering, windows, iot, smart-band, gatt
+- Summary: Deep dive into building DaFitDesktop, a C++20 command-line tool that connects to Da Fit / MOYOUNG smart bands over Bluetooth Low Energy. Covers the reverse-engineering process of the proprietary GATT protocol, decoding health data, and rendering an ANSI art health dashboard in the Windows terminal. Topics include BLE service discovery, characteristic enumeration, byte-level protocol analysis, and building CLI interfaces with ANSI escape codes.
+
+### 4. Git Merge vs Fast-Forward vs Rebase — A Visual Guide
+- URL: https://arijitk.in/posts/git-merge-rebase-strategies/
+- Date: 2026-04-15
+- Tags: git, version-control, merge, rebase, branching, devops
+- Summary: Visual guide to Git's three primary integration strategies: merge commits, fast-forward merges, and rebases. Uses ASCII art graphs to illustrate how each strategy modifies the commit history. Covers the pros and cons of each approach, when to use each one, and how they affect collaboration in team environments. Includes guidance on choosing strategies based on project requirements and team preferences.
+
+### 5. DesktopClockWidget — A Frameless WPF Clock for Windows
+- URL: https://arijitk.in/posts/desktop-clock-widget-wpf-dotnet/
+- Date: 2026-04-16
+- Tags: csharp, dotnet, wpf, windows, desktop-app, ui, vector-graphics
+- Summary: Walkthrough of building a feature-rich desktop clock widget using WPF and .NET 10. Covers analog and digital clock faces rendered entirely in vector graphics (no bitmap assets), full color customization, alarm functionality, stopwatch, countdown timer, and achieving zero taskbar footprint with always-on-top windowing. Discusses WPF rendering pipeline, custom controls, data binding patterns, and Windows desktop integration.
+
+### 6. TOTP From Scratch — How Your 2FA Code Actually Works
+- URL: https://arijitk.in/posts/totp-how-two-factor-auth-works/
+- Date: 2026-04-17
+- Tags: totp, two-factor-auth, security, python, cryptography, hmac, rfc-6238
+- Summary: Deep dive into RFC 6238 Time-based One-Time Passwords (TOTP). Explains the complete mathematical foundation: how a shared secret and current time produce a 6-digit code, the role of HMAC-SHA1 in the process, dynamic truncation, and time-step calculations. Includes a complete Python implementation built from scratch without any TOTP library, demonstrating each step of the algorithm. Covers compatibility with Google Authenticator and other TOTP apps.
+
+### 7. Trunk-Based Development with Release Branches
+- URL: https://arijitk.in/posts/tbd-release-branch-strategy/
+- Date: 2026-04-20
+- Tags: git, trunk-based-development, branching, release-management, devops, ci-cd
+- Summary: Deep-dive into the hybrid Git branching model that combines Trunk-Based Development with Release Branches. Covers complete workflows for creating release branches from trunk, managing hotfixes that flow back to trunk, conflict resolution strategies, cherry-pick workflows, and Q&A addressing common team concerns. Discusses how this model provides trunk-based development speed while maintaining release-grade stability for production deployments.
+
+### 8. TOTP as Primary Auth — System Design Case Study
+- URL: https://arijitk.in/posts/totp-as-primary-auth-system-design/
+- Date: 2026-05-31
+- Tags: system-design, totp, authentication, security, architecture, case-study
+- Summary: System design case study examining the decision to use TOTP as the sole authentication mechanism for a disposable office booking system. Analyzes why identity providers (OAuth, SAML) were overkill for a short-lived internal tool, why unauthorized reads were acceptable when data is meant to be broadcast (office seating charts), and the pragmatic architectural trade-offs of choosing the simplest solution that ships within the deadline. Covers threat modeling, security boundaries, and when "good enough" architecture is the right choice.
+
+---
+
+## Projects
+
+### DaFitDesktop
+- Repository: https://github.com/arklnd/DaFitDesktop
+- Tech: C++, BLE, Windows
+- Description: C++20 command-line tool that connects to Da Fit / MOYOUNG smart bands over Bluetooth LE and renders a health dashboard with ANSI art.
+
+### DesktopClockWidget
+- Repository: https://github.com/arklnd/DesktopClockWidget
+- Tech: C#, .NET, WPF
+- Description: Frameless, always-on-top WPF clock for Windows with analog + digital faces, alarm, stopwatch, and countdown timer.
+
+---
+
+## Site Technical Details
+
+- Built with: Astro 6.4 (static site generator)
+- Hosted on: GitHub Pages
+- Domain: arijitk.in
+- Features: PWA support, RSS feed, full-text search, code syntax highlighting, Mermaid diagrams, KaTeX math rendering, text-to-speech, dark/light theme
+- Content: Markdown/MDX blog posts
+- No tracking or analytics
+
+## Contact
+
+For questions about the content on this blog, reach out via:
+- LinkedIn: https://linkedin.com/in/a1kundu
+- GitHub: https://github.com/a1kundu

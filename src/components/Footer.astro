@@ -2,7 +2,15 @@
 const year = new Date().getFullYear();
 ---
 
-<footer class="footer">
+<footer class="footer" aria-label="Site footer">
+  <nav class="footer-nav" aria-label="Footer navigation">
+    <a href="/about">About</a>
+    <a href="/tags">Tags</a>
+    <a href="/rss.xml" aria-label="RSS Feed">RSS</a>
+    <a href="/sitemap-index.xml" aria-label="Sitemap">Sitemap</a>
+    <a href="https://github.com/a1kundu" target="_blank" rel="noopener noreferrer">GitHub<span class="sr-only"> (opens in a new tab)</span></a>
+    <a href="https://linkedin.com/in/a1kundu" target="_blank" rel="noopener noreferrer">LinkedIn<span class="sr-only"> (opens in a new tab)</span></a>
+  </nav>
   <p>&copy; {year} Arijit Kundu - arijitk.in . All rights reserved.</p>
 </footer>
 
@@ -13,10 +21,42 @@ const year = new Date().getFullYear();
     border-top: 1px solid var(--color-border);
   }
 
+  .footer-nav {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: var(--space-sm) var(--space-lg);
+    margin-bottom: var(--space-sm);
+  }
+
+  .footer-nav a {
+    font-family: var(--font-heading);
+    font-size: 0.75rem;
+    color: var(--color-text-tertiary);
+    text-decoration: none;
+    transition: color 0.15s ease;
+  }
+
+  .footer-nav a:hover {
+    color: var(--color-link);
+  }
+
   .footer p {
     font-family: var(--font-heading);
     font-size: 0.75rem;
     color: var(--color-text-tertiary);
     text-align: center;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
   }
 </style>

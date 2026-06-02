@@ -15,36 +15,200 @@ export async function getStaticPaths() {
 const post = Astro.props;
 const { Content } = await render(post);
 const readingTime = getReadingTime(post.body || "");
+const wordCount = (post.body || "").split(/\s+/).filter(Boolean).length;
 
 const postUrl = new URL(`/posts/${post.id}`, Astro.site).href;
+const siteUrl = Astro.site?.href || "https://arijitk.in";
+const datePublished = post.data.date.toISOString();
+const dateModified = post.data.lastModified ? post.data.lastModified.toISOString() : datePublished;
+const ogImageUrl = post.data.image ? new URL(post.data.image, Astro.site).href : undefined;
 
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "BlogPosting",
-  "headline": post.data.title,
-  "description": post.data.description,
-  "datePublished": post.data.date.toISOString(),
-  "url": postUrl,
-  "mainEntityOfPage": {
-    "@type": "WebPage",
-    "@id": postUrl,
+const jsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": post.data.title,
+    "description": post.data.description,
+    "datePublished": datePublished,
+    "dateModified": dateModified,
+    "url": postUrl,
+    "inLanguage": "en",
+    "wordCount": wordCount,
+    "keywords": post.data.tags.join(", "),
+    ...(post.data.tags.length > 0 && { "articleSection": post.data.tags[0] }),
+    ...(ogImageUrl && { "image": ogImageUrl }),
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": postUrl,
+    },
+    "author": {
+      "@type": "Person",
+      "name": post.data.author,
+      "url": siteUrl,
+    },
+    "publisher": {
+      "@type": "Person",
+      "name": "Arijit Kundu",
+      "url": siteUrl,
+    },
   },
-  "author": {
-    "@type": "Person",
-    "name": "Arijit Kundu",
-    "url": "https://arijitk.in",
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": siteUrl,
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": post.data.title,
+        "item": postUrl,
+      },
+    ],
   },
-  "publisher": {
-    "@type": "Person",
-    "name": "Arijit Kundu",
-    "url": "https://arijitk.in",
-  },
-};
+];
+
+// Gather all posts for related posts feature
+const allPosts = (await getCollection("posts"))
+  .filter((p) => p.id !== post.id)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+const relatedPosts = allPosts
+  .map((p) => ({
+    post: p,
+    score: p.data.tags.filter((t: string) => post.data.tags.includes(t)).length,
+  }))
+  .filter((p) => p.score > 0)
+  .sort((a, b) => b.score - a.score)
+  .slice(0, 3)
+  .map((p) => p.post);
+
+// If not enough related posts by tag, fill with recent posts
+const finalRelated = relatedPosts.length >= 2
+  ? relatedPosts
+  : [...relatedPosts, ...allPosts.filter((p) => !relatedPosts.some((r) => r.id === p.id))].slice(0, 3);
 ---
 
-<Layout title={`${post.data.title} — Arijit's Blog`} description={post.data.description} ogType="article">
+<Layout
+  title={`${post.data.title} — Arijit's Blog`}
+  description={post.data.description}
+  ogType="article"
+  ogImage={ogImageUrl}
+  publishedTime={datePublished}
+  modifiedTime={dateModified}
+  author={post.data.author}
+  tags={post.data.tags}
+  katex={true}
+>
   <script slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
-  <Article title={post.data.title} date={post.data.date} description={post.data.description} readingTime={readingTime} slug={post.id} projectId={post.data.project}>
+  <Article title={post.data.title} date={post.data.date} description={post.data.description} readingTime={readingTime} slug={post.id} projectId={post.data.project} tags={post.data.tags}>
     <Content />
   </Article>
+
+  {finalRelated.length > 0 && (
+    <aside class="related-posts" aria-label="Related posts">
+      <h2 class="related-heading">Related Posts</h2>
+      <ul class="related-grid" role="list">
+        {finalRelated.map((rp) => {
+          const rpDate = rp.data.date.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+          return (
+            <li class="related-card">
+              <a href={`/posts/${rp.id}`}>
+                <span class="related-title">{rp.data.title}</span>
+                <span class="related-desc">{rp.data.description}</span>
+                <time datetime={rp.data.date.toISOString()}>{rpDate}</time>
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+    </aside>
+  )}
 </Layout>
+
+<style>
+  .related-posts {
+    max-width: var(--width-content);
+    margin-top: var(--space-2xl);
+    padding-top: var(--space-xl);
+    border-top: 1px solid var(--color-border);
+  }
+
+  :global(html[data-wide="true"]) .related-posts {
+    max-width: var(--width-page);
+  }
+
+  .related-heading {
+    font-family: var(--font-heading);
+    font-size: 1.125rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin-bottom: var(--space-lg);
+    color: var(--color-text);
+  }
+
+  .related-grid {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: var(--space-md);
+  }
+
+  .related-card {
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    background: var(--color-surface);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+  }
+
+  .related-card:hover {
+    border-color: var(--color-link);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
+
+  .related-card a {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    padding: var(--space-md);
+    text-decoration: none;
+    color: var(--color-text);
+  }
+
+  .related-title {
+    font-family: var(--font-heading);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+    transition: color 0.15s ease;
+  }
+
+  .related-card:hover .related-title {
+    color: var(--color-link);
+  }
+
+  .related-desc {
+    font-family: var(--font-body);
+    font-size: 0.8125rem;
+    color: var(--color-text-secondary);
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .related-card time {
+    font-family: var(--font-heading);
+    font-size: 0.75rem;
+    color: var(--color-text-tertiary);
+    margin-top: var(--space-xs);
+  }
+</style>

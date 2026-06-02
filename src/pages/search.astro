@@ -38,6 +38,7 @@ import Heading from "../components/Heading.astro";
     title: string;
     description: string;
     date: string;
+    tags: string[];
     body: string;
   }
 
@@ -56,7 +57,7 @@ import Heading from "../components/Heading.astro";
     const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
     if (terms.length === 0) return index;
     return index.filter((entry) => {
-      const haystack = `${entry.title} ${entry.description} ${entry.body}`.toLowerCase();
+      const haystack = `${entry.title} ${entry.description} ${entry.tags.join(" ")} ${entry.body}`.toLowerCase();
       return terms.every((term) => haystack.includes(term));
     });
   }

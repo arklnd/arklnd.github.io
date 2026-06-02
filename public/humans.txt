@@ -1,0 +1,25 @@
+/* TEAM */
+Name: Arijit Kundu
+Role: Author, Developer
+Site: https://arijitk.in
+GitHub: https://github.com/a1kundu
+LinkedIn: https://linkedin.com/in/a1kundu
+Location: India
+
+/* SITE */
+Last update: 2026-06-02
+Language: English
+Standards: HTML5, CSS3, JavaScript
+Framework: Astro 6.4
+Hosting: GitHub Pages
+Domain: arijitk.in
+
+/* COMPONENTS */
+Runtime: Bun
+CSS: Custom properties, design tokens
+Fonts: DM Sans, Literata, JetBrains Mono (Google Fonts)
+Icons: Inline SVG (hand-coded)
+Diagrams: Mermaid
+Math: KaTeX
+Code highlighting: Shiki
+PWA: @vite-pwa/astro with Workbox

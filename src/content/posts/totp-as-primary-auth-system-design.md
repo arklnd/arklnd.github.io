@@ -2,6 +2,7 @@
 title: "TOTP as Primary Auth — Designing a Disposable Office Booking System in a Hurry"
 description: "A system design case study on using TOTP as the sole authentication mechanism for a short-lived internal tool: why identity providers were overkill, why unauthorized reads don't matter when the data is meant to be broadcast, and why sometimes the best architecture is the one you can ship this week."
 date: 2026-05-31
+tags: ["system-design", "totp", "authentication", "security", "architecture", "case-study"]
 ---
 
 ## When the team needed an office seat booking app in days, not months, we threw out the IdP integration, the session store, and the RBAC matrix — and replaced them all with a single TOTP secret per user.

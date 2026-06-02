@@ -1,0 +1,98 @@
+---
+import Layout from "../../components/Layout.astro";
+import Heading from "../../components/Heading.astro";
+import { getCollection } from "astro:content";
+
+const posts = await getCollection("posts");
+
+// Build tag -> post count map
+const tagMap = new Map<string, number>();
+posts.forEach((post) => {
+  post.data.tags.forEach((tag: string) => {
+    tagMap.set(tag, (tagMap.get(tag) || 0) + 1);
+  });
+});
+
+// Sort tags alphabetically
+const sortedTags = Array.from(tagMap.entries()).sort((a, b) => a[0].localeCompare(b[0]));
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "Tags — Arijit's Blog",
+  "description": "Browse all tags and topics on Arijit's Blog.",
+  "url": new URL("/tags", Astro.site).href,
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "Arijit's Blog",
+    "url": Astro.site?.href,
+  },
+};
+---
+
+<Layout title="Tags — Arijit's Blog" description="Browse all tags and topics on Arijit's Blog — software engineering, Git, .NET, security, system design, and more.">
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  <section class="tags-page">
+    <Heading as="h1">Tags</Heading>
+    <p class="tags-intro">Browse posts by topic. {sortedTags.length} tags across {posts.length} posts.</p>
+    <div class="tags-cloud">
+      {sortedTags.map(([tag, count]) => (
+        <a href={`/tags/${tag}`} class="tag-pill">
+          <span class="tag-name">{tag}</span>
+          <span class="tag-count">{count}</span>
+        </a>
+      ))}
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .tags-page {
+    max-width: var(--width-content);
+  }
+
+  .tags-intro {
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    color: var(--color-text-secondary);
+    margin-top: var(--space-sm);
+    margin-bottom: var(--space-xl);
+  }
+
+  .tags-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .tag-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.85rem;
+    border: 1px solid var(--color-border);
+    border-radius: 20px;
+    background: var(--color-surface);
+    text-decoration: none;
+    color: var(--color-text);
+    font-family: var(--font-heading);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .tag-pill:hover {
+    border-color: var(--color-link);
+    color: var(--color-link);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+
+  .tag-count {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    padding: 0.1rem 0.4rem;
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--color-link) 12%, transparent);
+    color: var(--color-link);
+  }
+</style>

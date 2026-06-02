@@ -2,6 +2,7 @@
 title: "Trunk-Based Development with Release Branches"
 description: "A deep-dive into TBD + Release Branch — the hybrid Git branching model that combines trunk-based speed with release-grade stability. Covers workflows, release mechanics, hotfixes, conflict strategies, and Q&A."
 date: 2026-04-20T11:30:00
+tags: ["git", "trunk-based-development", "branching", "release-management", "devops", "ci-cd"]
 ---
 
 ## The hybrid Git branching model that combines trunk-based speed with release-grade stability.

@@ -2,6 +2,7 @@
 title: "Trunk-Based Development vs Feature-Based Development"
 description: "A comprehensive comparison of TBD and GitFlow covering workflows, release mechanisms, conflict management, and framework upgrade strategies."
 date: 2026-04-14T11:30:00
+tags: ["git", "trunk-based-development", "gitflow", "branching", "devops", "ci-cd"]
 ---
 
 ## A comprehensive comparison guide covering workflows, release mechanisms, conflict management, and framework upgrade strategies.
