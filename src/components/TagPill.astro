@@ -3,21 +3,29 @@ import { getCollection } from "astro:content";
 
 interface Props {
   tag: string;
-  /** "default" = home/tags pages, "small" = article header */
-  size?: "default" | "small";
+  /** "default" = home/tags pages, "small" = article header, "micro" = PostCard inline */
+  size?: "default" | "small" | "micro";
 }
 
 const { tag, size = "default" } = Astro.props;
 
-const posts = await getCollection("posts");
-const count = posts.filter((p) => p.data.tags.includes(tag)).length;
 const label = tag.replace(/-/g, " ").toUpperCase();
+
+let count: number | null = null;
+if (size !== "micro") {
+  const posts = await getCollection("posts");
+  count = posts.filter((p) => p.data.tags.includes(tag)).length;
+}
 ---
 
-<a href={`/tags/${tag}`} class:list={["tp", size === "small" && "tp--sm"]}>
-  <span class="tp-name">{label}</span>
-  <span class="tp-count">{count}</span>
-</a>
+{size === "micro" ? (
+  <span class="tp tp--micro">{label}</span>
+) : (
+  <a href={`/tags/${tag}`} class:list={["tp", size === "small" && "tp--sm"]}>
+    <span class="tp-name">{label}</span>
+    <span class="tp-count">{count}</span>
+  </a>
+)}
 
 <style>
   .tp {
@@ -79,5 +87,17 @@ const label = tag.replace(/-/g, " ").toUpperCase();
     line-height: 1;
     position: relative;
     top: -0.3em;
+  }
+
+  /* ── Micro variant (PostCard inline) ─── */
+  .tp--micro {
+    padding: 0.1rem 0.45rem;
+    font-size: 0.625rem;
+    font-weight: 600;
+    border: none;
+    background: color-mix(in srgb, var(--color-link) 8%, transparent);
+    color: var(--color-link);
+    border-radius: 10px;
+    white-space: nowrap;
   }
 </style>
