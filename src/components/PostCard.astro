@@ -12,6 +12,8 @@ interface Props {
   reactions?: boolean;
   /** Enable view-transition names for title and date */
   transition?: boolean;
+  /** Show all tags instead of first 3 */
+  showAllTags?: boolean;
 }
 
 const {
@@ -19,6 +21,7 @@ const {
   variant = "list",
   reactions = false,
   transition = false,
+  showAllTags = false,
 } = Astro.props;
 
 const post = await getEntry("posts", slug);
@@ -59,10 +62,10 @@ const iso = date.toISOString();
     {tags.length > 0 && (
       <div class="pc-tags">
         <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pc-tags-icon" aria-hidden="true"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
-        {tags.slice(0, 3).map((tag) => (
+        {(showAllTags ? tags : tags.slice(0, 3)).map((tag) => (
           <TagPill tag={tag} size="micro" />
         ))}
-        {tags.length > 3 && <span class="pc-tag pc-tag--more">+{tags.length - 3}</span>}
+        {!showAllTags && tags.length > 3 && <span class="pc-tag pc-tag--more">+{tags.length - 3}</span>}
       </div>
     )}
   </a>
