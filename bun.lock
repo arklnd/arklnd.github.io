@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "arklnd.github.io",
+      "name": "arijitk.in",
       "dependencies": {
         "@astrojs/check": "0.9.9",
         "@astrojs/mdx": "6.0.1",
