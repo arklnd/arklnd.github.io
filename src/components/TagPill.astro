@@ -11,10 +11,11 @@ const { tag, size = "default" } = Astro.props;
 
 const posts = await getCollection("posts");
 const count = posts.filter((p) => p.data.tags.includes(tag)).length;
+const label = tag.replace(/-/g, " ").toUpperCase();
 ---
 
 <a href={`/tags/${tag}`} class:list={["tp", size === "small" && "tp--sm"]}>
-  <span class="tp-name">{tag}</span>
+  <span class="tp-name">{label}</span>
   <span class="tp-count">{count}</span>
 </a>
 
