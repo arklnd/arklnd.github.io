@@ -1,7 +1,7 @@
 ---
 title: "Welcome to My New Blog"
 description: "This is the first post on my new Astro-powered blog."
-date: 2026-03-08
+date: 1900-01-23
 tags: ["blog", "astro", "introduction"]
 ---
 
