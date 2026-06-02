@@ -1,6 +1,8 @@
 ---
 import Layout from "../components/Layout.astro";
 import Heading from "../components/Heading.astro";
+// Import PostCard so its global styles are included in the page
+import "../components/PostCard.astro";
 ---
 
 <Layout title="Search — Arijit's Blog" description="Search posts on Arijit's Blog.">
@@ -70,8 +72,11 @@ import Heading from "../components/Heading.astro";
     });
   }
 
-  function readingTime(body: string): string {
-    const words = body.trim().split(/\s+/).length;
+  function wordCount(body: string): number {
+    return body.trim().split(/\s+/).filter(Boolean).length;
+  }
+
+  function readingTime(words: number): string {
     const mins = Math.max(1, Math.round(words / 200));
     return `${mins} min read`;
   }
@@ -121,17 +126,31 @@ import Heading from "../components/Heading.astro";
     }
 
     for (const entry of results) {
+      const tagsHtml = entry.tags.length > 0
+        ? `<div class="pc-tags">
+            <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pc-tags-icon" aria-hidden="true"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+            ${entry.tags.slice(0, 3).map((t) => `<span class="pc-tag">${escapeHtml(t)}</span>`).join("")}
+            ${entry.tags.length > 3 ? `<span class="pc-tag pc-tag--more">+${entry.tags.length - 3}</span>` : ""}
+           </div>`
+        : "";
+
+      const words = wordCount(entry.body);
       const li = document.createElement("li");
-      li.className = "search-result-item";
+      li.className = "pc pc--list";
       li.innerHTML = `
-        <a href="/posts/${entry.slug}">
-          <span class="result-title">${highlight(entry.title, terms)}</span>
-          <span class="result-description">${highlight(entry.description, terms)}</span>
-          <span class="result-meta">
-            <time datetime="${entry.date}">${formatDate(entry.date)}</time>
-            <span class="result-dot" aria-hidden="true">·</span>
-            <span class="result-reading-time">${readingTime(entry.body)}</span>
-          </span>
+        <a href="/posts/${entry.slug}" class="pc-link">
+          <div class="pc-body">
+            <span class="pc-title">${highlight(entry.title, terms)}</span>
+            <span class="pc-desc">${highlight(entry.description, terms)}</span>
+          </div>
+          <div class="pc-footer">
+            <span class="pc-meta">
+              <time datetime="${entry.date}">${formatDate(entry.date)}</time>
+              &mdash; ${readingTime(words)}
+              &mdash; ${words.toLocaleString()} words
+            </span>
+          </div>
+          ${tagsHtml}
         </a>
       `;
       resultsList.appendChild(li);
@@ -215,7 +234,6 @@ import Heading from "../components/Heading.astro";
     color: var(--color-text-tertiary);
   }
 
-  /* result-count is in the Astro template, scoped attr present */
   .result-count {
     font-family: var(--font-heading);
     font-size: 0.8125rem;
@@ -223,8 +241,6 @@ import Heading from "../components/Heading.astro";
     margin-bottom: var(--space-md);
   }
 
-  /* search-empty is in the Astro template — use display:none for [hidden]
-     so the UA rule isn't overridden by display:flex */
   .search-empty {
     display: none;
     align-items: center;
@@ -239,81 +255,8 @@ import Heading from "../components/Heading.astro";
     display: flex;
   }
 
-  /* ---------- styles for dynamically-created result items ----------
-     Astro scopes CSS to [data-astro-cid-*] on the element itself, but
-     JS-created li/span/time nodes never get that attribute.
-     Use :global() so the selectors are emitted without the scoping attr. */
   :global(.search-results) {
     list-style: none;
     padding: 0;
-  }
-
-  :global(.search-result-item) {
-    border-bottom: 1px solid var(--color-border);
-  }
-
-  :global(.search-result-item:first-child) {
-    border-top: 1px solid var(--color-border);
-  }
-
-  :global(.search-result-item a) {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-xs);
-    padding: var(--space-lg) var(--space-sm);
-    margin: 0 calc(-1 * var(--space-sm));
-    border-radius: 6px;
-    text-decoration: none;
-    color: var(--color-text);
-    transition: background 0.15s ease;
-  }
-
-  :global(.search-result-item a:hover) {
-    background: var(--color-surface);
-  }
-
-  :global(.search-result-item a:hover .result-title) {
-    color: var(--color-link);
-  }
-
-  :global(.result-title) {
-    font-family: var(--font-heading);
-    font-size: 1.125rem;
-    font-weight: 600;
-    letter-spacing: -0.01em;
-    line-height: 1.3;
-    transition: color 0.15s ease;
-  }
-
-  :global(.result-description) {
-    font-family: var(--font-body);
-    font-size: 0.9375rem;
-    color: var(--color-text-secondary);
-    line-height: 1.5;
-  }
-
-  :global(.result-meta) {
-    display: flex;
-    align-items: center;
-    gap: var(--space-xs);
-    margin-top: var(--space-xs);
-    font-family: var(--font-heading);
-    font-size: 0.75rem;
-    color: var(--color-text-tertiary);
-  }
-
-  :global(.result-dot) {
-    opacity: 0.5;
-  }
-
-  :global(mark) {
-    background-color: rgba(61, 106, 168, 0.15);
-    color: inherit;
-    border-radius: 2px;
-    padding: 0 2px;
-  }
-
-  :global([data-theme="dark"] mark) {
-    background-color: rgba(100, 160, 240, 0.2);
   }
 </style>

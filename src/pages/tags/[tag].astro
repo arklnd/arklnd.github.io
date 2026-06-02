@@ -1,6 +1,7 @@
 ---
 import Layout from "../../components/Layout.astro";
 import Heading from "../../components/Heading.astro";
+import PostCard from "../../components/PostCard.astro";
 import { getCollection } from "astro:content";
 
 export async function getStaticPaths() {
@@ -75,22 +76,12 @@ const jsonLd = [
       <p class="tag-count">{posts.length} post{posts.length !== 1 ? "s" : ""}</p>
     </header>
     <ul class="post-list" role="list">
-      {posts.map((post: any) => {
-        const formattedDate = post.data.date.toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        });
-        return (
-          <li class="post-item">
-            <a href={`/posts/${post.id}`}>
-              <span class="post-title">{post.data.title}</span>
-              <span class="post-desc">{post.data.description}</span>
-              <time datetime={post.data.date.toISOString()}>{formattedDate}</time>
-            </a>
-          </li>
-        );
-      })}
+      {posts.map((post: any) => (
+        <PostCard
+          slug={post.id}
+          variant="list"
+        />
+      ))}
     </ul>
   </section>
 </Layout>
@@ -126,56 +117,5 @@ const jsonLd = [
   .post-list {
     list-style: none;
     padding: 0;
-  }
-
-  .post-item {
-    border-bottom: 1px solid var(--color-border);
-  }
-
-  .post-item:first-child {
-    border-top: 1px solid var(--color-border);
-  }
-
-  .post-item a {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-xs);
-    padding: var(--space-lg) var(--space-sm);
-    margin: 0 calc(-1 * var(--space-sm));
-    border-radius: 6px;
-    text-decoration: none;
-    color: var(--color-text);
-    transition: background 0.15s ease;
-  }
-
-  .post-item a:hover {
-    background: var(--color-surface);
-  }
-
-  .post-item a:hover .post-title {
-    color: var(--color-link);
-  }
-
-  .post-title {
-    font-family: var(--font-heading);
-    font-size: 1.0625rem;
-    font-weight: 600;
-    letter-spacing: -0.01em;
-    line-height: 1.35;
-    transition: color 0.15s ease;
-  }
-
-  .post-desc {
-    font-family: var(--font-body);
-    font-size: 0.875rem;
-    color: var(--color-text-secondary);
-    line-height: 1.5;
-  }
-
-  .post-item time {
-    font-family: var(--font-heading);
-    font-size: 0.75rem;
-    color: var(--color-text-tertiary);
-    margin-top: var(--space-xs);
   }
 </style>

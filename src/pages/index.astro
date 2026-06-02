@@ -1,20 +1,11 @@
 ---
 import Layout from "../components/Layout.astro";
 import Heading from "../components/Heading.astro";
-import ReactionsBadge from "../components/ReactionsBadge.astro";
+import PostCard from "../components/PostCard.astro";
 import { getCollection } from "astro:content";
-import { getReadingTime } from "../utils/readingTime";
 
 const posts = (await getCollection("posts")).sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
-);
-
-const postsWithReadingTime = await Promise.all(
-  posts.map(async (post) => {
-    const wordCount = post.body ? post.body.split(/\s+/g).filter(Boolean).length : 0;
-    const readingTime = getReadingTime(post.body ?? "");
-    return { ...post, wordCount, readingTime };
-  })
 );
 ---
 
@@ -46,42 +37,14 @@ const postsWithReadingTime = await Promise.all(
       <p class="home-tagline">A tech blog about systems, tools, and ideas.</p>
     </header>
     <ul class="post-grid" role="list">
-      {
-        postsWithReadingTime.map((post) => {
-          const formattedDate = post.data.date.toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          });
-          return (
-            <li class="post-card">
-              <a href={`/posts/${post.id}`} aria-label={post.data.title}>
-                <div class="card-body">
-                  <span class="post-title" transition:name={`post-title-${post.id}`}>{post.data.title}</span>
-                  <ReactionsBadge slug={post.id} />
-                  <span class="post-description">{post.data.description}</span>
-                </div>
-                <div class="card-footer">
-                  <span class="card-meta">
-                    <time datetime={post.data.date.toISOString()} transition:name={`post-date-${post.id}`}>{formattedDate}</time>
-                    &mdash; {post.wordCount.toLocaleString()} words &mdash; {post.readingTime}
-                  </span>
-                  <span class="card-arrow" aria-hidden="true">&rarr;</span>
-                </div>
-                {post.data.tags.length > 0 && (
-                  <div class="card-tags">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="tags-icon" aria-hidden="true"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
-                    {post.data.tags.slice(0, 3).map((tag: string) => (
-                      <span class="card-tag">{tag}</span>
-                    ))}
-                    {post.data.tags.length > 3 && <span class="card-tag card-tag-more">+{post.data.tags.length - 3}</span>}
-                  </div>
-                )}
-              </a>
-            </li>
-          );
-        })
-      }
+      {posts.map((post) => (
+        <PostCard
+          slug={post.id}
+          variant="grid"
+          reactions={true}
+          transition={true}
+        />
+      ))}
     </ul>
   </section>
 </Layout>
@@ -112,121 +75,5 @@ const postsWithReadingTime = await Promise.all(
     .post-grid {
       grid-template-columns: 1fr;
     }
-  }
-
-  .post-card {
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: 10px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.1);
-    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
-  }
-
-  [data-theme="dark"] .post-card {
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2), 0 4px 12px rgba(0, 0, 0, 0.25);
-  }
-
-  .post-card:hover {
-    border-color: var(--color-link);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1), 0 8px 24px rgba(0, 0, 0, 0.15);
-    transform: translateY(-2px);
-  }
-
-  [data-theme="dark"] .post-card:hover {
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.5);
-  }
-
-  .post-card a {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    padding: var(--space-lg);
-    text-decoration: none;
-    color: var(--color-text);
-  }
-
-  .card-body {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-sm);
-    margin-bottom: var(--space-lg);
-  }
-
-  .post-title {
-    font-family: var(--font-heading);
-    font-size: 1.0625rem;
-    font-weight: 600;
-    letter-spacing: -0.01em;
-    line-height: 1.35;
-    color: var(--color-text);
-    transition: color 0.15s ease;
-  }
-
-  .post-card:hover .post-title {
-    color: var(--color-link);
-  }
-
-  .post-description {
-    font-family: var(--font-body);
-    font-size: 0.875rem;
-    color: var(--color-text-secondary);
-    line-height: 1.6;
-  }
-
-  .card-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding-top: var(--space-sm);
-    border-top: 1px solid var(--color-border);
-  }
-
-  .card-meta {
-    font-family: var(--font-heading);
-    font-size: 0.8125rem;
-    color: var(--color-text-tertiary);
-    letter-spacing: 0.01em;
-  }
-
-  .card-arrow {
-    font-size: 1rem;
-    color: var(--color-text-tertiary);
-    transition: color 0.15s ease, transform 0.15s ease;
-    display: inline-block;
-  }
-
-  .post-card:hover .card-arrow {
-    color: var(--color-link);
-    transform: translateX(3px);
-  }
-
-  .card-tags {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.25rem;
-    margin-top: var(--space-xs);
-  }
-
-  .tags-icon {
-    color: var(--color-text-tertiary);
-    flex-shrink: 0;
-  }
-
-  .card-tag {
-    font-family: var(--font-heading);
-    font-size: 0.625rem;
-    font-weight: 600;
-    padding: 0.1rem 0.45rem;
-    border-radius: 10px;
-    background: color-mix(in srgb, var(--color-link) 8%, transparent);
-    color: var(--color-link);
-    white-space: nowrap;
-  }
-
-  .card-tag-more {
-    background: color-mix(in srgb, var(--color-text-tertiary) 10%, transparent);
-    color: var(--color-text-tertiary);
   }
 </style>

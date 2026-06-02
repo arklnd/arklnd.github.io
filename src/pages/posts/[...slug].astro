@@ -1,6 +1,7 @@
 ---
 import Layout from "../../components/Layout.astro";
 import Article from "../../components/Article.astro";
+import PostCard from "../../components/PostCard.astro";
 import { getCollection, render } from "astro:content";
 import { getReadingTime } from "../../utils/readingTime";
 
@@ -113,18 +114,12 @@ const finalRelated = relatedPosts.length >= 2
     <aside class="related-posts" aria-label="Related posts">
       <h2 class="related-heading">Related Posts</h2>
       <ul class="related-grid" role="list">
-        {finalRelated.map((rp) => {
-          const rpDate = rp.data.date.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
-          return (
-            <li class="related-card">
-              <a href={`/posts/${rp.id}`}>
-                <span class="related-title">{rp.data.title}</span>
-                <span class="related-desc">{rp.data.description}</span>
-                <time datetime={rp.data.date.toISOString()}>{rpDate}</time>
-              </a>
-            </li>
-          );
-        })}
+        {finalRelated.map((rp) => (
+          <PostCard
+            slug={rp.id}
+            variant="compact"
+          />
+        ))}
       </ul>
     </aside>
   )}
@@ -157,58 +152,5 @@ const finalRelated = relatedPosts.length >= 2
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
     gap: var(--space-md);
-  }
-
-  .related-card {
-    border: 1px solid var(--color-border);
-    border-radius: 10px;
-    background: var(--color-surface);
-    transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
-  }
-
-  .related-card:hover {
-    border-color: var(--color-link);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    transform: translateY(-2px);
-  }
-
-  .related-card a {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-xs);
-    padding: var(--space-md);
-    text-decoration: none;
-    color: var(--color-text);
-  }
-
-  .related-title {
-    font-family: var(--font-heading);
-    font-size: 0.9375rem;
-    font-weight: 600;
-    line-height: 1.35;
-    letter-spacing: -0.01em;
-    transition: color 0.15s ease;
-  }
-
-  .related-card:hover .related-title {
-    color: var(--color-link);
-  }
-
-  .related-desc {
-    font-family: var(--font-body);
-    font-size: 0.8125rem;
-    color: var(--color-text-secondary);
-    line-height: 1.5;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  .related-card time {
-    font-family: var(--font-heading);
-    font-size: 0.75rem;
-    color: var(--color-text-tertiary);
-    margin-top: var(--space-xs);
   }
 </style>
