@@ -2,11 +2,24 @@
 import Layout from "../components/Layout.astro";
 import Heading from "../components/Heading.astro";
 import PostCard from "../components/PostCard.astro";
+import TagPill from "../components/TagPill.astro";
 import { getCollection } from "astro:content";
 
 const posts = (await getCollection("posts")).sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
 );
+
+// Top tags by post count (for "Browse by Topic" section)
+const tagMap = new Map<string, number>();
+posts.forEach((post) => {
+  post.data.tags.forEach((tag: string) => {
+    tagMap.set(tag, (tagMap.get(tag) || 0) + 1);
+  });
+});
+const topTags = Array.from(tagMap.entries())
+  .sort((a, b) => b[1] - a[1])
+  .slice(0, 12)
+  .map(([tag]) => tag);
 ---
 
 <Layout title="Arijit's Blog" description="Arijit Kundu's tech blog — articles on software engineering, system design, authentication, Git workflows, .NET, reverse engineering, and developer tools.">
@@ -46,6 +59,18 @@ const posts = (await getCollection("posts")).sort(
         />
       ))}
     </ul>
+
+    <section class="home-tags" aria-label="Browse by topic">
+      <div class="home-tags-header">
+        <h2 class="home-tags-title">Browse by Topic</h2>
+        <a href="/tags" class="home-tags-all">All tags &rarr;</a>
+      </div>
+      <div class="home-tags-cloud">
+        {topTags.map((tag) => (
+          <TagPill tag={tag} />
+        ))}
+      </div>
+    </section>
   </section>
 </Layout>
 
@@ -75,5 +100,45 @@ const posts = (await getCollection("posts")).sort(
     .post-grid {
       grid-template-columns: 1fr;
     }
+  }
+
+  /* ── Browse by Topic ──────────────── */
+  .home-tags {
+    margin-top: var(--space-2xl);
+    padding-top: var(--space-xl);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .home-tags-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: var(--space-lg);
+  }
+
+  .home-tags-title {
+    font-family: var(--font-heading);
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin: 0;
+  }
+
+  .home-tags-all {
+    font-family: var(--font-heading);
+    font-size: 0.8125rem;
+    color: var(--color-text-tertiary);
+    text-decoration: none;
+    transition: color 0.15s ease;
+  }
+
+  .home-tags-all:hover {
+    color: var(--color-link);
+  }
+
+  .home-tags-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
   }
 </style>
