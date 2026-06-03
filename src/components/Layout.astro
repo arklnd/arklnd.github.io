@@ -33,6 +33,7 @@ const {
   katex = false,
 } = Astro.props;
 
+const fullTitle = `${title} | ArijitK.in`;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const googleVerification = import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION;
 const bingVerification = import.meta.env.PUBLIC_BING_SITE_VERIFICATION;
@@ -45,7 +46,7 @@ const bingVerification = import.meta.env.PUBLIC_BING_SITE_VERIFICATION;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     {googleVerification && <meta name="google-site-verification" content={googleVerification} />}
     {bingVerification && <meta name="msvalidate.01" content={bingVerification} />}
-    <title>{title}</title>
+    <title>{fullTitle}</title>
     <meta name="description" content={description} />
     <meta name="author" content={author} />
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
@@ -62,7 +63,7 @@ const bingVerification = import.meta.env.PUBLIC_BING_SITE_VERIFICATION;
 
     <!-- Open Graph -->
     <meta property="og:type" content={ogType} />
-    <meta property="og:title" content={title} />
+    <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonicalURL.href} />
     <meta property="og:site_name" content="Arijit's Blog" />
@@ -79,7 +80,7 @@ const bingVerification = import.meta.env.PUBLIC_BING_SITE_VERIFICATION;
 
     <!-- Twitter -->
     <meta name="twitter:card" content={ogImage ? "summary_large_image" : "summary"} />
-    <meta name="twitter:title" content={title} />
+    <meta name="twitter:title" content={fullTitle} />
     <meta name="twitter:description" content={description} />
     {ogImage && <meta name="twitter:image" content={ogImage} />}
 
@@ -122,7 +123,7 @@ const bingVerification = import.meta.env.PUBLIC_BING_SITE_VERIFICATION;
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;0,7..72,700;1,7..72,400;1,7..72,500&family=JetBrains+Mono:wght@400&display=swap"
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;0,7..72,700;1,7..72,400;1,7..72,500&family=JetBrains+Mono:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
   </head>
