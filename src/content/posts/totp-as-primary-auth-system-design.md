@@ -30,7 +30,7 @@ tags: ["system-design", "totp", "authentication", "security", "architecture", "c
 
 The situation was straightforward. Our organization was going through a major office infrastructure move. Teams were transitioning to a new workspace with limited seating — not everyone could come in every day, and the desks that were available needed to be coordinated. People needed a way to say "I'm coming to the office on Thursday" and see who else would be there.
 
-The tool we built — **OfficeAaschi** — is a full-stack seat booking system. Teams create shared seat pools, members join, and individuals book desks for specific days. There is a waitlist that automatically promotes people when cancellations happen. Simple enough.
+The tool we built — **OfficeAschi** — is a full-stack seat booking system. Teams create shared seat pools, members join, and individuals book desks for specific days. There is a waitlist that automatically promotes people when cancellations happen. Simple enough.
 
 But the critical constraint was **time**. This wasn't a product with a roadmap. It was a utility built to solve a problem that existed *right now*, for a known group of people, for a few months. The office move would complete, permanent desk assignments would happen, and this tool would be retired.
 
@@ -81,7 +81,7 @@ TOTP checked every box.
 
 TOTP (Time-based One-Time Password) is almost universally used as a **second** factor — the 6-digit code you enter *after* your password. The insight in this design is that there is nothing inherent in the TOTP protocol that limits it to being a second factor. It is simply a mechanism that proves you possess a specific secret. If the secret *is* your identity, then TOTP *is* your authentication.
 
-Here is how it works in OfficeAaschi:
+Here is how it works in OfficeAschi:
 
 - There are **no usernames**. There are **no passwords**. There is **no user table**.
 - When a manager creates a team, they generate a TOTP secret (client-side), scan it into their authenticator app (Google Authenticator, Authy, etc.), and prove they can produce a valid code. The server stores the secret.
@@ -178,7 +178,7 @@ The manager's TOTP secret is born entirely on the client. The server never gener
 sequenceDiagram
     participant Auth as Authenticator App
     participant Client as Browser / PWA
-    participant Server as OfficeAaschi API
+    participant Server as OfficeAschi API
     participant DB as Database
 
     Client->>Client: Generate 20-byte TOTP secret (client-side)
@@ -207,7 +207,7 @@ The same pattern repeats: the member generates their own independent secret, pro
 sequenceDiagram
     participant Auth as Authenticator App
     participant Client as Browser / PWA
-    participant Server as OfficeAaschi API
+    participant Server as OfficeAschi API
     participant DB as Database
 
     Client->>Server: GET /api/teams?q=Platform (no auth)
@@ -239,7 +239,7 @@ sequenceDiagram
     participant Auth as Authenticator App
     participant Client as Browser / PWA
     participant Interceptor as Angular HTTP Interceptor
-    participant Server as OfficeAaschi API
+    participant Server as OfficeAschi API
     participant MW as TotpAuthMiddleware
     participant DB as Database
 
@@ -275,7 +275,7 @@ This is the flow that happens most frequently. A member checks availability (no 
 sequenceDiagram
     participant Client as Browser / PWA
     participant Interceptor as Angular HTTP Interceptor
-    participant Server as OfficeAaschi API
+    participant Server as OfficeAschi API
     participant MW as TotpAuthMiddleware
     participant Cache as In-Memory Cache
 
@@ -308,7 +308,7 @@ When a booking is cancelled, the system automatically promotes the next person o
 sequenceDiagram
     participant Client as Browser / PWA
     participant Interceptor as Angular HTTP Interceptor
-    participant Server as OfficeAaschi API
+    participant Server as OfficeAschi API
     participant MW as TotpAuthMiddleware
     participant WS as WaitlistService
     participant DB as Database
@@ -380,7 +380,7 @@ sequenceDiagram
     Note over Client: "Your session has expired. Please log in again."
 ```
 
-The difference is stark. The OfficeAaschi flow has **zero redirects, zero prompts, and zero expiry interruptions** during normal use. The traditional flow adds an IdP redirect, an MFA prompt, a session store dependency, and periodic "session expired" interruptions — all to protect data that could be written on a whiteboard.
+The difference is stark. The OfficeAschi flow has **zero redirects, zero prompts, and zero expiry interruptions** during normal use. The traditional flow adds an IdP redirect, an MFA prompt, a session store dependency, and periodic "session expired" interruptions — all to protect data that could be written on a whiteboard.
 
 ---
 
@@ -388,7 +388,7 @@ The difference is stark. The OfficeAaschi flow has **zero redirects, zero prompt
 
 Most authentication systems exist to protect *confidential* data. Medical records, financial transactions, personal communications — information that should only be visible to authorized parties.
 
-The data in OfficeAaschi is fundamentally different. The information stored is:
+The data in OfficeAschi is fundamentally different. The information stored is:
 
 - Which teams exist
 - Which seats are available
@@ -399,7 +399,7 @@ This is **broadcast information by design**. The entire point of the application
 
 Restricting read access would actually *defeat the purpose of the tool*. If you can't see whether desks are available without authenticating, you can't make an informed decision about when to come in.
 
-This is why every GET endpoint in OfficeAaschi is **completely unauthenticated**:
+This is why every GET endpoint in OfficeAschi is **completely unauthenticated**:
 
 | Endpoint | Method | Auth Required |
 |---|---|---|
@@ -424,7 +424,7 @@ This is a critical architectural insight: **the sensitivity of the data determin
 
 Role-Based Access Control is a powerful model. You define roles (Admin, Manager, Editor, Viewer), assign permissions to roles, assign roles to users, and the system enforces what each user can do. For a complex enterprise application with dozens of resource types and nuanced permission boundaries, RBAC is essential.
 
-OfficeAaschi has exactly **two** meaningful permission levels:
+OfficeAschi has exactly **two** meaningful permission levels:
 
 1. **Manager (Team Owner):** Can add/remove seats, approve/deny member requests, delete the team
 2. **Reportee (Member):** Can book and cancel their own seats
@@ -438,7 +438,7 @@ In a system this simple, RBAC introduces complexity with no benefit:
 - An **authorization policy** framework with role checks on every endpoint
 - The cognitive overhead of "which role do I need for this action?"
 
-Instead, OfficeAaschi embeds the permission model directly in the TOTP scheme. The `Authorization` header declares the entity type:
+Instead, OfficeAschi embeds the permission model directly in the TOTP scheme. The `Authorization` header declares the entity type:
 
 - `TOTP manager:{teamId}:{code}` — I am proving I am the manager of this team
 - `TOTP reportee:{reporteeId}:{code}` — I am proving I am this specific team member
@@ -467,7 +467,7 @@ The conventional web authentication flow looks like this:
 
 This flow exists to solve a specific problem: **authentication is expensive** (password hashing, IdP round-trips), so you do it once and then carry a lightweight proof of that authentication across subsequent requests.
 
-OfficeAaschi does not have this problem. TOTP validation is **computationally trivial** — it is a single HMAC-SHA1 computation followed by a comparison. There is no password to hash (bcrypt at 10 rounds takes ~100ms). There is no IdP round-trip (network latency). There is no database lookup for a session record (the TOTP secret is already in an in-memory cache). The entire validation takes microseconds.
+OfficeAschi does not have this problem. TOTP validation is **computationally trivial** — it is a single HMAC-SHA1 computation followed by a comparison. There is no password to hash (bcrypt at 10 rounds takes ~100ms). There is no IdP round-trip (network latency). There is no database lookup for a session record (the TOTP secret is already in an in-memory cache). The entire validation takes microseconds.
 
 When authentication is this cheap, there is no reason to cache its result in a session. Every request can be independently authenticated at negligible cost. This gives you a fully **stateless** authentication model with significant architectural benefits:
 
@@ -477,17 +477,17 @@ When authentication is this cheap, there is no reason to cache its result in a s
 
 **No logout endpoint.** There is no session to invalidate. If a user wants to "log out" on a device, they delete the secret from `localStorage`. If they want to revoke access entirely, the manager removes them from the team, which deletes their TOTP secret from the database. Any future code they generate is useless because the server no longer has a matching secret.
 
-**No CSRF vulnerability.** CSRF attacks exploit the fact that browsers automatically attach cookies (including session cookies) to requests. OfficeAaschi uses a custom `Authorization` header, not cookies. Browsers do not automatically attach custom headers, so CSRF is structurally impossible.
+**No CSRF vulnerability.** CSRF attacks exploit the fact that browsers automatically attach cookies (including session cookies) to requests. OfficeAschi uses a custom `Authorization` header, not cookies. Browsers do not automatically attach custom headers, so CSRF is structurally impossible.
 
 **Horizontal scaling is trivial.** With session-based auth, you need sticky sessions or a shared session store so that any server instance can validate any user's session. With stateless TOTP validation, any server instance with access to the database (or the in-memory cache) can independently validate any request. There is no affinity requirement.
 
-The trade-off is that the client needs to either store the TOTP secret locally or prompt the user for a code on every action. OfficeAaschi solves this by storing the secret in `localStorage` and having the HTTP interceptor generate codes silently. The user pays the "authentication cost" once (scanning the QR code during setup) and never again.
+The trade-off is that the client needs to either store the TOTP secret locally or prompt the user for a code on every action. OfficeAschi solves this by storing the secret in `localStorage` and having the HTTP interceptor generate codes silently. The user pays the "authentication cost" once (scanning the QR code during setup) and never again.
 
 ---
 
 ## 10. The User Experience — Seamless and Hassle-Free
 
-The proof of any authentication design is in the user experience. A system can be architecturally elegant and still be painful to use. Here is what the OfficeAaschi flow actually feels like from the user's perspective:
+The proof of any authentication design is in the user experience. A system can be architecturally elegant and still be painful to use. Here is what the OfficeAschi flow actually feels like from the user's perspective:
 
 ### First-Time Setup (Once, Takes 60 Seconds)
 
@@ -518,7 +518,7 @@ If someone switches phones or clears their browser, they still have the authenti
 
 ### Comparison to Traditional Auth
 
-| Aspect | Traditional (IdP + Sessions) | OfficeAaschi (TOTP-Primary) |
+| Aspect | Traditional (IdP + Sessions) | OfficeAschi (TOTP-Primary) |
 |---|---|---|
 | Onboarding | Register, verify email, set password, configure MFA, maybe IdP consent | Scan QR code, enter one code |
 | Daily login | Enter credentials (or SSO redirect), wait for token | None (invisible) |
@@ -533,7 +533,7 @@ For a tool that people check once or twice a day to book a desk, the difference 
 
 ## 11. Trade-offs and Honest Limitations
 
-This design is not universally applicable. It works for OfficeAaschi because of specific contextual factors. Here is where it would break down:
+This design is not universally applicable. It works for OfficeAschi because of specific contextual factors. Here is where it would break down:
 
 **Sensitive data.** If the data were confidential (salary information, medical records, personal communications), unauthenticated reads would be unacceptable. TOTP-primary auth would still need to be supplemented with read-level access control.
 
@@ -545,13 +545,13 @@ This design is not universally applicable. It works for OfficeAaschi because of 
 
 **Authenticator app dependency.** Every user needs a TOTP authenticator app on their phone. For a tech-savvy team, this is a non-issue. For a workforce that includes people who have never installed an app, it introduces friction.
 
-These are real limitations. They are also **irrelevant** for OfficeAaschi's specific context: a short-lived internal tool, for a known group of tech workers, protecting low-sensitivity broadcast data, with a hard expiry date. The design fits the problem. Applying it to a different problem would require re-evaluating every one of these trade-offs.
+These are real limitations. They are also **irrelevant** for OfficeAschi's specific context: a short-lived internal tool, for a known group of tech workers, protecting low-sensitivity broadcast data, with a hard expiry date. The design fits the problem. Applying it to a different problem would require re-evaluating every one of these trade-offs.
 
 ---
 
 ## 12. Takeaways
 
-The architecture of OfficeAaschi is not a pattern to blindly replicate. It is a case study in **matching the authentication investment to the actual sensitivity and lifespan of the system**. The core principles:
+The architecture of OfficeAschi is not a pattern to blindly replicate. It is a case study in **matching the authentication investment to the actual sensitivity and lifespan of the system**. The core principles:
 
 - **Authenticate writes, not reads**, when the data is inherently public. If the information is meant to be broadcast, protecting it behind a login wall adds friction without adding security.
 
@@ -565,7 +565,7 @@ The architecture of OfficeAaschi is not a pattern to blindly replicate. It is a 
 
 - **Design for the lifespan.** A system meant to run for three months has different architectural requirements than one meant to run for three years. Over-engineering a disposable tool is waste. Under-engineering a permanent platform is debt. The skill is in reading the context correctly.
 
-| Design Decision | Traditional Approach | OfficeAaschi Approach | Why |
+| Design Decision | Traditional Approach | OfficeAschi Approach | Why |
 |---|---|---|---|
 | Identity | IdP (Azure AD, Okta) | TOTP secret per user | No IdP team availability, no infra needed |
 | Authentication | OAuth 2.0 / OIDC | TOTP code per request | Zero external dependencies |
@@ -575,4 +575,4 @@ The architecture of OfficeAaschi is not a pattern to blindly replicate. It is a 
 | Password reset | Email flow + IT helpdesk | Re-enter code from authenticator | No password exists to reset |
 | Revocation | Disable account in IdP | Manager removes member | Secret is deleted from DB |
 
-OfficeAaschi is not a model for how to build authentication in general. It is a model for how to think about authentication *in context* — to ask "what am I actually protecting, for how long, and at what cost?" before reaching for the enterprise playbook.
+OfficeAschi is not a model for how to build authentication in general. It is a model for how to think about authentication *in context* — to ask "what am I actually protecting, for how long, and at what cost?" before reaching for the enterprise playbook.
