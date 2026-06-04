@@ -70,11 +70,29 @@ const supabaseKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
 
 <style>
   .reaction-badge {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
     font-size: 0.7rem;
-    color: var(--color-text-tertiary);
+    color: var(--color-text-secondary);
     line-height: 1;
     letter-spacing: 0.02em;
     min-height: 1em;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    padding: 0.25em 0.6em 0.25em 0.4em;
+    width: fit-content;
+    opacity: 0.85;
+    transition: opacity 0.15s ease;
+  }
+
+  .reaction-badge:empty,
+  .reaction-badge.badge-empty {
+    display: none;
+  }
+
+  .pc:hover .reaction-badge {
+    opacity: 1;
   }
 </style>
