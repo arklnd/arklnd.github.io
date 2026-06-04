@@ -8,7 +8,7 @@ interface Props {
   slug: string;
   /** "grid" = home page cards, "list" = tag/search rows, "compact" = related posts */
   variant?: "grid" | "list" | "compact";
-  /** Show reactions badge (grid variant only) */
+  /** Show reactions badge (grid and list variants) */
   reactions?: boolean;
   /** Enable view-transition names for title and date */
   transition?: boolean;
@@ -48,7 +48,7 @@ const iso = date.toISOString();
         class="pc-title"
         transition:name={transition ? `post-title-${slug}` : undefined}
       >{title}</span>
-      {variant === "grid" && reactions && <ReactionsBadge slug={slug} />}
+      {(variant === "grid" || variant === "list") && reactions && <ReactionsBadge slug={slug} />}
       <span class="pc-desc">{description}</span>
     </div>
     <div class="pc-footer">
