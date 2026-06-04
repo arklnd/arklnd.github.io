@@ -21,6 +21,12 @@
   --width-content: 800px;
   --width-page: 70dvw;
 
+  /* Decorative background blobs */
+  --deco-blob-1: rgba(61, 106, 168, 0.12);
+  --deco-blob-2: rgba(140, 100, 180, 0.09);
+  --deco-blob-3: rgba(100, 170, 160, 0.08);
+  --deco-dots: rgba(0, 0, 0, 0.04);
+
   --space-xs: 0.25rem;
   --space-sm: 0.5rem;
   --space-md: 1rem;
@@ -54,6 +60,13 @@ body {
   font-family: var(--font-body);
   color: var(--color-text);
   background-color: var(--color-bg);
+  background-image:
+    radial-gradient(circle 1px at center, var(--deco-dots) 1px, transparent 0),
+    radial-gradient(ellipse 900px 700px at 0% 5%, var(--deco-blob-1), transparent 70%),
+    radial-gradient(ellipse 700px 600px at 95% 20%, var(--deco-blob-2), transparent 70%),
+    radial-gradient(ellipse 800px 600px at 40% 95%, var(--deco-blob-3), transparent 70%);
+  background-size: 24px 24px, auto, auto, auto;
+  background-attachment: fixed;
   line-height: 1.7;
 }
 
@@ -164,6 +177,11 @@ img {
   --color-link: #6ba3f5;
   --color-link-hover: #93bbf8;
   --color-code-bg: #2a2a28;
+
+  --deco-blob-1: rgba(60, 120, 220, 0.1);
+  --deco-blob-2: rgba(130, 80, 200, 0.08);
+  --deco-blob-3: rgba(40, 180, 160, 0.06);
+  --deco-dots: rgba(255, 255, 255, 0.03);
 }
 
 [data-theme="dark"] ::selection {
