@@ -1,6 +1,7 @@
 ---
 import Layout from "../components/Layout.astro";
 import Heading from "../components/Heading.astro";
+import ReactionsBadge from "../components/ReactionsBadge.astro";
 // Import PostCard so its global styles are included in the page
 import "../components/PostCard.astro";
 ---
@@ -24,6 +25,8 @@ import "../components/PostCard.astro";
     </div>
     <p id="result-count" class="result-count" aria-live="polite" aria-atomic="true" hidden></p>
     <ul id="search-results" class="search-results" aria-label="Search results"></ul>
+    {/* Hidden ReactionsBadge to include its script + styles */}
+    <ReactionsBadge slug="" />
     <p id="search-empty" class="search-empty" aria-live="polite" hidden>
       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
@@ -141,6 +144,7 @@ import "../components/PostCard.astro";
         <a href="/posts/${entry.slug}" class="pc-link">
           <div class="pc-body">
             <span class="pc-title">${highlight(entry.title, terms)}</span>
+            <span class="reaction-badge" data-slug="${entry.slug}"></span>
             <span class="pc-desc">${highlight(entry.description, terms)}</span>
           </div>
           <div class="pc-footer">
@@ -155,6 +159,9 @@ import "../components/PostCard.astro";
       `;
       resultsList.appendChild(li);
     }
+
+    // Trigger ReactionsBadge to populate badges on JS-rendered cards
+    document.dispatchEvent(new Event("reactions:render-badges"));
   }
 
   // Re-run after every View Transition navigation (and on first load)

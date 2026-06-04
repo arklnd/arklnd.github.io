@@ -17,6 +17,7 @@ const supabaseKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
 
   async function fetchAllReactions() {
     if (loaded) return;
+    loaded = true; // Set early to prevent concurrent duplicate fetches
     try {
       const res = await fetch(`${supabaseUrl}/rest/v1/rpc/get_all_reactions`, {
         method: "POST",
@@ -26,7 +27,7 @@ const supabaseKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
         },
         body: "{}",
       });
-      if (!res.ok) return;
+      if (!res.ok) { loaded = false; return; }
       const data = await res.json();
 
       // Group by post_slug
@@ -36,9 +37,8 @@ const supabaseKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
         }
         allReactions.get(row.post_slug).push({ emoji: row.emoji, count: row.count });
       }
-      loaded = true;
     } catch {
-      // Silently fail
+      loaded = false; // Allow retry on failure
     }
   }
 
@@ -66,9 +66,12 @@ const supabaseKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
   }
 
   document.addEventListener("astro:page-load", setup);
+  document.addEventListener("reactions:render-badges", () => {
+    setup();
+  });
 </script>
 
-<style>
+<style is:global>
   .reaction-badge {
     display: inline-flex;
     align-items: center;
