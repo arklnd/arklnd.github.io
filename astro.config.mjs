@@ -24,7 +24,7 @@ export default defineConfig({
         description: "A quiet place to read.",
         lang: "en",
         dir: "ltr",
-        orientation: "any",
+        orientation: "portrait",
         categories: ["blog", "education", "personalization"],
         theme_color: "#3d6aa8",
         background_color: "#e6e9ed",
