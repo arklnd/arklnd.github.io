@@ -5,7 +5,7 @@ import PostCard from "../components/PostCard.astro";
 import TagPill from "../components/TagPill.astro";
 import { getCollection } from "astro:content";
 
-const posts = (await getCollection("posts")).sort(
+const posts = (await getCollection("posts", ({ data }) => !data.draft)).sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
 );
 

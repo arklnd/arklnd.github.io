@@ -6,7 +6,7 @@ import { getCollection, render } from "astro:content";
 import { getReadingTime } from "../../utils/readingTime";
 
 export async function getStaticPaths() {
-  const posts = await getCollection("posts");
+  const posts = await getCollection("posts", ({ data }) => !data.draft);
   return posts.map((post) => ({
     params: { slug: post.id },
     props: post,
@@ -74,7 +74,7 @@ const jsonLd = [
 ];
 
 // Gather all posts for related posts feature
-const allPosts = (await getCollection("posts"))
+const allPosts = (await getCollection("posts", ({ data }) => !data.draft))
   .filter((p) => p.id !== post.id)
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 

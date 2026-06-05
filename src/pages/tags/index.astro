@@ -4,7 +4,7 @@ import Heading from "../../components/Heading.astro";
 import TagPill from "../../components/TagPill.astro";
 import { getCollection } from "astro:content";
 
-const posts = await getCollection("posts");
+const posts = await getCollection("posts", ({ data }) => !data.draft);
 
 // Collect unique tags, sorted alphabetically
 const tagSet = new Set<string>();

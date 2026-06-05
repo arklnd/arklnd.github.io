@@ -3,6 +3,7 @@ title: "Welcome to My New Blog"
 description: "This is the first post on my new Astro-powered blog."
 date: 1900-01-23
 tags: ["blog", "astro", "introduction"]
+draft: true
 ---
 
 ## Welcome!
