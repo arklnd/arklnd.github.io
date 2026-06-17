@@ -28,6 +28,14 @@ const projects: Project[] = [
     repoUrl: "https://github.com/arklnd/DesktopClockWidget",
     tech: ["C#", ".NET", "WPF"],
   },
+  {
+    id: "synapse",
+    name: "Synapse",
+    description:
+      "LLM-provider-agnostic AI agent for Android with full MCP support, built-in web search, Lua scripting, SSH, memory, and multi-agent delegation.",
+    repoUrl: "https://github.com/a1kundu/Synapse",
+    tech: ["Flutter", "Dart", "MCP", "Android"],
+  },
 ];
 
 export default projects;
