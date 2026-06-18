@@ -66,6 +66,7 @@ export default defineConfig({
         navigationPreload: true,
         navigateFallback: null,
         globPatterns: ["**/*.{css,js,svg,png,ico,txt,xml}"],
+        globIgnores: ["**/images/gallery/**"],
         additionalManifestEntries: [
           { url: "/offline", revision: commitHash },
         ],
