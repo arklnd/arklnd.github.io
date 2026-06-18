@@ -19,6 +19,12 @@ const photos: GalleryPhoto[] = [
     date: "2026-06-17",
   },
   {
+    slug: "img-20260517-174154563",
+    filename: "IMG_20260517_174154563.jpg",
+    caption: "Futiyari Dam",
+    date: "2026-05-17",
+  },
+  {
     slug: "pxl-20260419-171757455",
     filename: "PXL_20260419_171757455.jpg",
     caption: "The Dwarakeswar River",
