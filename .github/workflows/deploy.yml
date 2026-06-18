@@ -27,6 +27,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Restore processed gallery cache
+        if: inputs.force_gallery != true
         id: gallery-cache
         uses: actions/cache@v4
         with:
@@ -37,11 +38,11 @@ jobs:
           key: gallery-${{ hashFiles('public/images/gallery/*.jpg', 'public/images/gallery/*.jpeg', 'public/images/gallery/*.png', 'public/images/gallery/*.webp') }}
 
       - name: Install ImageMagick
-        if: steps.gallery-cache.outputs.cache-hit != 'true' || inputs.force_gallery == true
+        if: steps.gallery-cache.outputs.cache-hit != 'true'
         run: sudo apt-get update && sudo apt-get install -y imagemagick
 
       - name: Process gallery images
-        if: steps.gallery-cache.outputs.cache-hit != 'true' || inputs.force_gallery == true
+        if: steps.gallery-cache.outputs.cache-hit != 'true'
         run: bash scripts/process-gallery.sh
 
       - name: Install, build, and upload your site
