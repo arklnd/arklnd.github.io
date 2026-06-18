@@ -1,5 +1,6 @@
 ---
 import Layout from "../../components/Layout.astro";
+import ReactionsBadge from "../../components/ReactionsBadge.astro";
 import photos from "../../data/gallery";
 
 const isDev = import.meta.env.DEV;
@@ -30,6 +31,9 @@ const isDev = import.meta.env.DEV;
               {photo.place && <span class="caption-place">{photo.place}</span>}
             </figcaption>
           )}
+          <div class="gallery-reactions">
+            <ReactionsBadge slug={`photo:${photo.slug}`} />
+          </div>
         </figure>
       ))}
     </div>
@@ -115,6 +119,10 @@ const isDev = import.meta.env.DEV;
     font-family: var(--font-heading);
     font-size: 0.75rem;
     color: var(--color-text-tertiary);
+  }
+
+  .gallery-reactions {
+    padding: 0 var(--space-md) var(--space-sm);
   }
 
   @media (max-width: 600px) {
