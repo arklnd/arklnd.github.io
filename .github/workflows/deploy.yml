@@ -7,6 +7,11 @@ on:
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+    inputs:
+      force_gallery:
+        description: "Force gallery image reprocessing"
+        type: boolean
+        default: false
 
 # Allow this job to clone the repo and create a page deployment
 permissions:
@@ -32,11 +37,11 @@ jobs:
           key: gallery-${{ hashFiles('public/images/gallery/*.jpg', 'public/images/gallery/*.jpeg', 'public/images/gallery/*.png', 'public/images/gallery/*.webp') }}
 
       - name: Install ImageMagick
-        if: steps.gallery-cache.outputs.cache-hit != 'true'
+        if: steps.gallery-cache.outputs.cache-hit != 'true' || inputs.force_gallery == true
         run: sudo apt-get update && sudo apt-get install -y imagemagick
 
       - name: Process gallery images
-        if: steps.gallery-cache.outputs.cache-hit != 'true'
+        if: steps.gallery-cache.outputs.cache-hit != 'true' || inputs.force_gallery == true
         run: bash scripts/process-gallery.sh
 
       - name: Install, build, and upload your site
