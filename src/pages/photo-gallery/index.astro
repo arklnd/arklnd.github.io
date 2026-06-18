@@ -19,7 +19,7 @@ const isDev = import.meta.env.DEV;
         <figure class="gallery-item">
           <a href={`/photo-gallery/${photo.slug}`}>
             <img
-              src={isDev ? `/images/gallery/${photo.filename}` : `/images/gallery/thumbs/${photo.filename.replace(/\.\w+$/, '.webp')}`}
+              src={isDev ? `/images/gallery/${photo.filename}` : `/images/gallery/thumbs/${photo.filename}.webp`}
               alt={photo.caption}
               loading="lazy"
               decoding="async"

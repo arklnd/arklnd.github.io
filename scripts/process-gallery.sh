@@ -26,10 +26,9 @@ NEEDS_CONVERT=false
 
 for img in "${files[@]}"; do
   filename=$(basename "$img")
-  base="${filename%.*}"
 
   # Skip if all 3 outputs already exist
-  if [ -f "$THUMB_DIR/${base}.webp" ] && [ -f "$DISPLAY_DIR/${base}.webp" ] && [ -f "$OG_DIR/${base}.jpg" ]; then
+  if [ -f "$THUMB_DIR/${filename}.webp" ] && [ -f "$DISPLAY_DIR/${filename}.webp" ] && [ -f "$OG_DIR/${filename}.jpg" ]; then
     echo "Skipping (cached): $filename"
     continue
   fi
@@ -41,7 +40,7 @@ for img in "${files[@]}"; do
   convert "$img" \
     -resize 400x \
     -quality 80 \
-    "$THUMB_DIR/${base}.webp"
+    "$THUMB_DIR/${filename}.webp"
 
   # 2. Display image (original size, watermarked with logo + text, webp)
   LOGO="public/pwa-512x512.png"
@@ -56,7 +55,7 @@ for img in "${files[@]}"; do
     -pointsize 28 \
     -annotate +20+20 "$WATERMARK_TEXT" \
     -quality 85 \
-    "$DISPLAY_DIR/${base}.webp"
+    "$DISPLAY_DIR/${filename}.webp"
 
   # 3. OG image for social previews (1200x630, jpg for max compatibility)
   convert "$img" \
@@ -64,7 +63,7 @@ for img in "${files[@]}"; do
     -gravity center \
     -extent 1200x630 \
     -quality 85 \
-    "$OG_DIR/${base}.jpg"
+    "$OG_DIR/${filename}.jpg"
 
   echo "  ✓ thumb, display, og"
 done

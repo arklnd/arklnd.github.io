@@ -25,9 +25,8 @@ const formattedDate = new Date(photo.date).toLocaleDateString("en-US", {
 
 const isDev = import.meta.env.DEV;
 const siteUrl = Astro.site?.origin || "https://arijitk.in";
-const baseName = photo.filename.replace(/\.\w+$/, '');
-const ogImage = `${siteUrl}/images/gallery/og/${baseName}.jpg`;
-const displayImage = isDev ? `/images/gallery/${photo.filename}` : `/images/gallery/display/${baseName}.webp`;
+const ogImage = `${siteUrl}/images/gallery/og/${photo.filename}.jpg`;
+const displayImage = isDev ? `/images/gallery/${photo.filename}` : `/images/gallery/display/${photo.filename}.webp`;
 const pageUrl = `${siteUrl}/photo-gallery/${photo.slug}`;
 const description = `${photo.caption}${photo.place ? ` — ${photo.place}` : ""}`;
 
