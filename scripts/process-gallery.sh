@@ -22,10 +22,19 @@ if [ ${#files[@]} -eq 0 ]; then
   exit 0
 fi
 
+NEEDS_CONVERT=false
+
 for img in "${files[@]}"; do
   filename=$(basename "$img")
   base="${filename%.*}"
 
+  # Skip if all 3 outputs already exist
+  if [ -f "$THUMB_DIR/${base}.webp" ] && [ -f "$DISPLAY_DIR/${base}.webp" ] && [ -f "$OG_DIR/${base}.jpg" ]; then
+    echo "Skipping (cached): $filename"
+    continue
+  fi
+
+  NEEDS_CONVERT=true
   echo "Processing: $filename"
 
   # 1. Thumbnail for gallery grid (400px wide, webp)
@@ -55,4 +64,9 @@ for img in "${files[@]}"; do
   echo "  ✓ thumb, display, og"
 done
 
-echo "Gallery processing complete. ${#files[@]} images processed."
+echo "Gallery processing complete. ${#files[@]} images found."
+
+# Signal to CI whether ImageMagick was actually needed
+if [ "$NEEDS_CONVERT" = false ]; then
+  echo "All images were cached — no conversion needed."
+fi

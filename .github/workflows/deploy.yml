@@ -21,10 +21,22 @@ jobs:
       - name: Checkout your repository
         uses: actions/checkout@v4
 
+      - name: Restore processed gallery cache
+        id: gallery-cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            public/images/gallery/thumbs
+            public/images/gallery/display
+            public/images/gallery/og
+          key: gallery-${{ hashFiles('public/images/gallery/*.jpg', 'public/images/gallery/*.jpeg', 'public/images/gallery/*.png', 'public/images/gallery/*.webp') }}
+
       - name: Install ImageMagick
+        if: steps.gallery-cache.outputs.cache-hit != 'true'
         run: sudo apt-get update && sudo apt-get install -y imagemagick
 
       - name: Process gallery images
+        if: steps.gallery-cache.outputs.cache-hit != 'true'
         run: bash scripts/process-gallery.sh
 
       - name: Install, build, and upload your site
