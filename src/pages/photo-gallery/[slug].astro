@@ -1,0 +1,188 @@
+---
+import Layout from "../../components/Layout.astro";
+import photos from "../../data/gallery";
+import type { GetStaticPaths } from "astro";
+
+export const getStaticPaths: GetStaticPaths = () => {
+  return photos.map((photo) => ({
+    params: { slug: photo.slug },
+    props: { photo },
+  }));
+};
+
+const { photo } = Astro.props;
+
+const currentIndex = photos.findIndex((p) => p.slug === photo.slug);
+const prevPhoto = currentIndex > 0 ? photos[currentIndex - 1] : null;
+const nextPhoto = currentIndex < photos.length - 1 ? photos[currentIndex + 1] : null;
+
+const formattedDate = new Date(photo.date).toLocaleDateString("en-US", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+});
+
+const siteUrl = Astro.site?.origin || "https://arijitk.in";
+const ogImage = `${siteUrl}/images/gallery/${photo.filename}`;
+const pageUrl = `${siteUrl}/photo-gallery/${photo.slug}`;
+const description = `${photo.caption}${photo.place ? ` — ${photo.place}` : ""}`;
+
+const jsonLd = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "ImageObject",
+  name: photo.caption,
+  description,
+  contentUrl: ogImage,
+  url: pageUrl,
+  datePublished: photo.date,
+  ...(photo.place && { contentLocation: { "@type": "Place", name: photo.place } }),
+  author: { "@type": "Person", name: "Arijit Kundu" },
+});
+---
+
+<Layout title={photo.caption} description={description} ogImage={ogImage} bare>
+  <script slot="head" type="application/ld+json" set:html={jsonLd} />
+  <article class="photo-viewer">
+    <a href="/photo-gallery" class="back-link">&larr; Back to Gallery</a>
+
+    <figure class="photo-frame">
+      <img
+        src={`/images/gallery/${photo.filename}`}
+        alt={photo.caption}
+        loading="eager"
+        decoding="async"
+      />
+    </figure>
+
+    <div class="photo-info">
+      <h1 class="photo-caption">{photo.caption}</h1>
+      <div class="photo-meta">
+        <time datetime={photo.date}>{formattedDate}</time>
+        {photo.place && (
+          <span class="photo-place">{photo.place}</span>
+        )}
+      </div>
+    </div>
+
+    <nav class="photo-nav" aria-label="Photo navigation">
+      {prevPhoto ? (
+        <a href={`/photo-gallery/${prevPhoto.slug}`} class="nav-prev">&larr; Previous</a>
+      ) : (
+        <span class="nav-disabled">&larr; Previous</span>
+      )}
+      {nextPhoto ? (
+        <a href={`/photo-gallery/${nextPhoto.slug}`} class="nav-next">Next &rarr;</a>
+      ) : (
+        <span class="nav-disabled">Next &rarr;</span>
+      )}
+    </nav>
+  </article>
+</Layout>
+
+<style>
+  .photo-viewer {
+    padding: var(--space-xl) 0;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .back-link {
+    display: inline-block;
+    font-family: var(--font-heading);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    margin-bottom: var(--space-lg);
+    transition: color 0.15s ease;
+  }
+
+  .back-link:hover {
+    color: var(--color-link);
+  }
+
+  .photo-frame {
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    margin-bottom: var(--space-lg);
+  }
+
+  .photo-frame img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .photo-info {
+    margin-bottom: var(--space-xl);
+  }
+
+  .photo-caption {
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: var(--space-sm);
+  }
+
+  .photo-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    font-family: var(--font-heading);
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+  }
+
+  .photo-place::before {
+    content: "\2022";
+    margin-right: var(--space-md);
+    color: var(--color-border);
+  }
+
+  .photo-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: var(--space-lg);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .photo-nav a {
+    font-family: var(--font-heading);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-link);
+    text-decoration: none;
+    transition: color 0.15s ease;
+  }
+
+  .photo-nav a:hover {
+    color: var(--color-link-hover);
+  }
+
+  .nav-disabled {
+    font-family: var(--font-heading);
+    font-size: 0.875rem;
+    color: var(--color-border);
+    user-select: none;
+  }
+
+  @media (max-width: 600px) {
+    .photo-caption {
+      font-size: 1.25rem;
+    }
+
+    .photo-meta {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-xs);
+    }
+
+    .photo-place::before {
+      display: none;
+    }
+  }
+</style>

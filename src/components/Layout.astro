@@ -19,6 +19,8 @@ interface Props {
   tags?: string[];
   /** Whether this page uses KaTeX math rendering */
   katex?: boolean;
+  /** Hide nav and footer for immersive pages */
+  bare?: boolean;
 }
 
 const {
@@ -31,6 +33,7 @@ const {
   author = "Arijit Kundu",
   tags = [],
   katex = false,
+  bare = false,
 } = Astro.props;
 
 const fullTitle = `${title} | ArijitK.in`;
@@ -137,11 +140,11 @@ const bingVerification = import.meta.env.PUBLIC_BING_SITE_VERIFICATION;
     </div>
 
     <div class="page">
-      <Nav />
+      {!bare && <Nav />}
       <main id="main-content">
         <slot />
       </main>
-      <Footer />
+      {!bare && <Footer />}
     </div>
 
     <!-- PWA: Service Worker registration with auto-reload on new build -->
