@@ -43,8 +43,13 @@ for img in "${files[@]}"; do
     -quality 80 \
     "$THUMB_DIR/${base}.webp"
 
-  # 2. Display image (original size, watermarked, webp)
+  # 2. Display image (original size, watermarked with logo + text, webp)
+  LOGO="public/pwa-512x512.png"
   convert "$img" \
+    \( "$LOGO" -resize x28 -channel A -evaluate Multiply 0.35 +channel \) \
+    -gravity southeast \
+    -geometry +80+16 \
+    -composite \
     -gravity southeast \
     -fill "rgba(255,255,255,0.35)" \
     -font "DejaVu-Sans" \
