@@ -28,6 +28,11 @@ build/Release
 # Astro
 .astro/
 
+# Generated gallery images (created during CI build)
+public/images/gallery/thumbs/
+public/images/gallery/display/
+public/images/gallery/og/
+
 # Coverage
 coverage
 *.lcov

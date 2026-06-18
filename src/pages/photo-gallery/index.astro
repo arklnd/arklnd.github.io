@@ -1,6 +1,8 @@
 ---
 import Layout from "../../components/Layout.astro";
 import photos from "../../data/gallery";
+
+const isDev = import.meta.env.DEV;
 ---
 
 <Layout title="Photo Gallery" description="Photo Gallery">
@@ -16,7 +18,7 @@ import photos from "../../data/gallery";
         <figure class="gallery-item">
           <a href={`/photo-gallery/${photo.slug}`}>
             <img
-              src={`/images/gallery/${photo.filename}`}
+              src={isDev ? `/images/gallery/${photo.filename}` : `/images/gallery/thumbs/${photo.filename.replace(/\.\w+$/, '.webp')}`}
               alt={photo.caption}
               loading="lazy"
               decoding="async"
