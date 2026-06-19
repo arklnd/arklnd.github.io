@@ -68,6 +68,19 @@ const photos: GalleryPhoto[] = [
     date: "2026-01-06",
     place: "RDB Primarc Techno Park, Kolkata",
   },
+  {
+    slug: "img-20250330-152723182-hdr",
+    filename: "IMG_20250330_152723182_HDR.jpg",
+    caption: "Way to Sikkim",
+    date: "2025-03-30",
+    place: "Lachen, Sikkim",
+  },
+  {
+    slug: "pxl-20221011-173351638",
+    filename: "PXL_20221011_173351638.jpg",
+    caption: "",
+    date: "2022-10-11",
+  },
 ];
 
 export default photos;
