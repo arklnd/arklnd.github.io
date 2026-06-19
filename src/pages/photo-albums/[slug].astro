@@ -23,7 +23,9 @@ const albumPhotos: GalleryPhoto[] = album.photoSlugs
 
 const isDev = import.meta.env.DEV;
 const siteUrl = Astro.site?.origin || "https://arijitk.in";
-const coverPhoto = albumPhotos[0];
+const coverPhoto = album.coverSlug
+  ? albumPhotos.find((p) => p.slug === album.coverSlug) ?? albumPhotos[0]
+  : albumPhotos[0];
 const ogImage = coverPhoto
   ? `${siteUrl}/images/gallery/og/${coverPhoto.filename}.jpg`
   : undefined;
