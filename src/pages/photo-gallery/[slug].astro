@@ -1,7 +1,7 @@
 ---
 import Layout from "../../components/Layout.astro";
 import Reactions from "../../components/Reactions.astro";
-import photos from "../../data/photos";
+import photos, { albums } from "../../data/photos";
 import type { GetStaticPaths, InferGetStaticPropsType } from "astro";
 import type { GalleryPhoto } from "../../data/photos";
 
@@ -44,12 +44,15 @@ const jsonLd = JSON.stringify({
   ...(photo.place && { contentLocation: { "@type": "Place", name: photo.place } }),
   author: { "@type": "Person", name: "Arijit Kundu" },
 });
+const albumMap: Record<string, string> = Object.fromEntries(
+  albums.map((a) => [a.slug, a.title])
+);
 ---
 
 <Layout title={photo.caption} description={description} ogImage={ogImage} bare>
   <script slot="head" type="application/ld+json" set:html={jsonLd} />
   <article class="photo-viewer">
-    <a href="/photo-gallery" class="back-link">&larr; Back to Gallery</a>
+    <a href="/photo-gallery" class="back-link" id="back-link">&larr; Back to Gallery</a>
 
     <figure class="photo-frame">
       <div class="img-loader"></div>
@@ -241,7 +244,7 @@ const jsonLd = JSON.stringify({
   }
 </style>
 
-<script define:vars={{ prevUrl: prevPhoto ? `/photo-gallery/${prevPhoto.slug}` : null, nextUrl: nextPhoto ? `/photo-gallery/${nextPhoto.slug}` : null }}>
+<script define:vars={{ prevUrl: prevPhoto ? `/photo-gallery/${prevPhoto.slug}` : null, nextUrl: nextPhoto ? `/photo-gallery/${nextPhoto.slug}` : null, albumMap }}>
   const frame = document.querySelector(".photo-frame");
   const img = frame ? frame.querySelector("img") : null;
   if (!frame || !img) return;
@@ -426,4 +429,41 @@ const jsonLd = JSON.stringify({
     document.removeEventListener("mousemove", onMouseMove);
     document.removeEventListener("mouseup",   onMouseUp);
   }, { once: true });
+
+  // ── Dynamic back link ──
+  function updateBackLink() {
+    const link = document.getElementById("back-link");
+    if (!link) return;
+
+    let refUrl = null;
+
+    // Navigation API — works with Astro view transitions (SPA nav)
+    if (typeof navigation !== "undefined" && navigation.entries) {
+      const entries = navigation.entries();
+      const idx = entries.findIndex((e) => e.key === navigation.currentEntry?.key);
+      if (idx > 0) refUrl = entries[idx - 1].url;
+    }
+
+    // Fallback for full-page loads
+    if (!refUrl && document.referrer) refUrl = document.referrer;
+
+    if (!refUrl) return;
+
+    const match = refUrl.match(/\/photo-albums\/([^/?#]+)/);
+    if (match) {
+      const slug = match[1];
+      const title = albumMap[slug];
+      link.href = title ? `/photo-albums/${slug}` : "/photo-albums";
+      link.textContent = `\u2190 Back to ${title ?? "Albums"}`;
+    }
+    // If referrer was /photo-albums (index), point there
+    else if (refUrl.includes("/photo-albums")) {
+      link.href = "/photo-albums";
+      link.textContent = "\u2190 Back to Albums";
+    }
+    // else keep default "← Back to Gallery"
+  }
+
+  document.addEventListener("astro:page-load", updateBackLink);
+  updateBackLink();
 </script>
