@@ -52,15 +52,12 @@ for img in "${files[@]}"; do
   # 2. Display image (original size, watermarked with logo + text, webp)
   LOGO="public/pwa-512x512.png"
   $MAGICK "$img" \
-    \( "$LOGO" -resize x48 -alpha set -channel A -evaluate Multiply 0.6 +channel \) \
-    -gravity southeast \
-    -geometry +80+16 \
-    -composite \
-    -gravity southeast \
-    -fill "rgba(255,255,255,0.35)" \
-    -font "DejaVu-Sans" \
-    -pointsize 28 \
-    -annotate +20+20 "$WATERMARK_TEXT" \
+    \( \
+      \( "$LOGO" -resize x32 -alpha set -channel A -evaluate Multiply 0.6 +channel \) \
+      \( -background none -fill "rgba(255,255,255,0.35)" -font "DejaVu-Sans" -pointsize 28 label:"$WATERMARK_TEXT" \) \
+      -gravity center +append \
+    \) \
+    -gravity southeast -geometry +20+16 -composite \
     "$DISPLAY_DIR/${filename}.webp"
 
   # 3. OG image for social previews (1200x630, jpg for max compatibility)
