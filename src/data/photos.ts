@@ -177,7 +177,7 @@ const photos: GalleryPhoto[] = [
 export const albums: Album[] = [
   {
     slug: "paharpur",
-    title: "Paharpur",
+    title: "PAHARPUR",
     description: "Rocky cliffs, a winding river, and dry hills — a June afternoon at Paharpur.",
     coverSlug: "paharpur-20260619-bird-on-palm",
     photoSlugs: [
