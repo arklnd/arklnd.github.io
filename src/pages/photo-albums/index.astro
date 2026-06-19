@@ -5,9 +5,12 @@ import photos, { albums } from "../../data/photos";
 const isDev = import.meta.env.DEV;
 
 // Get up to 4 photos per album for the fanned card stack
+// Cover photo is placed last so it renders on top (highest z-order)
 const albumsWithCards = albums.map((album) => {
-  const cardSlugs = album.photoSlugs.slice(0, 4);
-  const cards = cardSlugs
+  const coverSlug = album.coverSlug ?? album.photoSlugs[0];
+  const otherSlugs = album.photoSlugs.filter((s) => s !== coverSlug).slice(0, 3);
+  const orderedSlugs = [...otherSlugs, coverSlug];
+  const cards = orderedSlugs
     .map((slug) => photos.find((p) => p.slug === slug))
     .filter(Boolean);
   return { album, cards };
