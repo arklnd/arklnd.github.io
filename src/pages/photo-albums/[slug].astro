@@ -56,11 +56,11 @@ const ogImage = coverPhoto
       <div class="hero-content">
         <a href="/photo-albums" class="back-link">&larr; Albums</a>
         <div class="hero-meta">
-          <span class="hero-count">{albumPhotos.length} photo{albumPhotos.length !== 1 ? "s" : ""}</span>
           <h1 class="hero-title">{album.title}</h1>
           {album.description && (
             <p class="hero-description">{album.description}</p>
           )}
+          <span class="hero-count">{albumPhotos.length} photo{albumPhotos.length !== 1 ? "s" : ""}</span>
           {coverPhoto && (
             <div class="hero-reactions">
               <Reactions slug={`photo:${coverPhoto.slug}`} />
