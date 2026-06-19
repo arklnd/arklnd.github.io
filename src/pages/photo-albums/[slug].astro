@@ -1,0 +1,243 @@
+---
+import Layout from "../../components/Layout.astro";
+import ReactionsBadge from "../../components/ReactionsBadge.astro";
+import photos, { albums } from "../../data/photos";
+import type { GetStaticPaths, InferGetStaticPropsType } from "astro";
+import type { GalleryPhoto } from "../../data/photos";
+
+export const getStaticPaths = (() => {
+  return albums.map((album) => ({
+    params: { slug: album.slug },
+    props: { album },
+  }));
+}) satisfies GetStaticPaths;
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+
+const { album } = Astro.props as Props;
+
+const albumPhotos: GalleryPhoto[] = album.photoSlugs
+  .map((slug) => photos.find((p) => p.slug === slug))
+  .filter((p): p is GalleryPhoto => p !== undefined);
+
+const isDev = import.meta.env.DEV;
+const siteUrl = Astro.site?.origin || "https://arijitk.in";
+const coverPhoto = albumPhotos[0];
+const ogImage = coverPhoto
+  ? `${siteUrl}/images/gallery/og/${coverPhoto.filename}.jpg`
+  : undefined;
+---
+
+<Layout
+  title={album.title}
+  description={album.description ?? `${album.title} — Photo Album`}
+  ogImage={ogImage}
+>
+  <article class="album-page">
+    <a href="/photo-albums" class="back-link">&larr; Albums</a>
+
+    <header class="album-header">
+      <h1 class="album-title">{album.title}</h1>
+      {album.description && (
+        <p class="album-description">{album.description}</p>
+      )}
+      <span class="album-count">{albumPhotos.length} photo{albumPhotos.length !== 1 ? "s" : ""}</span>
+    </header>
+
+    <div class="gallery-grid">
+      {albumPhotos.map((photo) => (
+        <figure class="gallery-item">
+          <div class="gallery-img-wrap">
+            <a href={`/photo-gallery/${photo.slug}`}>
+              <div class="img-loader"></div>
+              <img
+                src={isDev
+                  ? `/images/gallery/${photo.filename}`
+                  : `/images/gallery/thumbs/${photo.filename}.webp`}
+                alt={photo.caption}
+                loading="lazy"
+                decoding="async"
+                onload="this.previousElementSibling.style.display='none';this.classList.add('loaded')"
+              />
+            </a>
+            <div class="gallery-reactions">
+              <ReactionsBadge slug={`photo:${photo.slug}`} />
+            </div>
+            {(photo.caption || photo.place) && (
+              <div class="gallery-overlay">
+                <figcaption class="gallery-caption">
+                  {photo.place && <span class="caption-place">{photo.place}</span>}
+                  <span class="caption-text">{photo.caption}</span>
+                </figcaption>
+              </div>
+            )}
+          </div>
+        </figure>
+      ))}
+    </div>
+  </article>
+</Layout>
+
+<style>
+  .album-page {
+    padding: var(--space-xl) 0;
+  }
+
+  .back-link {
+    display: inline-block;
+    font-family: var(--font-heading);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    margin-bottom: var(--space-lg);
+    transition: color 0.15s ease;
+  }
+
+  .back-link:hover {
+    color: var(--color-link);
+  }
+
+  .album-header {
+    margin-bottom: var(--space-xl);
+  }
+
+  .album-title {
+    font-family: var(--font-heading);
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: var(--space-sm);
+  }
+
+  .album-description {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-sm);
+  }
+
+  .album-count {
+    font-family: var(--font-heading);
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+  }
+
+  .gallery-grid {
+    columns: 4 250px;
+    column-gap: var(--space-md);
+  }
+
+  .gallery-item {
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.32), 0 2px 6px rgba(0, 0, 0, 0.18);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    break-inside: avoid;
+    margin-bottom: var(--space-md);
+  }
+
+  .gallery-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14), 0 2px 6px rgba(0, 0, 0, 0.08);
+  }
+
+  .gallery-img-wrap {
+    position: relative;
+    line-height: 0;
+  }
+
+  .gallery-img-wrap a {
+    display: block;
+  }
+
+  .img-loader {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-surface);
+    z-index: 1;
+  }
+
+  .img-loader::after {
+    content: "";
+    width: 28px;
+    height: 28px;
+    border: 3px solid var(--color-border);
+    border-top-color: var(--color-link);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .gallery-item img {
+    width: 100%;
+    height: auto;
+    display: block;
+    transition: opacity 0.3s ease;
+    opacity: 0;
+  }
+
+  .gallery-item img.loaded {
+    opacity: 1;
+  }
+
+  .gallery-item:hover img {
+    opacity: 0.92;
+  }
+
+  .gallery-caption {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    line-height: 1.3;
+  }
+
+  .caption-text {
+    font-family: var(--font-heading);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: #fff;
+  }
+
+  .caption-place {
+    font-family: var(--font-heading);
+    font-size: 0.625rem;
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .gallery-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 24px 10px 10px;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.6));
+    pointer-events: none;
+  }
+
+  .gallery-reactions {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    z-index: 1;
+  }
+
+  @media (max-width: 600px) {
+    .gallery-grid {
+      columns: 2 150px;
+      column-gap: var(--space-sm);
+    }
+
+    .gallery-item {
+      margin-bottom: var(--space-sm);
+    }
+  }
+</style>

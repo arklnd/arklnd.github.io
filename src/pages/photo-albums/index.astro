@@ -1,0 +1,203 @@
+---
+import Layout from "../../components/Layout.astro";
+import photos, { albums } from "../../data/photos";
+
+const isDev = import.meta.env.DEV;
+
+const albumsWithCover = albums.map((album) => {
+  const coverSlug = album.coverSlug ?? album.photoSlugs[0];
+  const cover = photos.find((p) => p.slug === coverSlug);
+  return { album, cover };
+});
+---
+
+<Layout title="Photo Albums" description="Curated photo albums">
+  <article class="albums-page">
+    <h1 class="albums-title">Photo Albums</h1>
+
+    {albums.length === 0 && (
+      <p class="albums-empty">No albums yet. Add entries to <code>src/data/gallery.ts</code>.</p>
+    )}
+
+    <div class="albums-grid">
+      {albumsWithCover.map(({ album, cover }) => (
+        <a href={`/photo-albums/${album.slug}`} class="album-card">
+          <div class="album-cover">
+            {cover ? (
+              <>
+                <div class="img-loader"></div>
+                <img
+                  src={isDev
+                    ? `/images/gallery/${cover.filename}`
+                    : `/images/gallery/thumbs/${cover.filename}.webp`}
+                  alt={cover.caption || album.title}
+                  loading="lazy"
+                  decoding="async"
+                  onload="this.previousElementSibling.style.display='none';this.classList.add('loaded')"
+                />
+              </>
+            ) : (
+              <div class="album-cover-placeholder"></div>
+            )}
+            <div class="album-count">{album.photoSlugs.length} photo{album.photoSlugs.length !== 1 ? "s" : ""}</div>
+          </div>
+          <div class="album-info">
+            <h2 class="album-title">{album.title}</h2>
+            {album.description && (
+              <p class="album-description">{album.description}</p>
+            )}
+          </div>
+        </a>
+      ))}
+    </div>
+  </article>
+</Layout>
+
+<style>
+  .albums-page {
+    padding: var(--space-xl) 0;
+  }
+
+  .albums-title {
+    font-family: var(--font-heading);
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: var(--space-xl);
+    color: var(--color-text);
+  }
+
+  .albums-empty {
+    color: var(--color-text-secondary);
+    font-size: 0.95rem;
+  }
+
+  .albums-empty code {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    background: var(--color-code-bg);
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+  }
+
+  .albums-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: var(--space-lg);
+  }
+
+  .album-card {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.32), 0 2px 6px rgba(0, 0, 0, 0.18);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .album-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.2), 0 3px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .album-cover {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background: var(--color-surface);
+    line-height: 0;
+  }
+
+  .album-cover-placeholder {
+    width: 100%;
+    height: 100%;
+    background: var(--color-border);
+  }
+
+  .img-loader {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-surface);
+    z-index: 1;
+  }
+
+  .img-loader::after {
+    content: "";
+    width: 28px;
+    height: 28px;
+    border: 3px solid var(--color-border);
+    border-top-color: var(--color-link);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .album-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    opacity: 0;
+  }
+
+  .album-cover img.loaded {
+    opacity: 1;
+  }
+
+  .album-card:hover .album-cover img {
+    transform: scale(1.04);
+  }
+
+  .album-count {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    font-family: var(--font-heading);
+    font-size: 0.7rem;
+    font-weight: 600;
+    line-height: 1.4;
+    background: rgba(0, 0, 0, 0.55);
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 20px;
+    backdrop-filter: blur(4px);
+    letter-spacing: 0.02em;
+  }
+
+  .album-info {
+    padding: var(--space-md);
+  }
+
+  .album-title {
+    font-family: var(--font-heading);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: 4px;
+  }
+
+  .album-description {
+    font-family: var(--font-body);
+    font-size: 0.825rem;
+    color: var(--color-text-secondary);
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  @media (max-width: 600px) {
+    .albums-grid {
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: var(--space-sm);
+    }
+  }
+</style>
