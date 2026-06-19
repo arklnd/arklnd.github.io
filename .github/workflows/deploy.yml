@@ -33,7 +33,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           KEY="gallery-${{ hashFiles('public/images/gallery/*.jpg', 'public/images/gallery/*.jpeg', 'public/images/gallery/*.png', 'public/images/gallery/*.webp') }}"
-          gh actions-cache delete "$KEY" -R ${{ github.repository }} --confirm || echo "No existing cache to delete"
+          gh cache delete "$KEY" -R ${{ github.repository }} --confirm || echo "No existing cache to delete"
 
       - name: Restore processed gallery cache
         id: gallery-cache
