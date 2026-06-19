@@ -18,6 +18,7 @@ permissions:
   contents: read
   pages: write
   id-token: write
+  actions: write
 
 jobs:
   build:
@@ -26,10 +27,17 @@ jobs:
       - name: Checkout your repository
         uses: actions/checkout@v4
 
+      - name: Delete gallery cache (force mode)
+        if: inputs.force_gallery == true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          KEY="gallery-${{ hashFiles('public/images/gallery/*.jpg', 'public/images/gallery/*.jpeg', 'public/images/gallery/*.png', 'public/images/gallery/*.webp') }}"
+          gh actions-cache delete "$KEY" -R ${{ github.repository }} --confirm || echo "No existing cache to delete"
+
       - name: Restore processed gallery cache
-        if: inputs.force_gallery != true
         id: gallery-cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache@v4
         with:
           path: |
             public/images/gallery/thumbs
@@ -44,16 +52,6 @@ jobs:
       - name: Process gallery images
         if: steps.gallery-cache.outputs.cache-hit != 'true'
         run: bash scripts/process-gallery.sh
-
-      - name: Save gallery cache
-        if: steps.gallery-cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
-        with:
-          path: |
-            public/images/gallery/thumbs
-            public/images/gallery/display
-            public/images/gallery/og
-          key: gallery-${{ hashFiles('public/images/gallery/*.jpg', 'public/images/gallery/*.jpeg', 'public/images/gallery/*.png', 'public/images/gallery/*.webp') }}
 
       - name: Install, build, and upload your site
         uses: withastro/action@v3
