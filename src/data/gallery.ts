@@ -36,6 +36,38 @@ const photos: GalleryPhoto[] = [
     caption: "The Dwarakeswar River",
     date: "2026-04-19",
   },
+  {
+    slug: "img-20260302-141825905",
+    filename: "IMG_20260302_141825905.jpg",
+    caption: "",
+    date: "2026-03-02",
+  },
+  {
+    slug: "img-20260206-154635652",
+    filename: "IMG_20260206_154635652.jpg",
+    caption: "",
+    date: "2026-02-06",
+  },
+  {
+    slug: "pxl-20260107-174810196",
+    filename: "PXL_20260107_174810196.jpg",
+    caption: "",
+    date: "2026-01-07",
+  },
+  {
+    slug: "pxl-20260106-151337751",
+    filename: "PXL_20260106_151337751.jpg",
+    caption: "Indoor",
+    date: "2026-01-06",
+    place: "RDB Primarc Techno Park, Kolkata",
+  },
+  {
+    slug: "pxl-20260106-151551465",
+    filename: "PXL_20260106_151551465.jpg",
+    caption: "Indoor",
+    date: "2026-01-06",
+    place: "RDB Primarc Techno Park, Kolkata",
+  },
 ];
 
 export default photos;
