@@ -49,11 +49,13 @@ const jsonLd = JSON.stringify({
     <a href="/photo-gallery" class="back-link">&larr; Back to Gallery</a>
 
     <figure class="photo-frame">
+      <div class="img-loader"></div>
       <img
         src={displayImage}
         alt={photo.caption}
         loading="eager"
         decoding="async"
+        onload="this.previousElementSibling.style.display='none';this.classList.add('loaded')"
       />
     </figure>
 
@@ -115,11 +117,39 @@ const jsonLd = JSON.stringify({
     margin-bottom: var(--space-lg);
   }
 
+  .img-loader {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    background: var(--color-surface);
+  }
+
+  .img-loader::after {
+    content: "";
+    width: 36px;
+    height: 36px;
+    border: 3px solid var(--color-border);
+    border-top-color: var(--color-link);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
   .photo-frame img {
     width: 100%;
     height: auto;
     display: block;
     border-radius: 6px;
+    transition: opacity 0.3s ease;
+    opacity: 0;
+  }
+
+  .photo-frame img.loaded {
+    opacity: 1;
   }
 
   .photo-info {
