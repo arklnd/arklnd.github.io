@@ -2,16 +2,19 @@
 import Layout from "../../components/Layout.astro";
 import Reactions from "../../components/Reactions.astro";
 import photos from "../../data/photos";
-import type { GetStaticPaths } from "astro";
+import type { GetStaticPaths, InferGetStaticPropsType } from "astro";
+import type { GalleryPhoto } from "../../data/photos";
 
-export const getStaticPaths: GetStaticPaths = () => {
+export const getStaticPaths = (() => {
   return photos.map((photo) => ({
     params: { slug: photo.slug },
     props: { photo },
   }));
-};
+}) satisfies GetStaticPaths;
 
-const { photo } = Astro.props;
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+
+const { photo } = Astro.props as Props;
 
 const currentIndex = photos.findIndex((p) => p.slug === photo.slug);
 const prevPhoto = currentIndex > 0 ? photos[currentIndex - 1] : null;
@@ -115,6 +118,8 @@ const jsonLd = JSON.stringify({
     padding: 8px;
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
     margin-bottom: var(--space-lg);
+    touch-action: pan-y;
+    user-select: none;
   }
 
   .img-loader {
@@ -146,6 +151,17 @@ const jsonLd = JSON.stringify({
     border-radius: 6px;
     transition: opacity 0.3s ease;
     opacity: 0;
+    transform-origin: center center;
+    will-change: transform;
+    cursor: zoom-in;
+  }
+
+  .photo-frame img.zoomed {
+    cursor: grab;
+  }
+
+  .photo-frame img.dragging {
+    cursor: grabbing;
   }
 
   .photo-frame img.loaded {
@@ -226,34 +242,188 @@ const jsonLd = JSON.stringify({
 </style>
 
 <script define:vars={{ prevUrl: prevPhoto ? `/photo-gallery/${prevPhoto.slug}` : null, nextUrl: nextPhoto ? `/photo-gallery/${nextPhoto.slug}` : null }}>
-  let touchStartX = 0;
-  const MIN_SWIPE = 50;
+  const frame = document.querySelector(".photo-frame");
+  const img = frame ? frame.querySelector("img") : null;
+  if (!frame || !img) return;
 
+  // ── State ──
+  let scale = 1;
+  let tx = 0;        // accumulated pan X (screen px)
+  let ty = 0;        // accumulated pan Y (screen px)
+  let isPinching = false;
+  let startScale = 1;
+  let startDist = 0;
+  let startPanX = 0; // clientX at pan-start minus current tx
+  let startPanY = 0;
+  let swipeStartX = 0;
+  let lastTap = 0;
+  let isDragging = false;
+  let dragStartX = 0;
+  let dragStartY = 0;
+
+  const MIN_SWIPE = 50;
+  const MAX_SCALE = 5;
+
+  function pinchDist(t1, t2) {
+    return Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+  }
+
+  function clamp(val, min, max) {
+    return Math.min(max, Math.max(min, val));
+  }
+
+  function applyTransform(animate) {
+    // Clamp pan so the image edge doesn't go past the frame centre
+    if (scale > 1) {
+      const maxX = (frame.offsetWidth  * (scale - 1)) / 2;
+      const maxY = (frame.offsetHeight * (scale - 1)) / 2;
+      tx = clamp(tx, -maxX, maxX);
+      ty = clamp(ty, -maxY, maxY);
+    } else {
+      tx = 0;
+      ty = 0;
+    }
+
+    if (animate) img.style.transition = "transform 0.22s ease";
+    img.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
+    if (animate) setTimeout(() => { img.style.transition = ""; }, 230);
+
+    img.classList.toggle("zoomed", scale > 1);
+    img.classList.remove("dragging");
+    // Let the browser handle page scroll only when not zoomed
+    frame.style.touchAction = scale > 1 ? "none" : "pan-y";
+  }
+
+  function resetZoom(animate) {
+    scale = 1; tx = 0; ty = 0;
+    applyTransform(animate);
+  }
+
+  // ── Touch handlers ──
   function onTouchStart(e) {
-    touchStartX = e.changedTouches[0].screenX;
+    if (e.touches.length === 2) {
+      isPinching = true;
+      startDist  = pinchDist(e.touches[0], e.touches[1]);
+      startScale = scale;
+      e.preventDefault();
+    } else if (e.touches.length === 1) {
+      swipeStartX = e.touches[0].clientX;
+      if (scale > 1) {
+        startPanX = e.touches[0].clientX - tx;
+        startPanY = e.touches[0].clientY - ty;
+      }
+    }
+  }
+
+  function onTouchMove(e) {
+    if (e.touches.length === 2 && isPinching) {
+      scale = clamp(
+        startScale * (pinchDist(e.touches[0], e.touches[1]) / startDist),
+        1, MAX_SCALE
+      );
+      applyTransform(false);
+      e.preventDefault();
+    } else if (e.touches.length === 1 && scale > 1) {
+      tx = e.touches[0].clientX - startPanX;
+      ty = e.touches[0].clientY - startPanY;
+      applyTransform(false);
+      e.preventDefault();
+    }
   }
 
   function onTouchEnd(e) {
-    const diff = touchStartX - e.changedTouches[0].screenX;
-    if (Math.abs(diff) < MIN_SWIPE) return;
-
-    if (diff > 0 && nextUrl) {
-      window.location.href = nextUrl;
-    } else if (diff < 0 && prevUrl) {
-      window.location.href = prevUrl;
+    if (isPinching) {
+      isPinching = false;
+      // Snap back to 1 if barely zoomed
+      if (scale < 1.12) resetZoom(true);
+      return; // never navigate after a pinch gesture
     }
+
+    // Double-tap to reset zoom
+    const now = Date.now();
+    if (now - lastTap < 280 && e.changedTouches.length === 1) {
+      if (scale > 1) resetZoom(true);
+      lastTap = 0;
+      return;
+    }
+    lastTap = now;
+
+    // Block swipe when zoomed
+    if (scale > 1) return;
+
+    const dx = swipeStartX - e.changedTouches[0].clientX;
+    if (Math.abs(dx) < MIN_SWIPE) return;
+    if (dx > 0 && nextUrl) window.location.href = nextUrl;
+    else if (dx < 0 && prevUrl) window.location.href = prevUrl;
   }
 
-  const viewer = document.querySelector(".photo-viewer");
-  if (viewer) {
-    viewer.addEventListener("touchstart", onTouchStart);
-    viewer.addEventListener("touchend", onTouchEnd);
+  frame.addEventListener("touchstart", onTouchStart, { passive: false });
+  frame.addEventListener("touchmove",  onTouchMove,  { passive: false });
+  frame.addEventListener("touchend",   onTouchEnd);
+
+  // ── Mouse wheel zoom (desktop) ──
+  function onWheel(e) {
+    e.preventDefault();
+    const rect = frame.getBoundingClientRect();
+    // Mouse position relative to frame centre
+    const mx = e.clientX - rect.left - rect.width  / 2;
+    const my = e.clientY - rect.top  - rect.height / 2;
+
+    const factor = Math.exp(-e.deltaY * 0.003);
+    const newScale = clamp(scale * factor, 1, MAX_SCALE);
+
+    if (newScale === scale) return;
+
+    // Keep the image point under the cursor stationary
+    tx = mx - (mx - tx) * (newScale / scale);
+    ty = my - (my - ty) * (newScale / scale);
+    scale = newScale;
+    applyTransform(false);
   }
+
+  // ── Mouse drag pan (desktop) ──
+  function onMouseDown(e) {
+    if (scale <= 1) return;
+    if (e.button !== 0) return;
+    isDragging = true;
+    dragStartX = e.clientX - tx;
+    dragStartY = e.clientY - ty;
+    img.classList.add("dragging");
+    e.preventDefault();
+  }
+
+  function onMouseMove(e) {
+    if (!isDragging) return;
+    tx = e.clientX - dragStartX;
+    ty = e.clientY - dragStartY;
+    applyTransform(false);
+  }
+
+  function onMouseUp() {
+    if (!isDragging) return;
+    isDragging = false;
+    img.classList.remove("dragging");
+  }
+
+  // Double-click to reset zoom
+  function onDblClick(e) {
+    if (scale > 1) { resetZoom(true); e.preventDefault(); }
+  }
+
+  frame.addEventListener("wheel",      onWheel,     { passive: false });
+  frame.addEventListener("mousedown",  onMouseDown);
+  frame.addEventListener("dblclick",   onDblClick);
+  document.addEventListener("mousemove", onMouseMove);
+  document.addEventListener("mouseup",   onMouseUp);
 
   document.addEventListener("astro:before-swap", () => {
-    if (viewer) {
-      viewer.removeEventListener("touchstart", onTouchStart);
-      viewer.removeEventListener("touchend", onTouchEnd);
-    }
+    frame.removeEventListener("touchstart", onTouchStart);
+    frame.removeEventListener("touchmove",  onTouchMove);
+    frame.removeEventListener("touchend",   onTouchEnd);
+    frame.removeEventListener("wheel",      onWheel);
+    frame.removeEventListener("mousedown",  onMouseDown);
+    frame.removeEventListener("dblclick",   onDblClick);
+    document.removeEventListener("mousemove", onMouseMove);
+    document.removeEventListener("mouseup",   onMouseUp);
   }, { once: true });
 </script>
