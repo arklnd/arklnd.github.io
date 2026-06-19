@@ -176,6 +176,25 @@ const photos: GalleryPhoto[] = [
 
 export const albums: Album[] = [
   {
+    slug: "paharpur",
+    title: "Paharpur",
+    description: "Rocky cliffs, a winding river, and dry hills — a June afternoon at Paharpur.",
+    coverSlug: "paharpur-20260619-bird-on-palm",
+    photoSlugs: [
+      "paharpur-20260619-scene-01",
+      "paharpur-20260619-scene-02",
+      "paharpur-20260619-scene-03",
+      "paharpur-20260619-scene-04",
+      "paharpur-20260619-bird-on-palm",
+      "paharpur-20260619-river-valley",
+      "paharpur-20260619-rocky-cliff-river-01",
+      "paharpur-20260619-river-hills",
+      "paharpur-20260619-dark-rock-face",
+      "paharpur-20260619-river-cliff-bare-tree",
+      "paharpur-20260619-rocky-cliffside",
+    ],
+  },
+  {
     slug: "dwarakeswar-river",
     title: "Dwarakeswar River",
     description: "Photos along the Dwarakeswar River.",
@@ -205,25 +224,6 @@ export const albums: Album[] = [
     description: "Scenes from the road to Sikkim.",
     coverSlug: "img-20250330-152723182-hdr",
     photoSlugs: ["img-20250330-152723182-hdr"],
-  },
-  {
-    slug: "paharpur",
-    title: "Paharpur",
-    description: "Rocky cliffs, a winding river, and dry hills — a June afternoon at Paharpur.",
-    coverSlug: "paharpur-20260619-bird-on-palm",
-    photoSlugs: [
-      "paharpur-20260619-scene-01",
-      "paharpur-20260619-scene-02",
-      "paharpur-20260619-scene-03",
-      "paharpur-20260619-scene-04",
-      "paharpur-20260619-bird-on-palm",
-      "paharpur-20260619-river-valley",
-      "paharpur-20260619-rocky-cliff-river-01",
-      "paharpur-20260619-river-hills",
-      "paharpur-20260619-dark-rock-face",
-      "paharpur-20260619-river-cliff-bare-tree",
-      "paharpur-20260619-rocky-cliffside",
-    ],
   },
 ];
 
