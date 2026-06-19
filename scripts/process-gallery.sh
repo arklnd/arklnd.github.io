@@ -39,7 +39,7 @@ for img in "${files[@]}"; do
   # 1. Thumbnail for gallery grid (400px wide, webp)
   convert "$img" \
     -resize 400x \
-    -quality 80 \
+    -quality 75 \
     "$THUMB_DIR/${filename}.webp"
 
   # 2. Display image (original size, watermarked with logo + text, webp)
@@ -54,7 +54,6 @@ for img in "${files[@]}"; do
     -font "DejaVu-Sans" \
     -pointsize 28 \
     -annotate +20+20 "$WATERMARK_TEXT" \
-    -quality 85 \
     "$DISPLAY_DIR/${filename}.webp"
 
   # 3. OG image for social previews (1200x630, jpg for max compatibility)
