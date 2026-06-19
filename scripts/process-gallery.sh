@@ -49,11 +49,11 @@ for img in "${files[@]}"; do
     -resize 400x \
     -quality 75 \
     \( \
-      \( "$LOGO" -resize x20 -alpha set -channel A -evaluate Multiply 0.6 +channel \) \
-      \( -background none -fill "rgba(255,255,255,0.35)" -font "DejaVu-Sans" -pointsize 16 label:"$WATERMARK_TEXT" \) \
+      \( "$LOGO" -resize x13 -alpha set -channel A -evaluate Multiply 0.6 +channel \) \
+      \( -background none -fill "rgba(255,255,255,0.35)" -font "DejaVu-Sans" -pointsize 10 label:"$WATERMARK_TEXT" \) \
       -gravity center +append \
     \) \
-    -gravity southeast -geometry +10+8 -composite \
+    -gravity southeast -geometry +7+5 -composite \
     "$THUMB_DIR/${filename}.webp"
 
   # 2. Display image (original size, watermarked with logo + text, webp)
