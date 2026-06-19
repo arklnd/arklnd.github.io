@@ -197,16 +197,14 @@ const jsonLd = JSON.stringify({
 
 <script define:vars={{ prevUrl: prevPhoto ? `/photo-gallery/${prevPhoto.slug}` : null, nextUrl: nextPhoto ? `/photo-gallery/${nextPhoto.slug}` : null }}>
   let touchStartX = 0;
-  let touchEndX = 0;
   const MIN_SWIPE = 50;
 
-  document.addEventListener("touchstart", (e) => {
+  function onTouchStart(e) {
     touchStartX = e.changedTouches[0].screenX;
-  });
+  }
 
-  document.addEventListener("touchend", (e) => {
-    touchEndX = e.changedTouches[0].screenX;
-    const diff = touchStartX - touchEndX;
+  function onTouchEnd(e) {
+    const diff = touchStartX - e.changedTouches[0].screenX;
     if (Math.abs(diff) < MIN_SWIPE) return;
 
     if (diff > 0 && nextUrl) {
@@ -214,5 +212,18 @@ const jsonLd = JSON.stringify({
     } else if (diff < 0 && prevUrl) {
       window.location.href = prevUrl;
     }
-  });
+  }
+
+  const viewer = document.querySelector(".photo-viewer");
+  if (viewer) {
+    viewer.addEventListener("touchstart", onTouchStart);
+    viewer.addEventListener("touchend", onTouchEnd);
+  }
+
+  document.addEventListener("astro:before-swap", () => {
+    if (viewer) {
+      viewer.removeEventListener("touchstart", onTouchStart);
+      viewer.removeEventListener("touchend", onTouchEnd);
+    }
+  }, { once: true });
 </script>
