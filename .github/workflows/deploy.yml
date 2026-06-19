@@ -29,7 +29,7 @@ jobs:
       - name: Restore processed gallery cache
         if: inputs.force_gallery != true
         id: gallery-cache
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: |
             public/images/gallery/thumbs
@@ -44,6 +44,16 @@ jobs:
       - name: Process gallery images
         if: steps.gallery-cache.outputs.cache-hit != 'true'
         run: bash scripts/process-gallery.sh
+
+      - name: Save gallery cache
+        if: steps.gallery-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            public/images/gallery/thumbs
+            public/images/gallery/display
+            public/images/gallery/og
+          key: gallery-${{ hashFiles('public/images/gallery/*.jpg', 'public/images/gallery/*.jpeg', 'public/images/gallery/*.png', 'public/images/gallery/*.webp') }}
 
       - name: Install, build, and upload your site
         uses: withastro/action@v3
