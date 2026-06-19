@@ -45,7 +45,7 @@ for img in "${files[@]}"; do
   # 2. Display image (original size, watermarked with logo + text, webp)
   LOGO="public/pwa-512x512.png"
   convert "$img" \
-    \( "$LOGO" -resize x28 -alpha set -channel A -evaluate Multiply 0.35 +channel \) \
+    \( "$LOGO" -resize x48 -alpha set -channel A -evaluate Multiply 0.6 +channel \) \
     -gravity southeast \
     -geometry +80+16 \
     -composite \
