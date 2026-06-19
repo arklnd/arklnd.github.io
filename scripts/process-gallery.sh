@@ -19,6 +19,7 @@ OG_DIR="$GALLERY_DIR/og"
 mkdir -p "$THUMB_DIR" "$DISPLAY_DIR" "$OG_DIR"
 
 WATERMARK_TEXT="ArijitK.in"
+LOGO="public/pwa-512x512.png"
 
 shopt -s nullglob
 files=("$GALLERY_DIR"/*.jpg "$GALLERY_DIR"/*.jpeg "$GALLERY_DIR"/*.png "$GALLERY_DIR"/*.webp)
@@ -47,10 +48,15 @@ for img in "${files[@]}"; do
   $MAGICK "$img" \
     -resize 400x \
     -quality 75 \
+    \( \
+      \( "$LOGO" -resize x20 -alpha set -channel A -evaluate Multiply 0.6 +channel \) \
+      \( -background none -fill "rgba(255,255,255,0.35)" -font "DejaVu-Sans" -pointsize 16 label:"$WATERMARK_TEXT" \) \
+      -gravity center +append \
+    \) \
+    -gravity southeast -geometry +10+8 -composite \
     "$THUMB_DIR/${filename}.webp"
 
   # 2. Display image (original size, watermarked with logo + text, webp)
-  LOGO="public/pwa-512x512.png"
   $MAGICK "$img" \
     \( \
       \( "$LOGO" -resize x32 -alpha set -channel A -evaluate Multiply 0.6 +channel \) \
@@ -65,6 +71,12 @@ for img in "${files[@]}"; do
     -resize "1200x630^" \
     -gravity center \
     -extent 1200x630 \
+    \( \
+      \( "$LOGO" -resize x28 -alpha set -channel A -evaluate Multiply 0.6 +channel \) \
+      \( -background none -fill "rgba(255,255,255,0.35)" -font "DejaVu-Sans" -pointsize 24 label:"$WATERMARK_TEXT" \) \
+      -gravity center +append \
+    \) \
+    -gravity southeast -geometry +16+12 -composite \
     -quality 85 \
     "$OG_DIR/${filename}.jpg"
 
