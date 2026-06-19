@@ -106,10 +106,12 @@ const jsonLd = JSON.stringify({
   }
 
   .photo-frame {
-    border-radius: 8px;
+    border-radius: 0;
     overflow: hidden;
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
+    background: var(--color-frame);
+    border: 1px solid #acacac;
+    padding: 8px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
     margin-bottom: var(--space-lg);
   }
 
@@ -117,6 +119,7 @@ const jsonLd = JSON.stringify({
     width: 100%;
     height: auto;
     display: block;
+    border-radius: 6px;
   }
 
   .photo-info {

@@ -14,6 +14,7 @@
   --color-bg: #e6e9ed;
   --color-surface: #edf0f3;
   --color-border: #c5cad2;
+  --color-frame: #ffffff;
   --color-link: #3d6aa8;
   --color-link-hover: #2c4f82;
   --color-code-bg: #dce0e5;
@@ -174,6 +175,7 @@ img {
   --color-bg: #1a1a1a;
   --color-surface: #222220;
   --color-border: #333331;
+  --color-frame: #2a2a28;
   --color-link: #6ba3f5;
   --color-link-hover: #93bbf8;
   --color-code-bg: #2a2a28;
