@@ -76,7 +76,7 @@ const albumsWithCards = albums.map((album) => {
 
   .albums-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: 3rem 2rem;
   }
 
@@ -175,24 +175,9 @@ const albumsWithCards = albums.map((album) => {
   }
 
   @media (max-width: 600px) {
-    .albums-grid {
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 2.5rem 1.5rem;
-    }
-
     .card-fan {
       width: 150px;
       height: 210px;
-    }
-  }
-
-  @media (max-width: 600px) {
-    .albums-grid {
-      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-      gap: var(--space-sm);
-    }
-  }
-</style>
     }
   }
 </style>
