@@ -1,7 +1,7 @@
 import rss from "@astrojs/rss";
 import { getCollection } from "astro:content";
 import type { APIContext } from "astro";
-import photos from "../data/gallery";
+import photos from "../data/photos";
 
 export async function GET(context: APIContext) {
   const posts = (await getCollection("posts", ({ data }) => !data.draft)).sort(

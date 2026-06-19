@@ -11,6 +11,19 @@ export interface GalleryPhoto {
   place?: string;
 }
 
+export interface Album {
+  /** Unique slug — used in the URL */
+  slug: string;
+  /** Display title of the album */
+  title: string;
+  /** Optional description */
+  description?: string;
+  /** Slug of the photo to use as cover; defaults to first photo */
+  coverSlug?: string;
+  /** Ordered list of photo slugs that belong to this album */
+  photoSlugs: string[];
+}
+
 const photos: GalleryPhoto[] = [
   {
     slug: "img-20260617-190601093",
@@ -80,6 +93,40 @@ const photos: GalleryPhoto[] = [
     filename: "PXL_20221011_173351638.jpg",
     caption: "",
     date: "2022-10-11",
+  },
+];
+
+export const albums: Album[] = [
+  {
+    slug: "dwarakeswar-river",
+    title: "Dwarakeswar River",
+    description: "Photos along the Dwarakeswar River.",
+    coverSlug: "img-20260617-190601093",
+    photoSlugs: [
+      "img-20260617-190601093",
+      "pxl-20260419-171757455",
+      "pxl-20260419-171757455-png",
+    ],
+  },
+  {
+    slug: "futiyari-dam",
+    title: "Futiyari Dam",
+    coverSlug: "img-20260517-174154563",
+    photoSlugs: ["img-20260517-174154563"],
+  },
+  {
+    slug: "rdb-primarc-techno-park",
+    title: "RDB Primarc Techno Park",
+    description: "Indoor shots at RDB Primarc Techno Park, Kolkata.",
+    coverSlug: "pxl-20260106-151337751",
+    photoSlugs: ["pxl-20260106-151337751", "pxl-20260106-151551465"],
+  },
+  {
+    slug: "way-to-sikkim",
+    title: "Way to Sikkim",
+    description: "Scenes from the road to Sikkim.",
+    coverSlug: "img-20250330-152723182-hdr",
+    photoSlugs: ["img-20250330-152723182-hdr"],
   },
 ];
 
