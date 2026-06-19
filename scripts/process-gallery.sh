@@ -2,7 +2,14 @@
 set -euo pipefail
 
 # Process gallery images: generate thumbnails, watermarked display, and OG images
-# Requires: ImageMagick (convert)
+# Requires: ImageMagick (v6 or v7)
+
+# ImageMagick v7 uses 'magick', v6 uses 'convert'/'identify'
+if command -v magick &>/dev/null; then
+  MAGICK="magick"
+else
+  MAGICK="convert"
+fi
 
 GALLERY_DIR="public/images/gallery"
 THUMB_DIR="$GALLERY_DIR/thumbs"
@@ -37,14 +44,14 @@ for img in "${files[@]}"; do
   echo "Processing: $filename"
 
   # 1. Thumbnail for gallery grid (400px wide, webp)
-  convert "$img" \
+  $MAGICK "$img" \
     -resize 400x \
     -quality 75 \
     "$THUMB_DIR/${filename}.webp"
 
   # 2. Display image (original size, watermarked with logo + text, webp)
   LOGO="public/pwa-512x512.png"
-  convert "$img" \
+  $MAGICK "$img" \
     \( "$LOGO" -resize x48 -alpha set -channel A -evaluate Multiply 0.6 +channel \) \
     -gravity southeast \
     -geometry +80+16 \
@@ -57,7 +64,7 @@ for img in "${files[@]}"; do
     "$DISPLAY_DIR/${filename}.webp"
 
   # 3. OG image for social previews (1200x630, jpg for max compatibility)
-  convert "$img" \
+  $MAGICK "$img" \
     -resize "1200x630^" \
     -gravity center \
     -extent 1200x630 \
