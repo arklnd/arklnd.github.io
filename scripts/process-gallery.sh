@@ -46,6 +46,7 @@ for img in "${files[@]}"; do
 
   # 1. Thumbnail for gallery grid (400px wide, webp)
   $MAGICK "$img" \
+    -auto-orient \
     -resize 400x \
     -quality 75 \
     \( \
@@ -58,6 +59,7 @@ for img in "${files[@]}"; do
 
   # 2. Display image (original size, watermarked with logo + text, webp)
   $MAGICK "$img" \
+    -auto-orient \
     \( \
       \( "$LOGO" -resize x32 -alpha set -channel A -evaluate Multiply 0.6 +channel \) \
       \( -background none -fill "rgba(255,255,255,0.35)" -font "DejaVu-Sans" -pointsize 28 label:"$WATERMARK_TEXT" \) \
@@ -68,6 +70,7 @@ for img in "${files[@]}"; do
 
   # 3. OG image for social previews (1200x630, jpg for max compatibility)
   $MAGICK "$img" \
+    -auto-orient \
     -resize "1200x630^" \
     -gravity center \
     -extent 1200x630 \
