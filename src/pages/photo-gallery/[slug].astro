@@ -92,6 +92,10 @@ const albumMap: Record<string, string> = Object.fromEntries(
 </Layout>
 
 <style>
+  :global(.page:has(.photo-viewer)) {
+    max-width: 95dvw;
+  }
+
   .photo-viewer {
     padding: var(--space-xl) var(--space-lg);
     max-width: 100%;
