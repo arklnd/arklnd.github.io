@@ -53,6 +53,12 @@ jobs:
         if: steps.gallery-cache.outputs.cache-hit != 'true'
         run: bash scripts/process-gallery.sh
 
+      - name: Remove source gallery images from build
+        run: |
+          cd public/images/gallery
+          find . -maxdepth 1 -type f \( -name '*.jpg' -o -name '*.jpeg' -o -name '*.png' -o -name '*.webp' \) -delete
+          echo "Removed source images from deploy output"
+
       - name: Install, build, and upload your site
         uses: withastro/action@v3
         with:
