@@ -298,12 +298,12 @@ export const albums: Album[] = [
   {
     slug: "rdb-primarc-techno-park",
     title: "RDB Primarc Techno Park",
-    description: "Indoor shots at RDB Primarc Techno Park, Kolkata.",
+    description: "Indoor and outdoor shots at RDB Primarc Techno Park, Kolkata.",
     coverSlug: "pxl-20260106-151337751",
-    tags: ["indoor", "architecture", "office", "urban", "Kolkata"],
+    tags: ["indoor", "outdoor", "architecture", "office", "urban", "Kolkata"],
     location: "Kolkata, West Bengal, India",
     date: "2026-01-06",
-    photoSlugs: ["pxl-20260106-151337751", "pxl-20260106-151551465"],
+    photoSlugs: ["pxl-20260106-151337751", "pxl-20260106-151551465", "img-20260302-141825905"],
   },
   {
     slug: "way-to-sikkim",
