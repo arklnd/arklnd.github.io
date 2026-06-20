@@ -433,6 +433,10 @@ const albumMap: Record<string, string> = Object.fromEntries(
   // ── Touch handlers ──
   let touchFingers = 0; // track max fingers used during gesture
   let swipeStartY = 0;
+  let pinchMidX = 0;
+  let pinchMidY = 0;
+  let pinchStartTx = 0;
+  let pinchStartTy = 0;
 
   function onTouchStart(e) {
     if (e.touches.length === 2) {
@@ -440,6 +444,14 @@ const albumMap: Record<string, string> = Object.fromEntries(
       touchFingers = 2;
       startDist  = pinchDist(e.touches[0], e.touches[1]);
       startScale = scale;
+      // Store pinch midpoint relative to frame centre
+      const rect = frame.getBoundingClientRect();
+      const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+      const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+      pinchMidX = midX - rect.left - rect.width / 2;
+      pinchMidY = midY - rect.top - rect.height / 2;
+      pinchStartTx = tx;
+      pinchStartTy = ty;
       e.preventDefault();
     } else if (e.touches.length === 1) {
       touchFingers = 1;
@@ -456,10 +468,14 @@ const albumMap: Record<string, string> = Object.fromEntries(
     if (e.touches.length === 2) {
       touchFingers = 2; // mark as multi-finger even if started as 1
       if (isPinching) {
-        scale = clamp(
+        const newScale = clamp(
           startScale * (pinchDist(e.touches[0], e.touches[1]) / startDist),
           1, MAX_SCALE
         );
+        // Keep the pinch midpoint stationary (same logic as wheel zoom)
+        tx = pinchMidX - (pinchMidX - pinchStartTx) * (newScale / startScale);
+        ty = pinchMidY - (pinchMidY - pinchStartTy) * (newScale / startScale);
+        scale = newScale;
         if (scale > 1) loadHiRes();
         applyTransform(false);
         e.preventDefault();
