@@ -18,7 +18,7 @@ OG_DIR="$GALLERY_DIR/og"
 
 mkdir -p "$THUMB_DIR" "$DISPLAY_DIR" "$OG_DIR"
 
-WATERMARK_TEXT="ArijitK.in"
+WATERMARK_TEXT="© ArijitK.in"
 LOGO="public/pwa-512x512.png"
 
 shopt -s nullglob
