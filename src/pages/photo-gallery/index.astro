@@ -194,7 +194,7 @@ const albumsWithCards = albums.map((album) => {
 
   .gallery-grid {
     columns: 4 250px;
-    column-gap: var(--space-md);
+    column-gap: var(--space-lg);
   }
 
   /* ── Albums grid ── */
@@ -305,19 +305,31 @@ const albumsWithCards = albums.map((album) => {
   }
 
   .gallery-item {
-    border-radius: 8px;
+    border-radius: 4px;
     overflow: hidden;
     background: var(--color-surface);
     border: 1px solid var(--color-border);
+    padding: 1.5%;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.32), 0 2px 6px rgba(0, 0, 0, 0.18);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
     break-inside: avoid;
-    margin-bottom: var(--space-md);
+    margin-bottom: var(--space-lg);
+    transform: rotate(var(--rot, 0deg));
+    position: relative;
   }
 
+  .gallery-item:nth-child(7n+1) { --rot: -1.8deg; margin-top: 10px; }
+  .gallery-item:nth-child(7n+2) { --rot: 2.4deg; margin-top: 0px; }
+  .gallery-item:nth-child(7n+3) { --rot: -0.5deg; margin-top: 18px; }
+  .gallery-item:nth-child(7n+4) { --rot: 1.6deg; margin-top: 4px; }
+  .gallery-item:nth-child(7n+5) { --rot: -2.8deg; margin-top: 14px; }
+  .gallery-item:nth-child(7n+6) { --rot: 0.9deg; margin-top: 8px; }
+  .gallery-item:nth-child(7n+7) { --rot: -1.2deg; margin-top: 22px; }
+
   .gallery-item:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14), 0 2px 6px rgba(0, 0, 0, 0.08);
+    transform: rotate(0deg) translateY(-4px) scale(1.03);
+    box-shadow: 0 14px 36px rgba(0, 0, 0, 0.25), 0 4px 10px rgba(0, 0, 0, 0.12);
+    z-index: 2;
   }
 
   .gallery-img-wrap {
@@ -409,11 +421,19 @@ const albumsWithCards = albums.map((album) => {
   @media (max-width: 600px) {
     .gallery-grid {
       columns: 2 150px;
-      column-gap: var(--space-sm);
+      column-gap: var(--space-md);
     }
 
     .gallery-item {
-      margin-bottom: var(--space-sm);
+      margin-bottom: var(--space-md);
     }
+
+    .gallery-item:nth-child(7n+1) { --rot: -1.2deg; }
+    .gallery-item:nth-child(7n+2) { --rot: 1.6deg; }
+    .gallery-item:nth-child(7n+3) { --rot: -0.4deg; }
+    .gallery-item:nth-child(7n+4) { --rot: 1.0deg; }
+    .gallery-item:nth-child(7n+5) { --rot: -1.8deg; }
+    .gallery-item:nth-child(7n+6) { --rot: 0.6deg; }
+    .gallery-item:nth-child(7n+7) { --rot: -0.8deg; }
   }
 </style>
