@@ -31,17 +31,38 @@ const siteUrl = Astro.site?.origin || "https://arijitk.in";
 const ogImage = `${siteUrl}/images/gallery/og/${photo.filename}.jpg`;
 const displayImage = isDev ? `/images/gallery/${photo.filename}` : `/images/gallery/display/${photo.filename}.webp`;
 const pageUrl = `${siteUrl}/photo-gallery/${photo.slug}`;
-const description = `${photo.caption}${photo.place ? ` — ${photo.place}` : ""}`;
+
+// ── SEO: build rich description & keywords ──
+const photoAlbums = albums.filter((a) => a.photoSlugs.includes(photo.slug));
+const altText = photo.alt || photo.caption;
+
+const description = photo.caption
+  ? `${photo.caption}${photo.place ? ` — ${photo.place}` : ""}`
+  : photo.place
+    ? `Photo taken at ${photo.place} on ${formattedDate}`
+    : `Photo by Arijit Kundu — ${formattedDate}`;
+
+const keywords = [
+  ...(photo.tags ?? []),
+  ...(photo.place ? [photo.place] : []),
+  ...(photo.camera ? [photo.camera] : []),
+  ...photoAlbums.map((a) => a.title),
+  "photography",
+  "Arijit Kundu",
+].join(", ");
 
 const jsonLd = JSON.stringify({
   "@context": "https://schema.org",
   "@type": "ImageObject",
-  name: photo.caption,
+  name: photo.caption || altText,
   description,
   contentUrl: ogImage,
   url: pageUrl,
   datePublished: photo.date,
   ...(photo.place && { contentLocation: { "@type": "Place", name: photo.place } }),
+  ...(photo.camera && { exifData: [{ "@type": "PropertyValue", name: "camera", value: photo.camera }] }),
+  ...(photo.tags?.length && { keywords: photo.tags.join(", ") }),
+  ...(photoAlbums.length && { isPartOf: photoAlbums.map((a) => ({ "@type": "ImageGallery", name: a.title, url: `${siteUrl}/photo-albums/${a.slug}` })) }),
   author: { "@type": "Person", name: "Arijit Kundu" },
 });
 const albumMap: Record<string, string> = Object.fromEntries(
@@ -49,8 +70,11 @@ const albumMap: Record<string, string> = Object.fromEntries(
 );
 ---
 
-<Layout title={photo.caption} description={description} ogImage={ogImage} bare>
-  <script slot="head" type="application/ld+json" set:html={jsonLd} />
+<Layout title={photo.caption || altText} description={description} ogImage={ogImage} bare>
+  <Fragment slot="head">
+    <meta name="keywords" content={keywords} />
+    <script type="application/ld+json" set:html={jsonLd} />
+  </Fragment>
   <article class="photo-viewer">
     <a href="/photo-gallery" class="back-link" id="back-link">&larr; Back to Gallery</a>
 
@@ -58,7 +82,7 @@ const albumMap: Record<string, string> = Object.fromEntries(
       <div class="img-loader"></div>
       <img
         src={displayImage}
-        alt={photo.caption}
+        alt={altText}
         loading="eager"
         decoding="async"
         onload="this.previousElementSibling.style.display='none';this.classList.add('loaded')"

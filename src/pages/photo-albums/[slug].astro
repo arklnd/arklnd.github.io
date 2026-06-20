@@ -30,18 +30,22 @@ const ogImage = coverPhoto
   ? `${siteUrl}/images/gallery/og/${coverPhoto.filename}.jpg`
   : undefined;
 
-// ── SEO: extract keywords from album photos ──
+// ── SEO: combine album + photo keywords (deduplicated) ──
 const uniquePlaces = [...new Set(albumPhotos.map((p) => p.place).filter(Boolean))];
 const uniqueCaptions = [...new Set(albumPhotos.map((p) => p.caption).filter(Boolean))];
-const keywords = [
+const photoTags = albumPhotos.flatMap((p) => p.tags ?? []);
+const allKeywords = [
   album.title,
+  ...(album.tags ?? []),
+  ...(album.location ? [album.location] : []),
+  ...photoTags,
   ...uniquePlaces,
   ...uniqueCaptions,
   "photo album",
   "photography",
   "Arijit Kundu",
-  "Arijit's Blog",
-].join(", ");
+];
+const keywords = [...new Set(allKeywords.map((k) => k.toLowerCase()))].join(", ");
 
 const albumDescription =
   album.description ??
@@ -54,6 +58,9 @@ const albumJsonLd = JSON.stringify({
   description: albumDescription,
   url: `${siteUrl}/photo-albums/${album.slug}`,
   numberOfItems: albumPhotos.length,
+  ...(album.date && { datePublished: album.date }),
+  ...(album.location && { contentLocation: { "@type": "Place", name: album.location } }),
+  ...(album.tags?.length && { keywords: album.tags.join(", ") }),
   author: { "@type": "Person", name: "Arijit Kundu" },
   ...(ogImage ? { image: ogImage } : {}),
 });
@@ -115,7 +122,7 @@ const albumJsonLd = JSON.stringify({
                 src={isDev
                   ? `/images/gallery/${photo.filename}`
                   : `/images/gallery/thumbs/${photo.filename}.webp`}
-                alt={photo.caption}
+                alt={photo.alt || photo.caption}
                 loading="lazy"
                 decoding="async"
                 onload="this.previousElementSibling.style.display='none';this.classList.add('loaded')"
