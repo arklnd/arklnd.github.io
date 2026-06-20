@@ -26,10 +26,11 @@ const formattedDate = new Date(photo.date).toLocaleDateString("en-US", {
   day: "numeric",
 });
 
-const isDev = import.meta.env.DEV;
+const isDev = import.meta.env.DEV || import.meta.env.PUBLIC_LOCAL_DEV === "true";
+const base = import.meta.env.BASE_URL;
 const siteUrl = Astro.site?.origin || "https://arijitk.in";
 const ogImage = `${siteUrl}/images/gallery/og/${photo.filename}.jpg`;
-const displayImage = isDev ? `/images/gallery/${photo.filename}` : `/images/gallery/display/${photo.filename}.webp`;
+const displayImage = isDev ? `${base}images/gallery/${photo.filename}` : `${base}images/gallery/display/${photo.filename}.webp`;
 const pageUrl = `${siteUrl}/photo-gallery/${photo.slug}`;
 
 // ── SEO: build rich description & keywords ──
@@ -76,7 +77,7 @@ const albumMap: Record<string, string> = Object.fromEntries(
     <script type="application/ld+json" set:html={jsonLd} />
   </Fragment>
   <article class="photo-viewer">
-    <a href="/photo-gallery" class="back-link" id="back-link">&larr; Back to Gallery</a>
+    <a href={`${base}photo-gallery`} class="back-link" id="back-link">&larr; Back to Gallery</a>
 
     <figure class="photo-frame">
       <div class="img-loader"></div>
@@ -106,12 +107,12 @@ const albumMap: Record<string, string> = Object.fromEntries(
 
     <nav class="photo-nav" aria-label="Photo navigation">
       {prevPhoto ? (
-        <a href={`/photo-gallery/${prevPhoto.slug}`} class="nav-prev">&larr; Previous</a>
+        <a href={`${base}photo-gallery/${prevPhoto.slug}`} class="nav-prev">&larr; Previous</a>
       ) : (
         <span class="nav-disabled">&larr; Previous</span>
       )}
       {nextPhoto ? (
-        <a href={`/photo-gallery/${nextPhoto.slug}`} class="nav-next">Next &rarr;</a>
+        <a href={`${base}photo-gallery/${nextPhoto.slug}`} class="nav-next">Next &rarr;</a>
       ) : (
         <span class="nav-disabled">Next &rarr;</span>
       )}
@@ -360,7 +361,7 @@ const albumMap: Record<string, string> = Object.fromEntries(
   }
 </style>
 
-<script define:vars={{ prevUrl: prevPhoto ? `/photo-gallery/${prevPhoto.slug}` : null, nextUrl: nextPhoto ? `/photo-gallery/${nextPhoto.slug}` : null, albumMap }}>
+<script define:vars={{ prevUrl: prevPhoto ? `${import.meta.env.BASE_URL}photo-gallery/${prevPhoto.slug}` : null, nextUrl: nextPhoto ? `${import.meta.env.BASE_URL}photo-gallery/${nextPhoto.slug}` : null, albumMap, baseUrl: import.meta.env.BASE_URL }}>
   const frame = document.querySelector(".photo-frame");
   const img = frame ? frame.querySelector("img") : null;
   if (!frame || !img) return;
@@ -662,12 +663,12 @@ const albumMap: Record<string, string> = Object.fromEntries(
     if (match) {
       const slug = match[1];
       const title = albumMap[slug];
-      link.href = title ? `/photo-albums/${slug}` : "/photo-albums";
+      link.href = title ? `${baseUrl}photo-albums/${slug}` : `${baseUrl}photo-albums`;
       link.textContent = `\u2190 Back to ${title ?? "Albums"}`;
     }
     // If referrer was /photo-albums (index), point there
     else if (refUrl.includes("/photo-albums")) {
-      link.href = "/photo-albums";
+      link.href = `${baseUrl}photo-albums`;
       link.textContent = "\u2190 Back to Albums";
     }
     // else keep default "← Back to Gallery"

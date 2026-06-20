@@ -2,7 +2,8 @@
 import Layout from "../../components/Layout.astro";
 import photos, { albums } from "../../data/photos";
 
-const isDev = import.meta.env.DEV;
+const isDev = import.meta.env.DEV || import.meta.env.PUBLIC_LOCAL_DEV === "true";
+const base = import.meta.env.BASE_URL;
 
 // Get up to 4 photos per album for the fanned card stack
 // Cover photo is placed last so it renders on top (highest z-order)
@@ -22,8 +23,8 @@ const albumsWithCards = albums.map((album) => {
     <h1 class="albums-title">Photo Albums</h1>
 
     <div class="view-toggle">
-      <a href="/photo-gallery" class="toggle-btn">Gallery</a>
-      <a href="/photo-albums" class="toggle-btn active">Albums</a>
+      <a href={`${base}photo-gallery`} class="toggle-btn">Gallery</a>
+      <a href={`${base}photo-albums`} class="toggle-btn active">Albums</a>
     </div>
 
     {albums.length === 0 && (
@@ -32,7 +33,7 @@ const albumsWithCards = albums.map((album) => {
 
     <div class="albums-grid">
       {albumsWithCards.map(({ album, cards }) => (
-        <a href={`/photo-albums/${album.slug}`} class="album-hand">
+        <a href={`${base}photo-albums/${album.slug}`} class="album-hand">
           <div class="card-fan">
             {cards.map((photo, i) => (
               <div
@@ -41,8 +42,8 @@ const albumsWithCards = albums.map((album) => {
               >
                 <img
                   src={isDev
-                    ? `/images/gallery/${photo!.filename}`
-                    : `/images/gallery/thumbs/${photo!.filename}.webp`}
+                    ? `${base}images/gallery/${photo!.filename}`
+                    : `${base}images/gallery/thumbs/${photo!.filename}.webp`}
                   alt={photo!.caption || album.title}
                   loading="lazy"
                   decoding="async"

@@ -451,7 +451,7 @@ const formattedDate = post.data.date.toLocaleDateString("en-US", {
             if (document.fullscreenElement) {
               document.exitFullscreen();
             } else {
-              window.location.href = '/posts/' + postSlug;
+              window.location.href = import.meta.env.BASE_URL + 'posts/' + postSlug;
             }
           }
           if (e.key === 'f' || e.key === 'F') { toggleFullscreen(); }

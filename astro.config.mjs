@@ -11,6 +11,7 @@ const commitHash = execSync("git rev-parse --short HEAD").toString().trim();
 
 export default defineConfig({
   site: "https://arijitk.in",
+  base: process.env.ASTRO_BASE || "/",
   integrations: [
     mdx(),
     sitemap(),

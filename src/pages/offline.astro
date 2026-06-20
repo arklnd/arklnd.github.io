@@ -8,7 +8,7 @@ import Heading from "../components/Heading.astro";
     <Heading as="h1">You're Offline</Heading>
     <p>It looks like you've lost your internet connection.</p>
     <p>Previously visited pages may still be available from the cache.</p>
-    <a href="/">← Try going home</a>
+    <a href={import.meta.env.BASE_URL}>← Try going home</a>
   </section>
 </Layout>
 

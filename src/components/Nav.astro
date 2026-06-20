@@ -1,9 +1,10 @@
 ---
 const currentPath = Astro.url.pathname;
+const base = import.meta.env.BASE_URL;
 ---
 
 <nav class="nav" aria-label="Main">
-  <a href="/" class="nav-brand" aria-label="Arijit's Blog">
+  <a href={base} class="nav-brand" aria-label="Arijit's Blog">
     <svg class="brand-logo" width="30" height="34" viewBox="-2 -6 46 54" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <defs>
         <linearGradient id="brand-grad" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -41,7 +42,7 @@ const currentPath = Astro.url.pathname;
   </a>
   <ul class="nav-links" role="list">
     <li>
-      <a href="/" class:list={[{ active: currentPath === "/" || currentPath === "/"}]} aria-current={currentPath === "/" || currentPath === "/" ? "page" : undefined}> 
+      <a href={base} class:list={[{ active: currentPath === "/" || currentPath === "/"}]} aria-current={currentPath === "/" || currentPath === "/" ? "page" : undefined}> 
         <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M3 9.5L12 3l9 6.5V21a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z" />
         </svg>
@@ -49,7 +50,7 @@ const currentPath = Astro.url.pathname;
       </a>
     </li>
     <li>
-      <a href="/search" class:list={[{ active: currentPath === "/search" || currentPath === "/search/" }]} aria-current={currentPath === "/search" || currentPath === "/search/" ? "page" : undefined}> 
+      <a href={`${base}search`} class:list={[{ active: currentPath === "/search" || currentPath === "/search/" }]} aria-current={currentPath === "/search" || currentPath === "/search/" ? "page" : undefined}> 
         <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <circle cx="11" cy="11" r="7" />
           <line x1="21" y1="21" x2="16.65" y2="16.65" />
@@ -58,7 +59,7 @@ const currentPath = Astro.url.pathname;
       </a>
     </li>
     <li>
-      <a href="/about" class:list={[{ active: currentPath === "/about" || currentPath === "/about/" }]} aria-current={currentPath === "/about" || currentPath === "/about/" ? "page" : undefined}> 
+      <a href={`${base}about`} class:list={[{ active: currentPath === "/about" || currentPath === "/about/" }]} aria-current={currentPath === "/about" || currentPath === "/about/" ? "page" : undefined}> 
         <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <circle cx="12" cy="12" r="10" />
           <line x1="12" y1="16" x2="12" y2="12" />

@@ -1,18 +1,19 @@
 ---
 const year = new Date().getFullYear();
+const base = import.meta.env.BASE_URL;
 ---
 
 <footer class="footer" aria-label="Site footer">
   <nav class="footer-nav" aria-label="Footer navigation">
-    <a href="/photo-gallery">Photo Gallery</a>
+    <a href={`${base}photo-gallery`}>Photo Gallery</a>
     <span class="footer-dot" aria-hidden="true">&middot;</span>
-    <a href="/photo-albums">Photo Albums</a>
+    <a href={`${base}photo-albums`}>Photo Albums</a>
     <span class="footer-dot" aria-hidden="true">&middot;</span>
-    <a href="/tags">Tags</a>
+    <a href={`${base}tags`}>Tags</a>
     <span class="footer-dot" aria-hidden="true">&middot;</span>
-    <a href="/rss.xml" aria-label="RSS Feed">RSS</a>
+    <a href={`${base}rss.xml`} aria-label="RSS Feed">RSS</a>
     <span class="footer-dot" aria-hidden="true">&middot;</span>
-    <a href="/sitemap-index.xml" aria-label="Sitemap">Sitemap</a>
+    <a href={`${base}sitemap-index.xml`} aria-label="Sitemap">Sitemap</a>
     <span class="footer-dot" aria-hidden="true">&middot;</span>
     <a href="https://github.com/a1kundu" target="_blank" rel="noopener noreferrer">GitHub<span class="sr-only"> (opens in a new tab)</span></a>
     <span class="footer-dot" aria-hidden="true">&middot;</span>

@@ -53,7 +53,7 @@ import "../components/PostCard.astro";
 
   async function loadIndex(): Promise<void> {
     if (loaded) return;
-    const res = await fetch("/search-index.json");
+    const res = await fetch(`${import.meta.env.BASE_URL}search-index.json`);
     index = await res.json();
     loaded = true;
   }
@@ -141,7 +141,7 @@ import "../components/PostCard.astro";
       const li = document.createElement("li");
       li.className = "pc pc--list";
       li.innerHTML = `
-        <a href="/posts/${entry.slug}" class="pc-link">
+        <a href="${import.meta.env.BASE_URL}posts/${entry.slug}" class="pc-link">
           <div class="pc-body">
             <span class="pc-title">${highlight(entry.title, terms)}</span>
             <span class="reaction-badge" data-slug="${entry.slug}"></span>

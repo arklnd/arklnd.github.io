@@ -71,7 +71,7 @@ const jsonLd = [
   <script slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
   <section class="tag-page">
     <header class="tag-header">
-      <a href="/tags" class="back-link" aria-label="Back to all tags">&larr; All Tags</a>
+      <a href={`${import.meta.env.BASE_URL}tags`} class="back-link" aria-label="Back to all tags">&larr; All Tags</a>
       <Heading as="h1">{tag}</Heading>
       <p class="tag-count">{posts.length} post{posts.length !== 1 ? "s" : ""}</p>
     </header>

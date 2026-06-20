@@ -8,7 +8,7 @@ import Heading from "../components/Heading.astro";
     <Heading as="h1">Error 404</Heading>
     <b>Page (<code>{Astro.url.pathname}</code>) Not Found</b>
     <p>The page you're looking for doesn't exist.</p>
-    <a href="/">← Back to home</a>
+    <a href={import.meta.env.BASE_URL}>← Back to home</a>
   </section>
 </Layout>
 

@@ -3,7 +3,8 @@ import Layout from "../../components/Layout.astro";
 import ReactionsBadge from "../../components/ReactionsBadge.astro";
 import photos from "../../data/photos";
 
-const isDev = import.meta.env.DEV;
+const isDev = import.meta.env.DEV || import.meta.env.PUBLIC_LOCAL_DEV === "true";
+const base = import.meta.env.BASE_URL;
 ---
 
 <Layout title="Photo Gallery" description="Photo Gallery">
@@ -11,8 +12,8 @@ const isDev = import.meta.env.DEV;
     <h1 class="gallery-title">Photo Gallery</h1>
 
     <div class="view-toggle">
-      <a href="/photo-gallery" class="toggle-btn active">Gallery</a>
-      <a href="/photo-albums" class="toggle-btn">Albums</a>
+      <a href={`${base}photo-gallery`} class="toggle-btn active">Gallery</a>
+      <a href={`${base}photo-albums`} class="toggle-btn">Albums</a>
     </div>
 
     {photos.length === 0 && (
@@ -23,10 +24,10 @@ const isDev = import.meta.env.DEV;
       {photos.map((photo) => (
         <figure class="gallery-item">
           <div class="gallery-img-wrap">
-            <a href={`/photo-gallery/${photo.slug}`}>
+            <a href={`${base}photo-gallery/${photo.slug}`}>
               <div class="img-loader"></div>
               <img
-                src={isDev ? `/images/gallery/${photo.filename}` : `/images/gallery/thumbs/${photo.filename}.webp`}
+                src={isDev ? `${base}images/gallery/${photo.filename}` : `${base}images/gallery/thumbs/${photo.filename}.webp`}
                 alt={photo.caption}
                 loading="lazy"
                 decoding="async"

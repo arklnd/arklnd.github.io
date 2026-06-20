@@ -21,7 +21,7 @@ if (size !== "micro") {
 {size === "micro" ? (
   <span class="tp tp--micro">{label}</span>
 ) : (
-  <a href={`/tags/${tag}`} class:list={["tp", size === "small" && "tp--sm"]}>
+  <a href={`${import.meta.env.BASE_URL}tags/${tag}`} class:list={["tp", size === "small" && "tp--sm"]}>
     <span class="tp-name">{label}</span>
     <span class="tp-count">{count}</span>
   </a>
