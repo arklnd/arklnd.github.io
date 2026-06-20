@@ -593,6 +593,14 @@ const albumMap: Record<string, string> = Object.fromEntries(
     }
   }
 
+  // ── Arrow key navigation ──
+  function onKeyDown(e) {
+    if (scale > 1) return; // don't navigate while zoomed
+    if (e.key === "ArrowLeft" && prevUrl) { e.preventDefault(); window.location.href = prevUrl; }
+    else if (e.key === "ArrowRight" && nextUrl) { e.preventDefault(); window.location.href = nextUrl; }
+  }
+
+  document.addEventListener("keydown", onKeyDown);
   frame.addEventListener("wheel",      onWheel,     { passive: false });
   frame.addEventListener("mousedown",  onMouseDown);
   frame.addEventListener("dblclick",   onDblClick);
@@ -619,6 +627,7 @@ const albumMap: Record<string, string> = Object.fromEntries(
     frame.removeEventListener("dblclick",   onDblClick);
     document.removeEventListener("mousemove", onMouseMove);
     document.removeEventListener("mouseup",   onMouseUp);
+    document.removeEventListener("keydown",   onKeyDown);
     if (fsBtn) fsBtn.removeEventListener("click", toggleFullscreen);
     if (document.fullscreenElement) document.exitFullscreen();
   }, { once: true });
