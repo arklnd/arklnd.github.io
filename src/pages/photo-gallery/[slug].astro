@@ -307,14 +307,20 @@ const albumMap: Record<string, string> = Object.fromEntries(
   }
 
   // ── Touch handlers ──
+  let touchFingers = 0; // track max fingers used during gesture
+  let swipeStartY = 0;
+
   function onTouchStart(e) {
     if (e.touches.length === 2) {
       isPinching = true;
+      touchFingers = 2;
       startDist  = pinchDist(e.touches[0], e.touches[1]);
       startScale = scale;
       e.preventDefault();
     } else if (e.touches.length === 1) {
+      touchFingers = 1;
       swipeStartX = e.touches[0].clientX;
+      swipeStartY = e.touches[0].clientY;
       if (scale > 1) {
         startPanX = e.touches[0].clientX - tx;
         startPanY = e.touches[0].clientY - ty;
@@ -323,13 +329,16 @@ const albumMap: Record<string, string> = Object.fromEntries(
   }
 
   function onTouchMove(e) {
-    if (e.touches.length === 2 && isPinching) {
-      scale = clamp(
-        startScale * (pinchDist(e.touches[0], e.touches[1]) / startDist),
-        1, MAX_SCALE
-      );
-      applyTransform(false);
-      e.preventDefault();
+    if (e.touches.length === 2) {
+      touchFingers = 2; // mark as multi-finger even if started as 1
+      if (isPinching) {
+        scale = clamp(
+          startScale * (pinchDist(e.touches[0], e.touches[1]) / startDist),
+          1, MAX_SCALE
+        );
+        applyTransform(false);
+        e.preventDefault();
+      }
     } else if (e.touches.length === 1 && scale > 1) {
       tx = e.touches[0].clientX - startPanX;
       ty = e.touches[0].clientY - startPanY;
@@ -343,8 +352,16 @@ const albumMap: Record<string, string> = Object.fromEntries(
       isPinching = false;
       // Snap back to 1 if barely zoomed
       if (scale < 1.12) resetZoom(true);
+      touchFingers = 0;
       return; // never navigate after a pinch gesture
     }
+
+    // Never swipe if two fingers were used at any point
+    if (touchFingers >= 2) {
+      touchFingers = 0;
+      return;
+    }
+    touchFingers = 0;
 
     // Double-tap to reset zoom
     const now = Date.now();
@@ -359,7 +376,13 @@ const albumMap: Record<string, string> = Object.fromEntries(
     if (scale > 1) return;
 
     const dx = swipeStartX - e.changedTouches[0].clientX;
+    const dy = swipeStartY - e.changedTouches[0].clientY;
+
+    // Only swipe if horizontal distance is significant AND
+    // horizontal movement dominates vertical (ratio > 2:1)
     if (Math.abs(dx) < MIN_SWIPE) return;
+    if (Math.abs(dy) > Math.abs(dx) * 0.5) return;
+
     if (dx > 0 && nextUrl) window.location.href = nextUrl;
     else if (dx < 0 && prevUrl) window.location.href = prevUrl;
   }
