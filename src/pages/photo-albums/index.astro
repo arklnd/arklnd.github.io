@@ -21,6 +21,11 @@ const albumsWithCards = albums.map((album) => {
   <article class="albums-page">
     <h1 class="albums-title">Photo Albums</h1>
 
+    <div class="view-toggle">
+      <a href="/photo-gallery" class="toggle-btn">Gallery</a>
+      <a href="/photo-albums" class="toggle-btn active">Albums</a>
+    </div>
+
     {albums.length === 0 && (
       <p class="albums-empty">No albums yet. Add entries to <code>src/data/gallery.ts</code>.</p>
     )}
@@ -68,7 +73,45 @@ const albumsWithCards = albums.map((album) => {
     font-family: var(--font-heading);
     font-size: 2rem;
     font-weight: 700;
+    margin-bottom: var(--space-md);
+    color: var(--color-text);
+    text-align: center;
+  }
+
+  /* ── Toggle ── */
+  .view-toggle {
+    display: flex;
+    justify-content: center;
+    gap: 0;
     margin-bottom: var(--space-xl);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 4px;
+    width: fit-content;
+    margin-inline: auto;
+  }
+
+  .toggle-btn {
+    font-family: var(--font-heading);
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.4rem 1.2rem;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--color-text-tertiary);
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+
+  .toggle-btn:hover {
+    color: var(--color-text);
+  }
+
+  .toggle-btn.active {
+    background: var(--color-border);
     color: var(--color-text);
   }
 
