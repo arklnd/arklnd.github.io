@@ -29,13 +29,45 @@ const coverPhoto = album.coverSlug
 const ogImage = coverPhoto
   ? `${siteUrl}/images/gallery/og/${coverPhoto.filename}.jpg`
   : undefined;
+
+// ── SEO: extract keywords from album photos ──
+const uniquePlaces = [...new Set(albumPhotos.map((p) => p.place).filter(Boolean))];
+const uniqueCaptions = [...new Set(albumPhotos.map((p) => p.caption).filter(Boolean))];
+const keywords = [
+  album.title,
+  ...uniquePlaces,
+  ...uniqueCaptions,
+  "photo album",
+  "photography",
+  "Arijit Kundu",
+  "Arijit's Blog",
+].join(", ");
+
+const albumDescription =
+  album.description ??
+  `${album.title} — A photo album with ${albumPhotos.length} photos${uniquePlaces.length ? ` from ${uniquePlaces.join(", ")}` : ""}.`;
+
+const albumJsonLd = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "ImageGallery",
+  name: album.title,
+  description: albumDescription,
+  url: `${siteUrl}/photo-albums/${album.slug}`,
+  numberOfItems: albumPhotos.length,
+  author: { "@type": "Person", name: "Arijit Kundu" },
+  ...(ogImage ? { image: ogImage } : {}),
+});
 ---
 
 <Layout
   title={album.title}
-  description={album.description ?? `${album.title} — Photo Album`}
+  description={albumDescription}
   ogImage={ogImage}
 >
+  <Fragment slot="head">
+    <meta name="keywords" content={keywords} />
+    <script type="application/ld+json" set:html={albumJsonLd} />
+  </Fragment>
   <article class="album-page">
 
     <!-- ── Cinematic hero ── -->
