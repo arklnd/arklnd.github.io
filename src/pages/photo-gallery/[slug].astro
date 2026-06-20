@@ -360,22 +360,10 @@ const albumMap: Record<string, string> = Object.fromEntries(
   }
 </style>
 
-<script define:vars={{ prevUrl: prevPhoto ? `/photo-gallery/${prevPhoto.slug}` : null, nextUrl: nextPhoto ? `/photo-gallery/${nextPhoto.slug}` : null, albumMap, fullResImage: `/images/gallery/${photo.filename}` }}>
+<script define:vars={{ prevUrl: prevPhoto ? `/photo-gallery/${prevPhoto.slug}` : null, nextUrl: nextPhoto ? `/photo-gallery/${nextPhoto.slug}` : null, albumMap }}>
   const frame = document.querySelector(".photo-frame");
   const img = frame ? frame.querySelector("img") : null;
   if (!frame || !img) return;
-
-  // ── Hi-res swap: load full-res image on first zoom ──
-  let hiResLoaded = false;
-  function loadHiRes() {
-    if (hiResLoaded) return;
-    hiResLoaded = true;
-    const preload = new Image();
-    preload.src = fullResImage;
-    preload.onload = () => {
-      if (img.src !== preload.src) img.src = fullResImage;
-    };
-  }
 
   // ── State ──
   let scale = 1;
@@ -476,7 +464,6 @@ const albumMap: Record<string, string> = Object.fromEntries(
         tx = pinchMidX - (pinchMidX - pinchStartTx) * (newScale / startScale);
         ty = pinchMidY - (pinchMidY - pinchStartTy) * (newScale / startScale);
         scale = newScale;
-        if (scale > 1) loadHiRes();
         applyTransform(false);
         e.preventDefault();
       }
@@ -545,9 +532,6 @@ const albumMap: Record<string, string> = Object.fromEntries(
     const newScale = clamp(scale * factor, 1, MAX_SCALE);
 
     if (newScale === scale) return;
-
-    // Load full-resolution image on first zoom
-    if (newScale > 1) loadHiRes();
 
     // Keep the image point under the cursor stationary
     tx = mx - (mx - tx) * (newScale / scale);
