@@ -267,8 +267,8 @@ const albumMap: Record<string, string> = Object.fromEntries(
     border-radius: 6px;
     transition: opacity 0.3s ease;
     opacity: 0;
-    transform-origin: 0 0;
-    will-change: transform, width;
+    transform-origin: center center;
+    will-change: transform;
     cursor: zoom-in;
   }
 
@@ -393,11 +393,6 @@ const albumMap: Record<string, string> = Object.fromEntries(
   }
 
   function applyTransform(animate) {
-    // Lock frame height on first zoom to prevent container growth
-    if (scale > 1 && !frame.style.height) {
-      frame.style.height = frame.offsetHeight + "px";
-    }
-
     // Clamp pan so the image edge doesn't go past the frame centre
     if (scale > 1) {
       const maxX = (frame.offsetWidth  * (scale - 1)) / 2;
@@ -409,21 +404,9 @@ const albumMap: Record<string, string> = Object.fromEntries(
       ty = 0;
     }
 
-    // Use actual width resize instead of scale() for sharp rendering
-    const renderTx = tx - frame.offsetWidth * (scale - 1) / 2;
-    const renderTy = ty - frame.offsetHeight * (scale - 1) / 2;
-
-    if (animate) img.style.transition = "width 0.22s ease, transform 0.22s ease";
-    img.style.width = `${scale * 100}%`;
-    img.style.maxWidth = "none";
-    img.style.transform = `translate(${renderTx}px, ${renderTy}px)`;
+    if (animate) img.style.transition = "transform 0.22s ease";
+    img.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
     if (animate) setTimeout(() => { img.style.transition = ""; }, 230);
-
-    if (scale <= 1) {
-      img.style.width = "";
-      img.style.maxWidth = "";
-      frame.style.height = "";
-    }
 
     img.classList.toggle("zoomed", scale > 1);
     img.classList.remove("dragging");
