@@ -942,6 +942,9 @@ const supabaseKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
       if (emoji && emojiNames[emoji]) btn.title = emojiNames[emoji];
     });
 
+    // Expose handleToggle globally for double-tap love reaction
+    window.__reactionsToggle = handleToggle;
+
     renderReactions();
   }
 

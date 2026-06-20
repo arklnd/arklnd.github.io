@@ -134,6 +134,22 @@ const albumMap: Record<string, string> = Object.fromEntries(
     margin-bottom: var(--space-lg);
     touch-action: pan-y;
     user-select: none;
+    position: relative;
+  }
+
+  :global(.dbl-tap-heart) {
+    position: absolute;
+    font-size: 4rem;
+    pointer-events: none;
+    transform: translate(-50%, -50%) scale(0);
+    animation: heart-pop 0.8s ease forwards;
+    z-index: 10;
+  }
+
+  @keyframes heart-pop {
+    0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+    50% { transform: translate(-50%, -50%) scale(1.3); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
   }
 
   .img-loader {
@@ -370,10 +386,11 @@ const albumMap: Record<string, string> = Object.fromEntries(
     }
     touchFingers = 0;
 
-    // Double-tap to reset zoom
+    // Double-tap to reset zoom or trigger love reaction
     const now = Date.now();
     if (now - lastTap < 280 && e.changedTouches.length === 1) {
       if (scale > 1) resetZoom(true);
+      else triggerLoveReaction(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
       lastTap = 0;
       return;
     }
@@ -442,9 +459,32 @@ const albumMap: Record<string, string> = Object.fromEntries(
     img.classList.remove("dragging");
   }
 
-  // Double-click to reset zoom
+  // Double-click to reset zoom or trigger love reaction
   function onDblClick(e) {
     if (scale > 1) { resetZoom(true); e.preventDefault(); }
+    else { triggerLoveReaction(e.clientX, e.clientY); e.preventDefault(); }
+  }
+
+  // ── Double-tap/click love reaction ──
+  function triggerLoveReaction(x, y) {
+    // Show heart animation
+    const heart = document.createElement("span");
+    heart.className = "dbl-tap-heart";
+    heart.textContent = "❤️";
+    const rect = frame.getBoundingClientRect();
+    heart.style.left = (x - rect.left) + "px";
+    heart.style.top = (y - rect.top) + "px";
+    frame.appendChild(heart);
+    heart.addEventListener("animationend", () => heart.remove());
+
+    // Trigger the reaction
+    if (window.__reactionsToggle) {
+      const state = window.__reactionsState;
+      // Only add if user hasn't already reacted with ❤️
+      if (!state || !state.userReactions.includes("❤️")) {
+        window.__reactionsToggle("❤️");
+      }
+    }
   }
 
   frame.addEventListener("wheel",      onWheel,     { passive: false });
