@@ -94,10 +94,17 @@ const albumMap: Record<string, string> = Object.fromEntries(
 <style>
   :global(.page:has(.photo-viewer)) {
     max-width: 95dvw;
+    padding-inline: 0;
+  }
+
+  @media (max-width: 600px) {
+    :global(.page:has(.photo-viewer)) {
+      max-width: 100%;
+    }
   }
 
   .photo-viewer {
-    padding: var(--space-xl) var(--space-lg);
+    padding: var(--space-xl) var(--space-md);
     max-width: 100%;
     margin: 0 auto;
   }
