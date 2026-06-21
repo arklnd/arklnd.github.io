@@ -139,7 +139,8 @@ const { src, alt } = Astro.props;
       let pointerY = 0;
       let velocityX = 0;  // momentum horizontal (deg/frame)
       let velocityY = 0;  // momentum vertical (deg/frame)
-      const FRICTION = 0.92;  // decay per frame (0 = instant stop, 1 = no friction)
+      const DRAG_SENSITIVITY = 0.105;
+      const FRICTION = 0.924;  // decay per frame (0 = instant stop, 1 = no friction)
       const MIN_VELOCITY = 0.01;
 
       el.addEventListener("pointerdown", (e) => {
@@ -155,8 +156,8 @@ const { src, alt } = Astro.props;
       el.addEventListener("pointermove", (e) => {
         if (!isPointerDown || isPinching) return;
         const fovScale = fov / 90; // finer control when zoomed in
-        const dx = (e.clientX - pointerX) * 0.1 * fovScale;
-        const dy = (e.clientY - pointerY) * 0.1 * fovScale;
+        const dx = (e.clientX - pointerX) * DRAG_SENSITIVITY * fovScale;
+        const dy = (e.clientY - pointerY) * DRAG_SENSITIVITY * fovScale;
         velocityX = -dx;
         velocityY = dy;
         lon += velocityX;
