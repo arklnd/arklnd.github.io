@@ -347,6 +347,14 @@ const albumJsonLd = JSON.stringify({
     margin-top: 12px;
   }
 
+  /* Reaction picker opens upward so overflow:hidden on hero-img-wrap doesn't clip it */
+  .hero-reactions :global(.reaction-picker) {
+    top: auto;
+    bottom: 100%;
+    margin-top: 0;
+    margin-bottom: var(--space-sm);
+  }
+
   /* Override Reactions component colours for the dark hero */
   .hero-reactions :global(.reaction-add-btn) {
     color: rgba(255, 255, 255, 0.7);
