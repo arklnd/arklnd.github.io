@@ -107,14 +107,18 @@ const albumMap: Record<string, string> = Object.fromEntries(
 
     <nav class="viewer-overlay nav-overlay" aria-label="Photo navigation">
       {prevPhoto ? (
-        <a href={`${base}photo-gallery/${prevPhoto.slug}`} class="nav-prev" aria-label="Previous photo">&larr;</a>
+        <a href={`${base}photo-gallery/${prevPhoto.slug}`} class="nav-prev" aria-label="Previous photo">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+        </a>
       ) : (
-        <span class="nav-disabled">&larr;</span>
+        <span class="nav-disabled"></span>
       )}
       {nextPhoto ? (
-        <a href={`${base}photo-gallery/${nextPhoto.slug}`} class="nav-next" aria-label="Next photo">&rarr;</a>
+        <a href={`${base}photo-gallery/${nextPhoto.slug}`} class="nav-next" aria-label="Next photo">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+        </a>
       ) : (
-        <span class="nav-disabled">&rarr;</span>
+        <span class="nav-disabled"></span>
       )}
     </nav>
   </article>
@@ -292,7 +296,7 @@ const albumMap: Record<string, string> = Object.fromEntries(
     border-radius: 50%;
     background: rgba(0, 0, 0, 0.4);
     color: #fff;
-    font-size: 1.25rem;
+    line-height: 1;
     text-decoration: none;
     transition: background 0.15s ease, opacity 0.15s ease;
     opacity: 0.7;
