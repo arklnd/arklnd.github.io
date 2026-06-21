@@ -36,6 +36,8 @@ export interface Album {
   location?: string;
   /** Album date (YYYY-MM-DD) for datePublished in JSON-LD */
   date?: string;
+  /** Map link for the album location */
+  mapLink?: string;
 }
 
 const photos: GalleryPhoto[] = [
@@ -184,6 +186,8 @@ const photos: GalleryPhoto[] = [
     alt: "The Dwarakeswar River flowing through the countryside at dusk",
     date: "2026-06-17",
     tags: ["river", "Dwarakeswar", "dusk", "water", "nature"],
+    camera: "Moto G64",
+    coords: { lat: 23.3225212, lng: 86.8884317 }, // Chandidas Setu, Dwarakeswar River
   },
   {
     slug: "img-20260517-174154563",
@@ -407,7 +411,8 @@ export const albums: Album[] = [
     description: "Rocky cliffs, a winding river, and dry hills — a June afternoon at Paharpur.",
     coverSlug: "paharpur-20260619-scene-03",
     tags: ["landscape", "nature", "river", "rocks", "cliff", "wildlife", "rural India"],
-    location: "Paharpur, West Bengal, India",
+    location: "Paharpur, Purulia, West Bengal",
+    mapLink: "https://maps.app.goo.gl/CQtFQYjkV1c3Vspj6",
     date: "2026-06-19",
     photoSlugs: [
       "paharpur-20260619-scene-01",
@@ -432,7 +437,8 @@ export const albums: Album[] = [
     description: "Photos along the Dwarakeswar River.",
     coverSlug: "img-20260617-190601093",
     tags: ["river", "Dwarakeswar", "water", "nature", "West Bengal"],
-    location: "West Bengal, India",
+    location: "Chandidas Setu, Chhatna - Kamalpur Rd",
+    mapLink: "https://maps.app.goo.gl/XXM8ydPDMCJzqY7o8",
     date: "2026-06-17",
     photoSlugs: [
       "img-20260617-190601093",
@@ -446,7 +452,8 @@ export const albums: Album[] = [
     description: "The Futiyari Dam reservoir and its surroundings.",
     coverSlug: "img-20260517-174154563",
     tags: ["dam", "reservoir", "water", "infrastructure", "Futiyari"],
-    location: "West Bengal, India",
+    location: "Purilia, West Bengal, India",
+    mapLink: "https://maps.app.goo.gl/yGsJsSRjMzJH4LJN6",
     date: "2026-05-17",
     photoSlugs: ["img-20260517-174154563", "img-20260517-174031654", "img-20260517-174206858"],
   },
@@ -466,7 +473,8 @@ export const albums: Album[] = [
     description: "A tranquil village on the edge of Neora Valley National Park at 6,500 ft — dense tropical forests, misty dawns, and distant views of Kanchenjunga.",
     coverSlug: "img-20251220-062804772",
     tags: ["Kolakham", "Neora Valley", "Kalimpong", "West Bengal", "forest", "dawn", "Kanchenjunga", "mountains", "nature", "travel", "northeast India"],
-    location: "Kolakham, Kalimpong, West Bengal, India",
+    location: "Kolakham, Kalimpong, West Bengal",
+    mapLink: "https://maps.app.goo.gl/pEtCjAZ2kWFhyeyt7",
     date: "2025-12-20",
     photoSlugs: ["img-20251220-062804772", "img-20251220-062814776-hdr"],
   },
@@ -476,7 +484,8 @@ export const albums: Album[] = [
     description: "A quiet Lepcha hamlet at ~8,500 ft amid forests of pine, birch, and fir — panoramic sunrise views of snow-capped Kanchenjunga and the eastern Himalayan range.",
     coverSlug: "img-20251220-200019338-hdr",
     tags: ["Rishop", "Rishyap", "Kalimpong", "West Bengal", "Kanchenjunga", "Lepcha", "pine forest", "mountains", "sunrise", "HDR", "travel", "northeast India"],
-    location: "Rishop, Kalimpong, West Bengal, India",
+    location: "Rishop, Kalimpong, West Bengal",
+    mapLink: "https://maps.app.goo.gl/2bxqHgXP7iKziFNo9",
     date: "2025-12-19",
     photoSlugs: ["img-20251219-143756653", "img-20251220-200019338-hdr"],
   },
@@ -486,7 +495,8 @@ export const albums: Album[] = [
     description: "Forest dawns at Kolakham (6,500 ft) and panoramic Kanchenjunga views at Rishop (8,500 ft) — a December circuit through the offbeat hills of Kalimpong district.",
     coverSlug: "img-20251220-062804772",
     tags: ["Rishop", "Kolakham", "Kalimpong", "Neora Valley", "Kanchenjunga", "West Bengal", "mountains", "forest", "travel", "northeast India", "North Bengal"],
-    location: "Kolakham & Rishop, Kalimpong, West Bengal, India",
+    location: "Kolakham & Rishop, Kalimpong, West Bengal",
+    mapLink: "https://maps.app.goo.gl/cGuCkagMaTqmAcKn9",
     date: "2025-12-19",
     photoSlugs: [
       "img-20251219-143756653",
