@@ -36,7 +36,7 @@ const { src, alt } = Astro.props;
     RepeatWrapping,
   } from "three";
 
-  (function () {
+  function setupPanoramaViewer() {
     const wrap = document.getElementById("pano-wrap") as HTMLElement | null;
     const canvas = document.getElementById("pano-canvas");
     const loader = document.getElementById("pano-loader") as HTMLElement | null;
@@ -46,6 +46,8 @@ const { src, alt } = Astro.props;
     const src = wrap.dataset.src!;
     // Re-bind as definitely non-null so nested functions don't lose the narrowing
     const el = wrap;
+    if (el.dataset.panoInitialized === "true") return;
+    el.dataset.panoInitialized = "true";
 
     {
       // ── Renderer ──
@@ -190,6 +192,7 @@ const { src, alt } = Astro.props;
       const FOV_MAX = 110;
       let needsRender = false; // render-on-demand flag
       let paused = false; // tab visibility pause
+      let destroyed = false;
 
       // ── Mouse drag ──
       let isPointerDown = false;
@@ -333,6 +336,7 @@ const { src, alt } = Astro.props;
 
       // ── Cleanup on Astro page swap (View Transitions) ──
       const cleanup = () => {
+        destroyed = true;
         ro.disconnect();
         window.removeEventListener("keydown", onKeyDown);
         window.removeEventListener("keyup", onKeyUp);
@@ -353,6 +357,7 @@ const { src, alt } = Astro.props;
       const DEG2RAD = Math.PI / 180;
 
       function animate() {
+        if (destroyed) return;
         requestAnimationFrame(animate);
         if (paused) return;
 
@@ -387,7 +392,10 @@ const { src, alt } = Astro.props;
         }
       }
     }
-  })();
+  }
+
+  document.addEventListener("astro:page-load", setupPanoramaViewer);
+  setupPanoramaViewer();
 </script>
 
 <style>
