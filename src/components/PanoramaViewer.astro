@@ -28,7 +28,6 @@ const { src, alt } = Astro.props;
     CylinderGeometry,
     MeshBasicMaterial,
     Mesh,
-    Texture,
     TextureLoader,
     SRGBColorSpace,
     LinearFilter,
@@ -64,65 +63,9 @@ const { src, alt } = Astro.props;
       // ── Load texture, then build geometry based on aspect ratio ──
       const texLoader = new TextureLoader();
       const progressEl = document.getElementById("pano-progress");
-      let objectUrl: string | null = null;
-      const loaderShownAt = performance.now();
-
-      if (progressEl) progressEl.textContent = "Loading...";
-
-      function hideLoader() {
-        const remaining = Math.max(0, 300 - (performance.now() - loaderShownAt));
-        window.setTimeout(() => {
-          loader.style.display = "none";
-        }, remaining);
-      }
-
-      async function fetchTextureUrl(url: string) {
-        const response = await fetch(url);
-        if (!response.ok) throw new Error(`Failed to load panorama: ${response.status}`);
-
-        const total = Number(response.headers.get("content-length") ?? 0);
-        const contentType = response.headers.get("content-type") ?? "image/jpeg";
-
-        if (!response.body) {
-          const blob = await response.blob();
-          return URL.createObjectURL(blob);
-        }
-
-        const reader = response.body.getReader();
-        const chunks: Uint8Array[] = [];
-        let received = 0;
-
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          if (!value) continue;
-          chunks.push(value);
-          received += value.length;
-
-          if (progressEl) {
-            progressEl.textContent = total > 0
-              ? `${Math.round((received / total) * 100)}%`
-              : `${Math.round(received / 1024)} KB`;
-          }
-        }
-
-        const blob = new Blob(chunks, { type: contentType });
-        return URL.createObjectURL(blob);
-      }
-
-      function loadTexture(url: string) {
-        return new Promise<Texture>((resolve, reject) => {
-          texLoader.load(url, resolve, undefined, reject);
-        });
-      }
-
-      fetchTextureUrl(src)
-        .then((url) => {
-          objectUrl = url;
-          if (progressEl) progressEl.textContent = "Decoding...";
-          return loadTexture(url);
-        })
-        .then((tex) => {
+      texLoader.load(
+        src,
+        (tex) => {
           tex.colorSpace = SRGBColorSpace;
           tex.generateMipmaps = false;
           tex.minFilter = LinearFilter;
@@ -169,19 +112,26 @@ const { src, alt } = Astro.props;
             LAT_MAX = Math.min(85, vertCoverageDeg / 2 - 5);
           }
 
+          loader.style.display = "none";
           needsRender = true;
           resize();
           animate();
-          hideLoader();
           // Fade hint out after a few seconds
           setTimeout(() => {
             if (hint) hint.style.opacity = "0";
           }, 3500);
-        })
-        .catch((err) => {
+        },
+        (event) => {
+          if (progressEl && event.lengthComputable) {
+            const pct = Math.round((event.loaded / event.total) * 100);
+            progressEl.textContent = `${pct}%`;
+          }
+        },
+        (err) => {
           console.error("PanoramaViewer: texture load error", err);
-          if (progressEl) progressEl.textContent = "Could not load panorama";
-        });
+          loader.style.display = "none";
+        }
+      );
 
       // ── View state ──
       let lon = 0;   // horizontal angle (degrees)
@@ -348,7 +298,6 @@ const { src, alt } = Astro.props;
             obj.material.dispose();
           }
         });
-        if (objectUrl) URL.revokeObjectURL(objectUrl);
         renderer.dispose();
       };
       document.addEventListener("astro:before-swap", cleanup, { once: true });
