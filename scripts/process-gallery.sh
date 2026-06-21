@@ -72,8 +72,14 @@ for img in "${files[@]}"; do
     "$THUMB_DIR/${filename}.webp"
 
   # 2. Display image (original size, watermarked, webp)
+  # WebP max dimension is 16383px — resize panoramas to fit
+  RESIZE_FLAG=""
+  if [ "$IMG_W" -gt 16383 ] || [ "$IMG_H" -gt 16383 ]; then
+    RESIZE_FLAG="-resize 16383x16383>"
+  fi
   $MAGICK "$img" \
     -auto-orient \
+    $RESIZE_FLAG \
     \( \
       \( "$LOGO" -resize x32 -alpha set -channel A -evaluate Multiply 0.6 +channel \) \
       \( -background none -fill "rgba(255,255,255,0.35)" -font "DejaVu-Sans" -pointsize 28 label:"$WATERMARK_TEXT" \) \
