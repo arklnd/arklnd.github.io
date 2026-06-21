@@ -32,6 +32,7 @@ const { src, alt } = Astro.props;
     SRGBColorSpace,
     LinearFilter,
     BackSide,
+    RepeatWrapping,
   } from "three";
 
   (function () {
@@ -66,6 +67,8 @@ const { src, alt } = Astro.props;
           tex.colorSpace = SRGBColorSpace;
           tex.generateMipmaps = false;
           tex.minFilter = LinearFilter;
+          tex.wrapS = RepeatWrapping;
+          tex.repeat.x = -1; // flip horizontally to correct BackSide mirror
           material.map = tex;
           material.needsUpdate = true;
 
