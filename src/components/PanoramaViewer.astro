@@ -143,6 +143,7 @@ const { src, alt } = Astro.props;
 
       // ── Mouse drag ──
       let isPointerDown = false;
+      let isPinching = false; // suppress drag during pinch zoom
       let pointerX = 0;
       let pointerY = 0;
       let velocityX = 0;  // momentum horizontal (deg/frame)
@@ -161,7 +162,7 @@ const { src, alt } = Astro.props;
       });
 
       el.addEventListener("pointermove", (e) => {
-        if (!isPointerDown) return;
+        if (!isPointerDown || isPinching) return;
         const dx = (e.clientX - pointerX) * 0.1;
         const dy = (e.clientY - pointerY) * 0.1;
         velocityX = -dx;
@@ -201,10 +202,19 @@ const { src, alt } = Astro.props;
 
       el.addEventListener("touchstart", (e) => {
         if (e.touches.length === 2) {
+          isPinching = true;
+          velocityX = 0;
+          velocityY = 0;
           lastPinchDist = Math.hypot(
             e.touches[0].clientX - e.touches[1].clientX,
             e.touches[0].clientY - e.touches[1].clientY
           );
+        }
+      }, { passive: true });
+
+      el.addEventListener("touchend", (e) => {
+        if (e.touches.length < 2) {
+          isPinching = false;
         }
       }, { passive: true });
 
