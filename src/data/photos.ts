@@ -479,6 +479,21 @@ export const albums: Album[] = [
     photoSlugs: ["img-20251219-143756653", "img-20251220-200019338-hdr"],
   },
   {
+    slug: "kalimpong-tour",
+    title: "Kalimpong Tour",
+    description: "A December trip through the misty hills of Rishop and the forested village of Kolakham.",
+    coverSlug: "img-20251220-062804772",
+    tags: ["Rishop", "Kolakham", "Kalimpong", "Sikkim", "mountains", "forest", "travel", "northeast India"],
+    location: "Rishop & Kolakham, West Bengal / Sikkim, India",
+    date: "2025-12-19",
+    photoSlugs: [
+      "img-20251219-143756653",
+      "img-20251220-062804772",
+      "img-20251220-062814776-hdr",
+      "img-20251220-200019338-hdr",
+    ],
+  },
+  {
     slug: "village-life",
     title: "Village Life",
     description: "Slices of everyday rural life — fields, paths, and quiet afternoons.",
