@@ -17,6 +17,8 @@ export interface GalleryPhoto {
   camera?: string;
   /** GPS coordinates for map linking */
   coords?: { lat: number; lng: number };
+  /** Whether this is an equirectangular / 360° panorama photo */
+  panorama?: boolean;
 }
 
 export interface Album {
@@ -315,6 +317,39 @@ const photos: GalleryPhoto[] = [
   },
   // ── Rishop, 2025-12-19/20 ──
   {
+    slug: "img-20251221-091336086",
+    filename: "IMG_20251221_091336086.jpg",
+    caption: "Rishop — 360° panorama",
+    alt: "Cylindrical 360° panorama from Rishop: sweeping views of the Kanchenjunga range, pine-clad hillsides, and the Himalayan sky",
+    date: "2025-12-21",
+    place: "Rishop, Kalimpong, West Bengal",
+    tags: ["Rishop", "Kalimpong", "mountains", "Kanchenjunga", "panorama", "360", "pine forest", "travel", "northeast India"],
+    camera: "Moto G64",
+    panorama: true,
+  },
+  {
+    slug: "pxl-20251221-091607171",
+    filename: "PXL_20251221_091607171.PHOTOSPHERE.jpg",
+    caption: "Rishop — photosphere",
+    alt: "Full photosphere from Rishop at ~8,500 ft: 360° immersive view of snow-capped Kanchenjunga, forested ridges, and a Lepcha hamlet under clear sky",
+    date: "2025-12-21",
+    place: "Rishop, Kalimpong, West Bengal",
+    tags: ["Rishop", "Kalimpong", "mountains", "Kanchenjunga", "photosphere", "360", "pine forest", "travel", "northeast India"],
+    camera: "Google Pixel",
+    panorama: true,
+  },
+  {
+    slug: "pxl-20251221-091908988",
+    filename: "PXL_20251221_091908988.PHOTOSPHERE.jpg",
+    caption: "Rishop — 360° panorama",
+    alt: "Equirectangular 360° panorama from Rishop at ~8,500 ft: pine-forested hillsides, a hilltop village, and the vast Himalayan range under clear blue sky",
+    date: "2025-12-21",
+    place: "Rishop, Kalimpong, West Bengal",
+    tags: ["Rishop", "Kalimpong", "mountains", "Kanchenjunga", "panorama", "360", "pine forest", "travel", "northeast India"],
+    camera: "Google Pixel",
+    panorama: true,
+  },
+  {
     slug: "img-20251220-200019338-hdr",
     filename: "IMG_20251220_200019338_HDR.jpg",
     caption: "Rishop",
@@ -487,7 +522,7 @@ export const albums: Album[] = [
     location: "Rishop, Kalimpong, West Bengal",
     mapLink: "https://maps.app.goo.gl/2bxqHgXP7iKziFNo9",
     date: "2025-12-19",
-    photoSlugs: ["img-20251219-143756653", "img-20251220-200019338-hdr"],
+    photoSlugs: ["img-20251221-091336086", "pxl-20251221-091607171", "pxl-20251221-091908988", "img-20251219-143756653", "img-20251220-200019338-hdr"],
   },
   {
     slug: "kalimpong-tour",
@@ -499,6 +534,9 @@ export const albums: Album[] = [
     mapLink: "https://maps.app.goo.gl/cGuCkagMaTqmAcKn9",
     date: "2025-12-19",
     photoSlugs: [
+      "img-20251221-091336086",
+      "pxl-20251221-091607171",
+      "pxl-20251221-091908988",
       "img-20251219-143756653",
       "img-20251220-062804772",
       "img-20251220-062814776-hdr",

@@ -1,6 +1,7 @@
 ---
 import Layout from "../../components/Layout.astro";
 import Reactions from "../../components/Reactions.astro";
+import PanoramaViewer from "../../components/PanoramaViewer.astro";
 import photos, { albums } from "../../data/photos";
 import type { GetStaticPaths, InferGetStaticPropsType } from "astro";
 import type { GalleryPhoto } from "../../data/photos";
@@ -81,14 +82,20 @@ const albumMap: Record<string, string> = Object.fromEntries(
       <img src={displayImage} alt="" />
     </div>
     <div class="viewer-canvas" id="viewer-canvas">
-      <div class="img-loader"></div>
-      <img
-        src={displayImage}
-        alt={altText}
-        loading="eager"
-        decoding="async"
-        onload="this.previousElementSibling.style.display='none';this.classList.add('loaded')"
-      />
+      {photo.panorama ? (
+        <PanoramaViewer src={displayImage} alt={altText} />
+      ) : (
+        <>
+          <div class="img-loader"></div>
+          <img
+            src={displayImage}
+            alt={altText}
+            loading="eager"
+            decoding="async"
+            onload="this.previousElementSibling.style.display='none';this.classList.add('loaded')"
+          />
+        </>
+      )}
     </div>
 
     <div class="viewer-overlay top-bar">

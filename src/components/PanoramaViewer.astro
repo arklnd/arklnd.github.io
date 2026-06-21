@@ -1,0 +1,322 @@
+---
+interface Props {
+  src: string;
+  alt: string;
+}
+const { src, alt } = Astro.props;
+---
+
+<div class="pano-wrap" id="pano-wrap" aria-label={alt} role="img" data-src={src}>
+  <canvas id="pano-canvas"></canvas>
+  <div class="pano-loader" id="pano-loader">
+    <div class="pano-spinner"></div>
+  </div>
+  <div class="pano-hint" id="pano-hint" aria-hidden="true">
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20A14.5 14.5 0 0 0 12 2"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
+    <span>Drag to explore · Scroll to zoom</span>
+  </div>
+  <div class="pano-badge" aria-hidden="true">360°</div>
+</div>
+
+<script>
+  import {
+    WebGLRenderer,
+    Scene,
+    PerspectiveCamera,
+    SphereGeometry,
+    CylinderGeometry,
+    MeshBasicMaterial,
+    Mesh,
+    TextureLoader,
+    SRGBColorSpace,
+  } from "three";
+
+  (function () {
+    const wrap = document.getElementById("pano-wrap") as HTMLElement | null;
+    const canvas = document.getElementById("pano-canvas");
+    const loader = document.getElementById("pano-loader") as HTMLElement | null;
+    const hint = document.getElementById("pano-hint") as HTMLElement | null;
+
+    if (!wrap || !canvas || !loader) return;
+    const src = wrap.dataset.src!;
+    // Re-bind as definitely non-null so nested functions don't lose the narrowing
+    const el = wrap;
+
+    {
+      // ── Renderer ──
+      const renderer = new WebGLRenderer({ canvas, antialias: true, alpha: false });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+      // ── Scene / Camera ──
+      const scene = new Scene();
+      const camera = new PerspectiveCamera(90, 1, 0.1, 1000); // fov, aspect, near, far
+      camera.rotation.order = "YXZ";
+
+      const material = new MeshBasicMaterial({ map: null });
+
+      // ── Load texture, then build geometry based on aspect ratio ──
+      const texLoader = new TextureLoader();
+      texLoader.load(
+        src,
+        (tex) => {
+          tex.colorSpace = SRGBColorSpace;
+          material.map = tex;
+          material.needsUpdate = true;
+
+          const imgW = tex.image.width;
+          const imgH = tex.image.height;
+          const ratio = imgW / imgH;
+
+          let mesh: Mesh;
+          if (ratio > 3) {
+            // Cylindrical strip panorama (e.g. 9:1, 4:1)
+            // Assume 360° horizontal; compute cylinder height from aspect ratio
+            const radius = 500;
+            const height = 2 * Math.PI * radius * (imgH / imgW);
+            const geometry = new CylinderGeometry(radius, radius, height, 64, 1, true);
+            geometry.scale(-1, 1, 1); // render on inside
+            mesh = new Mesh(geometry, material);
+          } else {
+            // Equirectangular — full (2:1) or partial photosphere (2.x:1)
+            // Compute vertical angular coverage from aspect ratio
+            const fullHeight = imgW / 2; // height that would cover full 180°
+            const thetaLength = Math.min(Math.PI, (imgH / fullHeight) * Math.PI);
+            const thetaStart = (Math.PI - thetaLength) / 2; // assume centered crop
+            const geometry = new SphereGeometry(500, 60, 40, 0, Math.PI * 2, thetaStart, thetaLength);
+            geometry.scale(-1, 1, 1);
+            mesh = new Mesh(geometry, material);
+          }
+          scene.add(mesh);
+
+          // Clamp vertical look range based on geometry coverage
+          if (ratio > 3) {
+            const vertAngleDeg = (imgH / imgW) * 360;
+            LAT_MAX = Math.min(85, vertAngleDeg / 2 - 5);
+            // Set FOV to fit the strip snugly
+            fov = Math.min(FOV_MAX, Math.max(FOV_MIN, vertAngleDeg * 0.9));
+            camera.fov = fov;
+            camera.updateProjectionMatrix();
+          } else if (ratio > 2.2) {
+            // Partial photosphere — limit vertical look to within coverage
+            const fullHeight = imgW / 2;
+            const vertCoverageDeg = (imgH / fullHeight) * 180;
+            LAT_MAX = Math.min(85, vertCoverageDeg / 2 - 5);
+          }
+
+          loader.style.display = "none";
+          resize();
+          animate();
+          // Fade hint out after a few seconds
+          setTimeout(() => {
+            if (hint) hint.style.opacity = "0";
+          }, 3500);
+        },
+        undefined,
+        (err) => {
+          console.error("PanoramaViewer: texture load error", err);
+          loader.style.display = "none";
+        }
+      );
+
+      // ── View state ──
+      let lon = 0;   // horizontal angle (degrees)
+      let lat = 0;   // vertical angle (degrees)
+      let fov = 90;
+      let LAT_MAX = 85;
+      const FOV_MIN = 30;
+      const FOV_MAX = 110;
+
+      // ── Mouse drag ──
+      let isPointerDown = false;
+      let pointerX = 0;
+      let pointerY = 0;
+
+      el.addEventListener("pointerdown", (e) => {
+        isPointerDown = true;
+        pointerX = e.clientX;
+        pointerY = e.clientY;
+        el.setPointerCapture(e.pointerId);
+        el.style.cursor = "grabbing";
+      });
+
+      el.addEventListener("pointermove", (e) => {
+        if (!isPointerDown) return;
+        const dx = (e.clientX - pointerX) * 0.1;
+        const dy = (e.clientY - pointerY) * 0.1;
+        lon -= dx;
+        lat += dy;
+        lat = Math.max(-LAT_MAX, Math.min(LAT_MAX, lat));
+        pointerX = e.clientX;
+        pointerY = e.clientY;
+      });
+
+      el.addEventListener("pointerup", () => {
+        isPointerDown = false;
+        el.style.cursor = "grab";
+      });
+
+      el.addEventListener("pointercancel", () => {
+        isPointerDown = false;
+        el.style.cursor = "grab";
+      });
+
+      // ── Scroll / wheel zoom ──
+      el.addEventListener("wheel", (e) => {
+        e.preventDefault();
+        fov += e.deltaY * 0.05;
+        fov = Math.max(FOV_MIN, Math.min(FOV_MAX, fov));
+        camera.fov = fov;
+        camera.updateProjectionMatrix();
+      }, { passive: false });
+
+      // ── Touch pinch zoom ──
+      let lastPinchDist = 0;
+
+      el.addEventListener("touchstart", (e) => {
+        if (e.touches.length === 2) {
+          lastPinchDist = Math.hypot(
+            e.touches[0].clientX - e.touches[1].clientX,
+            e.touches[0].clientY - e.touches[1].clientY
+          );
+        }
+      }, { passive: true });
+
+      el.addEventListener("touchmove", (e) => {
+        if (e.touches.length === 2) {
+          const dist = Math.hypot(
+            e.touches[0].clientX - e.touches[1].clientX,
+            e.touches[0].clientY - e.touches[1].clientY
+          );
+          const delta = lastPinchDist - dist;
+          fov += delta * 0.1;
+          fov = Math.max(FOV_MIN, Math.min(FOV_MAX, fov));
+          camera.fov = fov;
+          camera.updateProjectionMatrix();
+          lastPinchDist = dist;
+          e.preventDefault();
+        }
+      }, { passive: false });
+
+      // ── Keyboard look ──
+      const KEYS: Record<string, boolean> = {};
+      window.addEventListener("keydown", (e) => { KEYS[e.key] = true; });
+      window.addEventListener("keyup", (e) => { KEYS[e.key] = false; });
+
+      // ── Resize ──
+      function resize() {
+        const w = el.clientWidth;
+        const h = el.clientHeight;
+        renderer.setSize(w, h);
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+      }
+      const ro = new ResizeObserver(resize);
+      ro.observe(el);
+
+      // ── Animation loop ──
+      const DEG2RAD = Math.PI / 180;
+
+      function animate() {
+        requestAnimationFrame(animate);
+
+        // Keyboard look
+        if (KEYS["ArrowLeft"]  || KEYS["a"] || KEYS["A"]) lon -= 0.35;
+        if (KEYS["ArrowRight"] || KEYS["d"] || KEYS["D"]) lon += 0.35;
+        if (KEYS["ArrowUp"]    || KEYS["w"] || KEYS["W"]) lat = Math.min(LAT_MAX, lat + 0.35);
+        if (KEYS["ArrowDown"]  || KEYS["s"] || KEYS["S"]) lat = Math.max(-LAT_MAX, lat - 0.35);
+        if (KEYS["+"] || KEYS["="]) { fov = Math.max(FOV_MIN, fov - 0.5); camera.fov = fov; camera.updateProjectionMatrix(); }
+        if (KEYS["-"])              { fov = Math.min(FOV_MAX, fov + 0.5); camera.fov = fov; camera.updateProjectionMatrix(); }
+
+        // Use Euler rotation directly (YXZ order) for reliable orientation
+        camera.rotation.y = -lon * DEG2RAD;
+        camera.rotation.x = lat * DEG2RAD;
+
+        renderer.render(scene, camera);
+      }
+    }
+  })();
+</script>
+
+<style>
+  .pano-wrap {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    cursor: grab;
+    user-select: none;
+    touch-action: none;
+    background: #0d0d0d;
+  }
+
+  #pano-canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .pano-loader {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    background: #0d0d0d;
+    pointer-events: none;
+  }
+
+  .pano-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(255,255,255,0.15);
+    border-top-color: var(--color-link, #7fd4e1);
+    border-radius: 50%;
+    animation: pano-spin 0.75s linear infinite;
+  }
+
+  @keyframes pano-spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .pano-badge {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    z-index: 5;
+    padding: 0.2rem 0.55rem;
+    font-family: var(--font-heading, system-ui);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 6px;
+    pointer-events: none;
+  }
+
+  .pano-hint {
+    position: absolute;
+    bottom: 6rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.35rem 0.85rem;
+    font-family: var(--font-heading, system-ui);
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.9);
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 20px;
+    pointer-events: none;
+    transition: opacity 0.8s ease;
+    white-space: nowrap;
+  }
+</style>
