@@ -32,6 +32,7 @@ const base = import.meta.env.BASE_URL;
 const siteUrl = Astro.site?.origin || "https://arijitk.in";
 const ogImage = `${siteUrl}/images/gallery/og/${photo.filename}.jpg`;
 const displayImage = isDev ? `${base}images/gallery/${photo.filename}` : `${base}images/gallery/display/${photo.filename}.webp`;
+const thumbImage = isDev ? `${base}images/gallery/${photo.filename}` : `${base}images/gallery/thumbs/${photo.filename}.webp`;
 const pageUrl = `${siteUrl}/photo-gallery/${photo.slug}`;
 
 // ── SEO: build rich description & keywords ──
@@ -78,9 +79,11 @@ const albumMap: Record<string, string> = Object.fromEntries(
     <script type="application/ld+json" set:html={jsonLd} />
   </Fragment>
   <article class="photo-viewer">
-    <div class="ambient-bg" aria-hidden="true">
-      <img src={displayImage} alt="" />
-    </div>
+    {!photo.panorama && (
+      <div class="ambient-bg" aria-hidden="true">
+        <img src={thumbImage} alt="" fetchpriority="low" decoding="async" />
+      </div>
+    )}
     <div class="viewer-canvas" id="viewer-canvas">
       {photo.panorama ? (
         <PanoramaViewer src={displayImage} alt={altText} />
@@ -172,7 +175,6 @@ const albumMap: Record<string, string> = Object.fromEntries(
     filter: blur(60px) saturate(2.2) brightness(0.42);
     transform: scale(1.15);
     opacity: 1;
-    will-change: filter;
   }
 
   .viewer-canvas {

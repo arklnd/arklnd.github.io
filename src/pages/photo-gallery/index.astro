@@ -133,6 +133,8 @@ const base = import.meta.env.BASE_URL;
     margin-bottom: var(--space-lg);
     transform: rotate(var(--rot, 0deg));
     position: relative;
+    content-visibility: auto;
+    contain-intrinsic-size: auto 250px;
   }
 
   .gallery-item:nth-child(7n+1) { --rot: -1.8deg; margin-top: 10px; }

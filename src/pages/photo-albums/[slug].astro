@@ -446,6 +446,8 @@ const albumJsonLd = JSON.stringify({
     margin-bottom: var(--space-md);
     transform: rotate(var(--rot, 0deg));
     position: relative;
+    content-visibility: auto;
+    contain-intrinsic-size: auto 250px;
   }
 
   .gallery-item:nth-child(7n+1) { --rot: -1.8deg; margin-top: 10px; }
