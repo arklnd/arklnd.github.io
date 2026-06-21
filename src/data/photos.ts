@@ -372,10 +372,10 @@ const photos: GalleryPhoto[] = [
   {
     slug: "img-20250705-180944789-hdr",
     filename: "IMG_20250705_180944789_HDR.jpg",
-    caption: "Village life",
-    alt: "HDR evening scene of rural village life",
+    caption: "",
+    alt: "",
     date: "2025-07-05",
-    tags: ["village", "rural", "HDR", "nature", "evening"],
+    tags: ["flower", "HDR", "nature", "evening"],
   },
   {
     slug: "img-20250330-152723182-hdr",
