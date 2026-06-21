@@ -77,6 +77,9 @@ const albumMap: Record<string, string> = Object.fromEntries(
     <script type="application/ld+json" set:html={jsonLd} />
   </Fragment>
   <article class="photo-viewer">
+    <div class="ambient-bg" aria-hidden="true">
+      <img src={displayImage} alt="" />
+    </div>
     <div class="viewer-canvas" id="viewer-canvas">
       <div class="img-loader"></div>
       <img
@@ -145,15 +148,30 @@ const albumMap: Record<string, string> = Object.fromEntries(
     width: 100dvw;
     height: 100dvh;
     overflow: hidden;
-    background: #000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    background: #0d0d0d;
+  }
+
+  .ambient-bg {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    z-index: 0;
+  }
+
+  .ambient-bg img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: blur(60px) saturate(2.2) brightness(0.42);
+    transform: scale(1.15);
+    opacity: 1;
+    will-change: filter;
   }
 
   .viewer-canvas {
     position: absolute;
     inset: 0;
+    z-index: 1;
     display: flex;
     align-items: center;
     justify-content: center;
