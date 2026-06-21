@@ -44,6 +44,20 @@ for img in "${files[@]}"; do
   NEEDS_CONVERT=true
   echo "Processing: $filename"
 
+  # Detect panoramic images (ratio > 2:1) — skip watermark for display
+  if command -v magick &>/dev/null; then
+    IMG_W=$($MAGICK identify -format "%w" "$img[0]")
+    IMG_H=$($MAGICK identify -format "%h" "$img[0]")
+  else
+    IMG_W=$(identify -format "%w" "$img[0]")
+    IMG_H=$(identify -format "%h" "$img[0]")
+  fi
+  IS_PANO=false
+  if [ "$IMG_H" -gt 0 ] && [ $((IMG_W / IMG_H)) -ge 2 ]; then
+    IS_PANO=true
+    echo "  → Panoramic image detected (${IMG_W}x${IMG_H})"
+  fi
+
   # 1. Thumbnail for gallery grid (400px wide, webp)
   $MAGICK "$img" \
     -auto-orient \
@@ -57,31 +71,50 @@ for img in "${files[@]}"; do
     -gravity southeast -geometry +7+5 -composite \
     "$THUMB_DIR/${filename}.webp"
 
-  # 2. Display image (original size, watermarked with logo + text, webp)
-  $MAGICK "$img" \
-    -auto-orient \
-    \( \
-      \( "$LOGO" -resize x32 -alpha set -channel A -evaluate Multiply 0.6 +channel \) \
-      \( -background none -fill "rgba(255,255,255,0.35)" -font "DejaVu-Sans" -pointsize 28 label:"$WATERMARK_TEXT" \) \
-      -gravity center +append \
-    \) \
-    -gravity southeast -geometry +20+16 -composite \
-    "$DISPLAY_DIR/${filename}.webp"
+  # 2. Display image (watermarked for regular photos, clean for panoramas)
+  if [ "$IS_PANO" = true ]; then
+    # Panorama: no watermark, just auto-orient and convert to webp
+    $MAGICK "$img" \
+      -auto-orient \
+      "$DISPLAY_DIR/${filename}.webp"
+  else
+    $MAGICK "$img" \
+      -auto-orient \
+      \( \
+        \( "$LOGO" -resize x32 -alpha set -channel A -evaluate Multiply 0.6 +channel \) \
+        \( -background none -fill "rgba(255,255,255,0.35)" -font "DejaVu-Sans" -pointsize 28 label:"$WATERMARK_TEXT" \) \
+        -gravity center +append \
+      \) \
+      -gravity southeast -geometry +20+16 -composite \
+      "$DISPLAY_DIR/${filename}.webp"
+  fi
 
   # 3. OG image for social previews (1200x630, jpg for max compatibility)
-  $MAGICK "$img" \
-    -auto-orient \
-    -resize "1200x630^" \
-    -gravity center \
-    -extent 1200x630 \
-    \( \
-      \( "$LOGO" -resize x28 -alpha set -channel A -evaluate Multiply 0.6 +channel \) \
-      \( -background none -fill "rgba(255,255,255,0.35)" -font "DejaVu-Sans" -pointsize 24 label:"$WATERMARK_TEXT" \) \
-      -gravity center +append \
-    \) \
-    -gravity southeast -geometry +16+12 -composite \
-    -quality 85 \
-    "$OG_DIR/${filename}.jpg"
+  if [ "$IS_PANO" = true ]; then
+    # Panorama: resize to fit width, then pad to 1200x630 with black bars
+    $MAGICK "$img" \
+      -auto-orient \
+      -resize "1200x630" \
+      -gravity center \
+      -background black \
+      -extent 1200x630 \
+      -quality 85 \
+      "$OG_DIR/${filename}.jpg"
+  else
+    $MAGICK "$img" \
+      -auto-orient \
+      -resize "1200x630^" \
+      -gravity center \
+      -extent 1200x630 \
+      \( \
+        \( "$LOGO" -resize x28 -alpha set -channel A -evaluate Multiply 0.6 +channel \) \
+        \( -background none -fill "rgba(255,255,255,0.35)" -font "DejaVu-Sans" -pointsize 24 label:"$WATERMARK_TEXT" \) \
+        -gravity center +append \
+      \) \
+      -gravity southeast -geometry +16+12 -composite \
+      -quality 85 \
+      "$OG_DIR/${filename}.jpg"
+  fi
 
   echo "  ✓ thumb, display, og"
 done
