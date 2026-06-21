@@ -30,6 +30,8 @@ const { src, alt } = Astro.props;
     Mesh,
     TextureLoader,
     SRGBColorSpace,
+    LinearFilter,
+    BackSide,
   } from "three";
 
   (function () {
@@ -45,7 +47,7 @@ const { src, alt } = Astro.props;
 
     {
       // ── Renderer ──
-      const renderer = new WebGLRenderer({ canvas, antialias: true, alpha: false });
+      const renderer = new WebGLRenderer({ canvas, antialias: false, alpha: false });
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
       // ── Scene / Camera ──
@@ -53,7 +55,7 @@ const { src, alt } = Astro.props;
       const camera = new PerspectiveCamera(90, 1, 0.1, 1000); // fov, aspect, near, far
       camera.rotation.order = "YXZ";
 
-      const material = new MeshBasicMaterial({ map: null });
+      const material = new MeshBasicMaterial({ map: null, side: BackSide });
 
       // ── Load texture, then build geometry based on aspect ratio ──
       const texLoader = new TextureLoader();
@@ -62,6 +64,8 @@ const { src, alt } = Astro.props;
         src,
         (tex) => {
           tex.colorSpace = SRGBColorSpace;
+          tex.generateMipmaps = false;
+          tex.minFilter = LinearFilter;
           material.map = tex;
           material.needsUpdate = true;
 
@@ -76,7 +80,6 @@ const { src, alt } = Astro.props;
             const radius = 500;
             const height = 2 * Math.PI * radius * (imgH / imgW);
             const geometry = new CylinderGeometry(radius, radius, height, 64, 1, true);
-            geometry.scale(-1, 1, 1); // render on inside
             mesh = new Mesh(geometry, material);
           } else {
             // Equirectangular — full (2:1) or partial photosphere (2.x:1)
@@ -85,7 +88,6 @@ const { src, alt } = Astro.props;
             const thetaLength = Math.min(Math.PI, (imgH / fullHeight) * Math.PI);
             const thetaStart = (Math.PI - thetaLength) / 2; // assume centered crop
             const geometry = new SphereGeometry(500, 60, 40, 0, Math.PI * 2, thetaStart, thetaLength);
-            geometry.scale(-1, 1, 1);
             mesh = new Mesh(geometry, material);
           }
           scene.add(mesh);
@@ -106,6 +108,7 @@ const { src, alt } = Astro.props;
           }
 
           loader.style.display = "none";
+          needsRender = true;
           resize();
           animate();
           // Fade hint out after a few seconds
@@ -132,6 +135,8 @@ const { src, alt } = Astro.props;
       let LAT_MAX = 85;
       const FOV_MIN = 30;
       const FOV_MAX = 110;
+      let needsRender = false; // render-on-demand flag
+      let paused = false; // tab visibility pause
 
       // ── Mouse drag ──
       let isPointerDown = false;
@@ -163,6 +168,7 @@ const { src, alt } = Astro.props;
         lat = Math.max(-LAT_MAX, Math.min(LAT_MAX, lat));
         pointerX = e.clientX;
         pointerY = e.clientY;
+        needsRender = true;
       });
 
       el.addEventListener("pointerup", () => {
@@ -184,6 +190,7 @@ const { src, alt } = Astro.props;
         fov = Math.max(FOV_MIN, Math.min(FOV_MAX, fov));
         camera.fov = fov;
         camera.updateProjectionMatrix();
+        needsRender = true;
       }, { passive: false });
 
       // ── Touch pinch zoom ──
@@ -210,14 +217,17 @@ const { src, alt } = Astro.props;
           camera.fov = fov;
           camera.updateProjectionMatrix();
           lastPinchDist = dist;
+          needsRender = true;
           e.preventDefault();
         }
       }, { passive: false });
 
       // ── Keyboard look ──
       const KEYS: Record<string, boolean> = {};
-      window.addEventListener("keydown", (e) => { KEYS[e.key] = true; });
-      window.addEventListener("keyup", (e) => { KEYS[e.key] = false; });
+      const onKeyDown = (e: KeyboardEvent) => { KEYS[e.key] = true; needsRender = true; };
+      const onKeyUp = (e: KeyboardEvent) => { KEYS[e.key] = false; };
+      window.addEventListener("keydown", onKeyDown);
+      window.addEventListener("keyup", onKeyUp);
 
       // ── Resize ──
       function resize() {
@@ -226,15 +236,40 @@ const { src, alt } = Astro.props;
         renderer.setSize(w, h);
         camera.aspect = w / h;
         camera.updateProjectionMatrix();
+        needsRender = true;
       }
       const ro = new ResizeObserver(resize);
       ro.observe(el);
+
+      // ── Pause when tab hidden ──
+      const onVisChange = () => { paused = document.hidden; if (!paused) needsRender = true; };
+      document.addEventListener("visibilitychange", onVisChange);
+
+      // ── Cleanup on Astro page swap (View Transitions) ──
+      const cleanup = () => {
+        ro.disconnect();
+        window.removeEventListener("keydown", onKeyDown);
+        window.removeEventListener("keyup", onKeyUp);
+        document.removeEventListener("visibilitychange", onVisChange);
+        scene.traverse((obj) => {
+          if (obj instanceof Mesh) {
+            obj.geometry.dispose();
+            if (obj.material.map) obj.material.map.dispose();
+            obj.material.dispose();
+          }
+        });
+        renderer.dispose();
+      };
+      document.addEventListener("astro:before-swap", cleanup, { once: true });
 
       // ── Animation loop ──
       const DEG2RAD = Math.PI / 180;
 
       function animate() {
         requestAnimationFrame(animate);
+        if (paused) return;
+
+        let moved = false;
 
         // Momentum — apply velocity when not dragging
         if (!isPointerDown) {
@@ -244,22 +279,25 @@ const { src, alt } = Astro.props;
             lat = Math.max(-LAT_MAX, Math.min(LAT_MAX, lat));
             velocityX *= FRICTION;
             velocityY *= FRICTION;
+            moved = true;
           }
         }
 
         // Keyboard look
-        if (KEYS["ArrowLeft"]  || KEYS["a"] || KEYS["A"]) lon -= 0.35;
-        if (KEYS["ArrowRight"] || KEYS["d"] || KEYS["D"]) lon += 0.35;
-        if (KEYS["ArrowUp"]    || KEYS["w"] || KEYS["W"]) lat = Math.min(LAT_MAX, lat + 0.35);
-        if (KEYS["ArrowDown"]  || KEYS["s"] || KEYS["S"]) lat = Math.max(-LAT_MAX, lat - 0.35);
-        if (KEYS["+"] || KEYS["="]) { fov = Math.max(FOV_MIN, fov - 0.5); camera.fov = fov; camera.updateProjectionMatrix(); }
-        if (KEYS["-"])              { fov = Math.min(FOV_MAX, fov + 0.5); camera.fov = fov; camera.updateProjectionMatrix(); }
+        if (KEYS["ArrowLeft"]  || KEYS["a"] || KEYS["A"]) { lon -= 0.35; moved = true; }
+        if (KEYS["ArrowRight"] || KEYS["d"] || KEYS["D"]) { lon += 0.35; moved = true; }
+        if (KEYS["ArrowUp"]    || KEYS["w"] || KEYS["W"]) { lat = Math.min(LAT_MAX, lat + 0.35); moved = true; }
+        if (KEYS["ArrowDown"]  || KEYS["s"] || KEYS["S"]) { lat = Math.max(-LAT_MAX, lat - 0.35); moved = true; }
+        if (KEYS["+"] || KEYS["="]) { fov = Math.max(FOV_MIN, fov - 0.5); camera.fov = fov; camera.updateProjectionMatrix(); moved = true; }
+        if (KEYS["-"])              { fov = Math.min(FOV_MAX, fov + 0.5); camera.fov = fov; camera.updateProjectionMatrix(); moved = true; }
 
-        // Use Euler rotation directly (YXZ order) for reliable orientation
-        camera.rotation.y = -lon * DEG2RAD;
-        camera.rotation.x = lat * DEG2RAD;
-
-        renderer.render(scene, camera);
+        // Only render when something changed
+        if (moved || needsRender) {
+          camera.rotation.y = -lon * DEG2RAD;
+          camera.rotation.x = lat * DEG2RAD;
+          renderer.render(scene, camera);
+          needsRender = false;
+        }
       }
     }
   })();
