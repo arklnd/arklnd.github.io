@@ -15,6 +15,10 @@ const { src, alt } = Astro.props;
     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20A14.5 14.5 0 0 0 12 2"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
     <span>Drag to explore · Scroll to zoom</span>
   </div>
+  <button class="pano-motion" id="pano-motion" type="button" aria-pressed="false" hidden>
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/><path d="M8 6h8"/></svg>
+    <span>Motion</span>
+  </button>
   <div class="pano-badge" aria-hidden="true">360°</div>
 </div>
 
@@ -39,6 +43,7 @@ const { src, alt } = Astro.props;
     const canvas = document.getElementById("pano-canvas");
     const loader = document.getElementById("pano-loader") as HTMLElement | null;
     const hint = document.getElementById("pano-hint") as HTMLElement | null;
+    const motionButton = document.getElementById("pano-motion") as HTMLButtonElement | null;
 
     if (!wrap || !canvas || !loader) return;
     const src = wrap.dataset.src!;
@@ -143,6 +148,105 @@ const { src, alt } = Astro.props;
       const FRICTION = 0.924;  // decay per frame (0 = instant stop, 1 = no friction)
       const MIN_VELOCITY = 0.01;
 
+      // ── Device motion look ──
+      type DeviceOrientationEventWithPermission = typeof DeviceOrientationEvent & {
+        requestPermission?: () => Promise<"granted" | "denied" | "default">;
+      };
+
+      let motionEnabled = false;
+      let motionBaseAlpha: number | null = null;
+      let motionBaseBeta = 0;
+      let motionBaseGamma = 0;
+      let motionBaseLon = 0;
+      let motionBaseLat = 0;
+      let motionTargetLon: number | null = null;
+      let motionTargetLat: number | null = null;
+      const MOTION_PITCH_SENSITIVITY = 0.75;
+      const MOTION_SMOOTHING = 0.18;
+
+      function angleDelta(value: number, base: number) {
+        let delta = value - base;
+        if (delta > 180) delta -= 360;
+        if (delta < -180) delta += 360;
+        return delta;
+      }
+
+      function screenAngle() {
+        if (typeof screen.orientation?.angle === "number") return screen.orientation.angle;
+        const legacyWindow = window as Window & { orientation?: number };
+        return typeof legacyWindow.orientation === "number" ? legacyWindow.orientation : 0;
+      }
+
+      function resetMotionOrigin() {
+        motionBaseAlpha = null;
+        motionBaseLon = lon;
+        motionBaseLat = lat;
+        motionTargetLon = lon;
+        motionTargetLat = lat;
+        velocityX = 0;
+        velocityY = 0;
+      }
+
+      function setMotionButtonState() {
+        if (!motionButton) return;
+        motionButton.classList.toggle("is-active", motionEnabled);
+        motionButton.setAttribute("aria-pressed", motionEnabled ? "true" : "false");
+      }
+
+      function onDeviceOrientation(e: DeviceOrientationEvent) {
+        if (!motionEnabled || e.alpha === null || e.beta === null || e.gamma === null) return;
+
+        if (motionBaseAlpha === null) {
+          motionBaseAlpha = e.alpha;
+          motionBaseBeta = e.beta;
+          motionBaseGamma = e.gamma;
+          motionBaseLon = lon;
+          motionBaseLat = lat;
+        }
+
+        const yawDelta = angleDelta(e.alpha, motionBaseAlpha);
+        const betaDelta = e.beta - motionBaseBeta;
+        const gammaDelta = e.gamma - motionBaseGamma;
+        const orientation = ((screenAngle() % 360) + 360) % 360;
+        let pitchDelta = betaDelta;
+
+        if (orientation === 90) pitchDelta = -gammaDelta;
+        if (orientation === 180) pitchDelta = -betaDelta;
+        if (orientation === 270) pitchDelta = gammaDelta;
+
+        motionTargetLon = motionBaseLon + yawDelta;
+        motionTargetLat = Math.max(-LAT_MAX, Math.min(LAT_MAX, motionBaseLat + pitchDelta * MOTION_PITCH_SENSITIVITY));
+        needsRender = true;
+      }
+
+      const onMotionButtonClick = async () => {
+        if (!motionButton) return;
+
+        if (motionEnabled) {
+          motionEnabled = false;
+          window.removeEventListener("deviceorientation", onDeviceOrientation, true);
+          resetMotionOrigin();
+          setMotionButtonState();
+          return;
+        }
+
+        const MotionEvent = window.DeviceOrientationEvent as DeviceOrientationEventWithPermission | undefined;
+        if (MotionEvent?.requestPermission) {
+          const permission = await MotionEvent.requestPermission();
+          if (permission !== "granted") return;
+        }
+
+        motionEnabled = true;
+        resetMotionOrigin();
+        window.addEventListener("deviceorientation", onDeviceOrientation, true);
+        setMotionButtonState();
+      };
+
+      if (motionButton && "DeviceOrientationEvent" in window && window.matchMedia("(pointer: coarse)").matches) {
+        motionButton.hidden = false;
+        motionButton.addEventListener("click", onMotionButtonClick);
+      }
+
       el.addEventListener("pointerdown", (e) => {
         isPointerDown = true;
         pointerX = e.clientX;
@@ -170,6 +274,7 @@ const { src, alt } = Astro.props;
 
       el.addEventListener("pointerup", () => {
         isPointerDown = false;
+        if (motionEnabled) resetMotionOrigin();
         el.style.cursor = "grab";
       });
 
@@ -280,6 +385,8 @@ const { src, alt } = Astro.props;
         window.removeEventListener("keydown", onKeyDown);
         window.removeEventListener("keyup", onKeyUp);
         document.removeEventListener("visibilitychange", onVisChange);
+        motionButton?.removeEventListener("click", onMotionButtonClick);
+        window.removeEventListener("deviceorientation", onDeviceOrientation, true);
         scene.traverse((obj) => {
           if (obj instanceof Mesh) {
             obj.geometry.dispose();
@@ -309,6 +416,16 @@ const { src, alt } = Astro.props;
             lat = Math.max(-LAT_MAX, Math.min(LAT_MAX, lat));
             velocityX *= FRICTION;
             velocityY *= FRICTION;
+            moved = true;
+          }
+        }
+
+        if (motionEnabled && !isPointerDown && !isPinching && motionTargetLon !== null && motionTargetLat !== null) {
+          const lonDelta = motionTargetLon - lon;
+          const latDelta = motionTargetLat - lat;
+          if (Math.abs(lonDelta) > MIN_VELOCITY || Math.abs(latDelta) > MIN_VELOCITY) {
+            lon += lonDelta * MOTION_SMOOTHING;
+            lat += latDelta * MOTION_SMOOTHING;
             moved = true;
           }
         }
@@ -394,6 +511,41 @@ const { src, alt } = Astro.props;
     border: 1px solid rgba(255,255,255,0.2);
     border-radius: 6px;
     pointer-events: none;
+  }
+
+  .pano-motion {
+    position: absolute;
+    top: 0.75rem;
+    right: 4.2rem;
+    z-index: 5;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    min-height: 1.75rem;
+    padding: 0.25rem 0.55rem;
+    font-family: var(--font-heading, system-ui);
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 6px;
+  }
+
+  .pano-motion[hidden] {
+    display: none;
+  }
+
+  .pano-motion.is-active {
+    color: #06191c;
+    background: var(--color-link, #7fd4e1);
+    border-color: transparent;
+  }
+
+  .pano-motion svg {
+    flex: 0 0 auto;
   }
 
   .pano-hint {
