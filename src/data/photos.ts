@@ -403,7 +403,7 @@ export const albums: Album[] = [
     slug: "paharpur",
     title: "Paharpur",
     description: "Rocky cliffs, a winding river, and dry hills — a June afternoon at Paharpur.",
-    coverSlug: "paharpur-20260619-bird-on-palm",
+    coverSlug: "paharpur-20260619-scene-03",
     tags: ["landscape", "nature", "river", "rocks", "cliff", "wildlife", "rural India"],
     location: "Paharpur, West Bengal, India",
     date: "2026-06-19",
