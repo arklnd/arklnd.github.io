@@ -375,6 +375,28 @@ const albumJsonLd = JSON.stringify({
     margin-top: 0;
     margin-bottom: var(--space-sm);
     max-height: min(350px, 40vh);
+    background: rgba(20, 24, 30, 0.55);
+    backdrop-filter: blur(28px) saturate(160%);
+    -webkit-backdrop-filter: blur(28px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.45), 0 0 0 0.5px rgba(255,255,255,0.08) inset;
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .hero-reactions :global(.picker-search) {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .hero-reactions :global(.picker-search::placeholder) {
+    color: rgba(255, 255, 255, 0.45);
+  }
+
+  .hero-reactions :global(.picker-group-label) {
+    color: rgba(255, 255, 255, 0.45);
   }
 
   /* Override Reactions component colours for the dark hero */
@@ -382,7 +404,8 @@ const albumJsonLd = JSON.stringify({
     color: rgba(255, 255, 255, 0.7);
     border-color: rgba(255, 255, 255, 0.35);
     background: rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(6px);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
   }
 
   .hero-reactions :global(.reaction-add-btn:hover) {
@@ -395,7 +418,8 @@ const albumJsonLd = JSON.stringify({
     color: rgba(255, 255, 255, 0.85);
     border-color: rgba(255, 255, 255, 0.3);
     background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(6px);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
   }
 
   .hero-reactions :global(.reaction-btn:hover),
