@@ -214,7 +214,7 @@ const { src, alt } = Astro.props;
         if (orientation === 180) pitchDelta = -betaDelta;
         if (orientation === 270) pitchDelta = gammaDelta;
 
-        motionTargetLon = motionBaseLon + yawDelta;
+        motionTargetLon = motionBaseLon - yawDelta;
         motionTargetLat = Math.max(-LAT_MAX, Math.min(LAT_MAX, motionBaseLat + pitchDelta * MOTION_PITCH_SENSITIVITY));
         needsRender = true;
       }
