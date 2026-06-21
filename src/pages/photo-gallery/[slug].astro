@@ -197,10 +197,20 @@ const albumMap: Record<string, string> = Object.fromEntries(
     position: absolute;
     z-index: 10;
     pointer-events: none;
+    transition: opacity 0.25s ease;
   }
 
   .viewer-overlay > * {
     pointer-events: auto;
+  }
+
+  .photo-viewer.overlays-hidden .viewer-overlay {
+    opacity: 0;
+    pointer-events: none !important;
+  }
+
+  .photo-viewer.overlays-hidden .viewer-overlay > * {
+    pointer-events: none;
   }
 
   .top-bar {
@@ -499,6 +509,23 @@ const albumMap: Record<string, string> = Object.fromEntries(
     else if (dx < 0 && prevUrl) window.location.href = prevUrl;
   }
 
+  // ── Single click toggles overlays ──
+  const viewer = document.querySelector(".photo-viewer");
+  let singleClickTimer = null;
+  frame.addEventListener("click", (e) => {
+    // Ignore if this was a drag or a nav/reaction link click
+    if (isDragging) return;
+    if (e.target.closest("a, button")) return;
+    // Use a short delay so double-click can cancel it
+    clearTimeout(singleClickTimer);
+    singleClickTimer = setTimeout(() => {
+      viewer?.classList.toggle("overlays-hidden");
+    }, 220);
+  });
+  frame.addEventListener("dblclick", () => {
+    clearTimeout(singleClickTimer);
+  });
+
   frame.addEventListener("touchstart", onTouchStart, { passive: false });
   frame.addEventListener("touchmove",  onTouchMove,  { passive: false });
   frame.addEventListener("touchend",   onTouchEnd);
@@ -599,6 +626,7 @@ const albumMap: Record<string, string> = Object.fromEntries(
     document.removeEventListener("mousemove", onMouseMove);
     document.removeEventListener("mouseup",   onMouseUp);
     document.removeEventListener("keydown",   onKeyDown);
+    clearTimeout(singleClickTimer);
   }, { once: true });
 
   // ── Dynamic back link ──
