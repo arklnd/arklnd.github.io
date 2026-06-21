@@ -163,10 +163,14 @@ const albumJsonLd = JSON.stringify({
     margin-bottom: var(--space-xl);
   }
 
+  /* drift lives on the wrapper so hover transition on the img never conflicts */
   .hero-img-wrap {
     position: absolute;
     inset: 0;
     overflow: hidden;
+    animation: hero-drift 22s ease-in-out infinite alternate;
+    transform-origin: center center;
+    will-change: transform;
   }
 
   .hero-bg {
@@ -177,12 +181,24 @@ const albumJsonLd = JSON.stringify({
     object-fit: cover;
     object-position: center 40%;
     filter: brightness(0.75);
-    transform: scale(1.02);
-    transition: transform 8s ease;
+    transform: scale(1);
+    transform-origin: center center;
+    transition: transform 1.4s cubic-bezier(0.4, 0, 0.2, 1),
+                filter   1.2s ease;
+    will-change: transform, filter;
+  }
+
+  @keyframes hero-drift {
+    0%   { transform: scale(1.04) translate(0%,    0%);    }
+    25%  { transform: scale(1.07) translate(-1.2%, 0.4%);  }
+    50%  { transform: scale(1.06) translate(0.8%,  -0.6%); }
+    75%  { transform: scale(1.08) translate(-0.5%, -0.3%); }
+    100% { transform: scale(1.05) translate(0.6%,  0.5%);  }
   }
 
   .album-hero:hover .hero-img-wrap .hero-bg {
-    transform: scale(1.06);
+    transform: scale(1.1) translateY(-2%);
+    filter: brightness(0.62);
   }
 
   /* layered vignette — dark edges, deep bottom for text */
