@@ -163,8 +163,9 @@ const { src, alt } = Astro.props;
 
       el.addEventListener("pointermove", (e) => {
         if (!isPointerDown || isPinching) return;
-        const dx = (e.clientX - pointerX) * 0.1;
-        const dy = (e.clientY - pointerY) * 0.1;
+        const fovScale = fov / 90; // finer control when zoomed in
+        const dx = (e.clientX - pointerX) * 0.1 * fovScale;
+        const dy = (e.clientY - pointerY) * 0.1 * fovScale;
         velocityX = -dx;
         velocityY = dy;
         lon += velocityX;
@@ -213,8 +214,30 @@ const { src, alt } = Astro.props;
       }, { passive: true });
 
       el.addEventListener("touchend", (e) => {
-        if (e.touches.length < 2) {
+        if (e.touches.length < 2 && isPinching) {
           isPinching = false;
+          // Re-sync pointer to remaining finger to prevent jump
+          if (e.touches.length === 1) {
+            pointerX = e.touches[0].clientX;
+            pointerY = e.touches[0].clientY;
+          }
+        }
+      }, { passive: true });
+
+      // ── Double-tap to reset zoom ──
+      let lastTapTime = 0;
+      el.addEventListener("touchend", (e) => {
+        if (e.touches.length !== 0 || isPinching) return;
+        const now = Date.now();
+        if (now - lastTapTime < 300) {
+          // Double tap detected — reset FOV
+          fov = 90;
+          camera.fov = fov;
+          camera.updateProjectionMatrix();
+          needsRender = true;
+          lastTapTime = 0;
+        } else {
+          lastTapTime = now;
         }
       }, { passive: true });
 
