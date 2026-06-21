@@ -31,6 +31,9 @@ const { src, alt } = Astro.props;
     CylinderGeometry,
     MeshBasicMaterial,
     Mesh,
+    Euler,
+    Quaternion,
+    Vector3,
     TextureLoader,
     SRGBColorSpace,
     LinearFilter,
@@ -136,6 +139,7 @@ const { src, alt } = Astro.props;
       let needsRender = false; // render-on-demand flag
       let paused = false; // tab visibility pause
       let destroyed = false;
+      const DEG2RAD = Math.PI / 180;
 
       // ── Mouse drag ──
       let isPointerDown = false;
@@ -154,22 +158,18 @@ const { src, alt } = Astro.props;
       };
 
       let motionEnabled = false;
-      let motionBaseAlpha: number | null = null;
-      let motionBaseBeta = 0;
-      let motionBaseGamma = 0;
-      let motionBaseLon = 0;
-      let motionBaseLat = 0;
-      let motionTargetLon: number | null = null;
-      let motionTargetLat: number | null = null;
-      const MOTION_PITCH_SENSITIVITY = 0.75;
+      let motionHasBaseline = false;
       const MOTION_SMOOTHING = 0.18;
-
-      function angleDelta(value: number, base: number) {
-        let delta = value - base;
-        if (delta > 180) delta -= 360;
-        if (delta < -180) delta += 360;
-        return delta;
-      }
+      const motionEuler = new Euler(0, 0, 0, "YXZ");
+      const motionDeviceQuaternion = new Quaternion();
+      const motionBaseDeviceQuaternion = new Quaternion();
+      const motionBaseDeviceQuaternionInverse = new Quaternion();
+      const motionBaseViewQuaternion = new Quaternion();
+      const motionTargetQuaternion = new Quaternion();
+      const motionDeltaQuaternion = new Quaternion();
+      const motionScreenQuaternion = new Quaternion();
+      const motionZAxis = new Vector3(0, 0, 1);
+      const motionCameraAdjustment = new Quaternion(-Math.sqrt(0.5), 0, 0, Math.sqrt(0.5));
 
       function screenAngle() {
         if (typeof screen.orientation?.angle === "number") return screen.orientation.angle;
@@ -177,12 +177,31 @@ const { src, alt } = Astro.props;
         return typeof legacyWindow.orientation === "number" ? legacyWindow.orientation : 0;
       }
 
+      function setQuaternionFromDeviceOrientation(target: Quaternion, e: DeviceOrientationEvent) {
+        const alpha = (e.alpha ?? 0) * DEG2RAD;
+        const beta = (e.beta ?? 0) * DEG2RAD;
+        const gamma = (e.gamma ?? 0) * DEG2RAD;
+        const orient = screenAngle() * DEG2RAD;
+
+        motionEuler.set(beta, alpha, -gamma, "YXZ");
+        target.setFromEuler(motionEuler);
+        target.multiply(motionCameraAdjustment);
+        target.multiply(motionScreenQuaternion.setFromAxisAngle(motionZAxis, -orient));
+      }
+
+      function setQuaternionFromLonLat(target: Quaternion) {
+        motionEuler.set(lat * DEG2RAD, -lon * DEG2RAD, 0, "YXZ");
+        target.setFromEuler(motionEuler);
+      }
+
+      function syncLonLatFromCamera() {
+        motionEuler.setFromQuaternion(camera.quaternion, "YXZ");
+        lon = -motionEuler.y / DEG2RAD;
+        lat = Math.max(-LAT_MAX, Math.min(LAT_MAX, motionEuler.x / DEG2RAD));
+      }
+
       function resetMotionOrigin() {
-        motionBaseAlpha = null;
-        motionBaseLon = lon;
-        motionBaseLat = lat;
-        motionTargetLon = lon;
-        motionTargetLat = lat;
+        motionHasBaseline = false;
         velocityX = 0;
         velocityY = 0;
       }
@@ -196,26 +215,18 @@ const { src, alt } = Astro.props;
       function onDeviceOrientation(e: DeviceOrientationEvent) {
         if (!motionEnabled || e.alpha === null || e.beta === null || e.gamma === null) return;
 
-        if (motionBaseAlpha === null) {
-          motionBaseAlpha = e.alpha;
-          motionBaseBeta = e.beta;
-          motionBaseGamma = e.gamma;
-          motionBaseLon = lon;
-          motionBaseLat = lat;
+        setQuaternionFromDeviceOrientation(motionDeviceQuaternion, e);
+
+        if (!motionHasBaseline) {
+          motionBaseDeviceQuaternion.copy(motionDeviceQuaternion);
+          motionBaseDeviceQuaternionInverse.copy(motionBaseDeviceQuaternion).invert();
+          setQuaternionFromLonLat(motionBaseViewQuaternion);
+          motionTargetQuaternion.copy(motionBaseViewQuaternion);
+          motionHasBaseline = true;
         }
 
-        const yawDelta = angleDelta(e.alpha, motionBaseAlpha);
-        const betaDelta = e.beta - motionBaseBeta;
-        const gammaDelta = e.gamma - motionBaseGamma;
-        const orientation = ((screenAngle() % 360) + 360) % 360;
-        let pitchDelta = betaDelta;
-
-        if (orientation === 90) pitchDelta = -gammaDelta;
-        if (orientation === 180) pitchDelta = -betaDelta;
-        if (orientation === 270) pitchDelta = gammaDelta;
-
-        motionTargetLon = motionBaseLon - yawDelta;
-        motionTargetLat = Math.max(-LAT_MAX, Math.min(LAT_MAX, motionBaseLat + pitchDelta * MOTION_PITCH_SENSITIVITY));
+        motionDeltaQuaternion.copy(motionBaseDeviceQuaternionInverse).multiply(motionDeviceQuaternion);
+        motionTargetQuaternion.copy(motionBaseViewQuaternion).multiply(motionDeltaQuaternion);
         needsRender = true;
       }
 
@@ -399,8 +410,6 @@ const { src, alt } = Astro.props;
       document.addEventListener("astro:before-swap", cleanup, { once: true });
 
       // ── Animation loop ──
-      const DEG2RAD = Math.PI / 180;
-
       function animate() {
         if (destroyed) return;
         requestAnimationFrame(animate);
@@ -420,12 +429,10 @@ const { src, alt } = Astro.props;
           }
         }
 
-        if (motionEnabled && !isPointerDown && !isPinching && motionTargetLon !== null && motionTargetLat !== null) {
-          const lonDelta = motionTargetLon - lon;
-          const latDelta = motionTargetLat - lat;
-          if (Math.abs(lonDelta) > MIN_VELOCITY || Math.abs(latDelta) > MIN_VELOCITY) {
-            lon += lonDelta * MOTION_SMOOTHING;
-            lat += latDelta * MOTION_SMOOTHING;
+        if (motionEnabled && !isPointerDown && !isPinching && motionHasBaseline) {
+          if (1 - Math.abs(camera.quaternion.dot(motionTargetQuaternion)) > 0.000001) {
+            camera.quaternion.slerp(motionTargetQuaternion, MOTION_SMOOTHING);
+            syncLonLatFromCamera();
             moved = true;
           }
         }
@@ -440,8 +447,9 @@ const { src, alt } = Astro.props;
 
         // Only render when something changed
         if (moved || needsRender) {
-          camera.rotation.y = -lon * DEG2RAD;
-          camera.rotation.x = lat * DEG2RAD;
+          if (!motionEnabled || !motionHasBaseline || isPointerDown || isPinching) {
+            camera.rotation.set(lat * DEG2RAD, -lon * DEG2RAD, 0, "YXZ");
+          }
           renderer.render(scene, camera);
           needsRender = false;
         }
