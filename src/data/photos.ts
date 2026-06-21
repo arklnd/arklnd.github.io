@@ -462,7 +462,7 @@ export const albums: Album[] = [
     slug: "kolakham",
     title: "Kolakham",
     description: "A tranquil village on the edge of Neora Valley National Park at 6,500 ft — dense tropical forests, misty dawns, and distant views of Kanchenjunga.",
-    coverSlug: "img-20251220-062814776-hdr",
+    coverSlug: "img-20251220-062804772",
     tags: ["Kolakham", "Neora Valley", "Kalimpong", "West Bengal", "forest", "dawn", "Kanchenjunga", "mountains", "nature", "travel", "northeast India"],
     location: "Kolakham, Kalimpong, West Bengal, India",
     date: "2025-12-20",
