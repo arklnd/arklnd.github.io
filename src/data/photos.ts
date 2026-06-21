@@ -363,10 +363,11 @@ const photos: GalleryPhoto[] = [
   {
     slug: "img-20250827-150402630-hdr",
     filename: "IMG_20250827_150402630_HDR.jpg",
-    caption: "Village life",
-    alt: "HDR photo of rural landscape and village life",
+    caption: "RDB Primarc Techno Park",
+    alt: "HDR photo at RDB Primarc Techno Park, Kolkata",
     date: "2025-08-27",
-    tags: ["village", "rural", "HDR", "nature", "landscape"],
+    place: "RDB Primarc Techno Park, Kolkata",
+    tags: ["architecture", "office", "Kolkata", "urban", "HDR"],
   },
   {
     slug: "img-20250705-180944789-hdr",
@@ -455,7 +456,7 @@ export const albums: Album[] = [
     tags: ["indoor", "outdoor", "architecture", "office", "urban", "Kolkata"],
     location: "Kolkata, West Bengal, India",
     date: "2026-01-06",
-    photoSlugs: ["img-20251028-150905238", "pxl-20260106-151337751", "pxl-20260106-151551465", "img-20260106-150926100", "img-20260106-150942128", "img-20260302-141825905"],
+    photoSlugs: ["img-20251028-150905238", "img-20250827-150402630-hdr", "pxl-20260106-151337751", "pxl-20260106-151551465", "img-20260106-150926100", "img-20260106-150942128", "img-20260302-141825905"],
   },
   {
     slug: "kolakham",
@@ -485,8 +486,6 @@ export const albums: Album[] = [
     tags: ["village", "rural", "nature", "everyday life", "West Bengal"],
     date: "2025-09-29",
     photoSlugs: [
-      "img-20250705-180944789-hdr",
-      "img-20250827-150402630-hdr",
       "img-20250929-153355749-hdr",
       "img-20250929-154619650-hdr",
       "img-20250929-154731931-hdr",
