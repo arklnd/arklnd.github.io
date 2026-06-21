@@ -15,6 +15,8 @@ export interface GalleryPhoto {
   alt?: string;
   /** Camera or device used (e.g. "Moto G64", "Canon EOS R6") */
   camera?: string;
+  /** GPS coordinates for map linking */
+  coords?: { lat: number; lng: number };
 }
 
 export interface Album {
