@@ -103,11 +103,6 @@ const { src, alt } = Astro.props;
             fov = Math.min(FOV_MAX, Math.max(FOV_MIN, vertAngleDeg * 0.9));
             camera.fov = fov;
             camera.updateProjectionMatrix();
-          } else if (ratio > 2.2) {
-            // Partial photosphere — limit vertical look to within coverage
-            const fullHeight = imgW / 2;
-            const vertCoverageDeg = (imgH / fullHeight) * 180;
-            LAT_MAX = Math.min(85, vertCoverageDeg / 2 - 5);
           }
 
           loader.style.display = "none";
