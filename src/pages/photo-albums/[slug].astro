@@ -508,8 +508,17 @@ const albumJsonLd = JSON.stringify({
   }
 
   @media (max-width: 600px) {
+    .album-hero {
+      height: clamp(420px, 110vw, 560px);
+    }
+
     .hero-content {
       padding: 20px 20px 28px;
+    }
+
+    .hero-details-corner {
+      top: 20px;
+      right: 20px;
     }
 
     .gallery-grid {
