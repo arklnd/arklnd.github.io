@@ -146,6 +146,8 @@ const { src, alt } = Astro.props;
       let isPinching = false; // suppress drag during pinch zoom
       let pointerX = 0;
       let pointerY = 0;
+      let didDrag = false;
+      let didPinch = false;
       let velocityX = 0;  // momentum horizontal (deg/frame)
       let velocityY = 0;  // momentum vertical (deg/frame)
       const DRAG_SENSITIVITY = 0.105;
@@ -162,8 +164,8 @@ const { src, alt } = Astro.props;
       const MOTION_SMOOTHING = 0.18;
       const motionEuler = new Euler(0, 0, 0, "YXZ");
       const motionDeviceQuaternion = new Quaternion();
-      const motionBaseDeviceQuaternion = new Quaternion();
-      const motionBaseDeviceQuaternionInverse = new Quaternion();
+      const motionReferenceQuaternion = new Quaternion();
+      const motionReferenceQuaternionInverse = new Quaternion();
       const motionBaseViewQuaternion = new Quaternion();
       const motionTargetQuaternion = new Quaternion();
       const motionDeltaQuaternion = new Quaternion();
@@ -177,16 +179,20 @@ const { src, alt } = Astro.props;
         return typeof legacyWindow.orientation === "number" ? legacyWindow.orientation : 0;
       }
 
-      function setQuaternionFromDeviceOrientation(target: Quaternion, e: DeviceOrientationEvent) {
-        const alpha = (e.alpha ?? 0) * DEG2RAD;
-        const beta = (e.beta ?? 0) * DEG2RAD;
-        const gamma = (e.gamma ?? 0) * DEG2RAD;
+      function setQuaternionFromDeviceAngles(target: Quaternion, alphaDeg: number, betaDeg: number, gammaDeg: number) {
+        const alpha = alphaDeg * DEG2RAD;
+        const beta = betaDeg * DEG2RAD;
+        const gamma = gammaDeg * DEG2RAD;
         const orient = screenAngle() * DEG2RAD;
 
         motionEuler.set(beta, alpha, -gamma, "YXZ");
         target.setFromEuler(motionEuler);
         target.multiply(motionCameraAdjustment);
         target.multiply(motionScreenQuaternion.setFromAxisAngle(motionZAxis, -orient));
+      }
+
+      function setQuaternionFromDeviceOrientation(target: Quaternion, e: DeviceOrientationEvent) {
+        setQuaternionFromDeviceAngles(target, e.alpha ?? 0, e.beta ?? 0, e.gamma ?? 0);
       }
 
       function setQuaternionFromLonLat(target: Quaternion) {
@@ -218,14 +224,14 @@ const { src, alt } = Astro.props;
         setQuaternionFromDeviceOrientation(motionDeviceQuaternion, e);
 
         if (!motionHasBaseline) {
-          motionBaseDeviceQuaternion.copy(motionDeviceQuaternion);
-          motionBaseDeviceQuaternionInverse.copy(motionBaseDeviceQuaternion).invert();
           setQuaternionFromLonLat(motionBaseViewQuaternion);
           motionTargetQuaternion.copy(motionBaseViewQuaternion);
           motionHasBaseline = true;
         }
 
-        motionDeltaQuaternion.copy(motionBaseDeviceQuaternionInverse).multiply(motionDeviceQuaternion);
+        setQuaternionFromDeviceAngles(motionReferenceQuaternion, 0, 90, 0);
+        motionReferenceQuaternionInverse.copy(motionReferenceQuaternion).invert();
+        motionDeltaQuaternion.copy(motionReferenceQuaternionInverse).multiply(motionDeviceQuaternion);
         motionTargetQuaternion.copy(motionBaseViewQuaternion).multiply(motionDeltaQuaternion);
         needsRender = true;
       }
@@ -259,6 +265,10 @@ const { src, alt } = Astro.props;
       }
 
       el.addEventListener("pointerdown", (e) => {
+        if (!isPointerDown) {
+          didDrag = false;
+          didPinch = false;
+        }
         isPointerDown = true;
         pointerX = e.clientX;
         pointerY = e.clientY;
@@ -275,6 +285,7 @@ const { src, alt } = Astro.props;
         const dy = (e.clientY - pointerY) * DRAG_SENSITIVITY * fovScale;
         velocityX = -dx;
         velocityY = dy;
+        didDrag = true;
         lon += velocityX;
         lat += velocityY;
         lat = Math.max(-LAT_MAX, Math.min(LAT_MAX, lat));
@@ -285,7 +296,7 @@ const { src, alt } = Astro.props;
 
       el.addEventListener("pointerup", () => {
         isPointerDown = false;
-        if (motionEnabled) resetMotionOrigin();
+        if (motionEnabled && didDrag && !didPinch) resetMotionOrigin();
         el.style.cursor = "grab";
       });
 
@@ -312,6 +323,7 @@ const { src, alt } = Astro.props;
       el.addEventListener("touchstart", (e) => {
         if (e.touches.length === 2) {
           isPinching = true;
+          didPinch = true;
           velocityX = 0;
           velocityY = 0;
           lastPinchDist = Math.hypot(
