@@ -459,7 +459,7 @@ const { src, alt } = Astro.props;
 
         // Only render when something changed
         if (moved || needsRender) {
-          if (!motionEnabled || !motionHasBaseline || isPointerDown || isPinching) {
+          if (!motionEnabled || !motionHasBaseline || (isPointerDown && !isPinching)) {
             camera.rotation.set(lat * DEG2RAD, -lon * DEG2RAD, 0, "YXZ");
           }
           renderer.render(scene, camera);
