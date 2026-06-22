@@ -161,15 +161,10 @@ const { src, alt } = Astro.props;
       };
 
       let motionEnabled = false;
-      let motionHasBaseline = false;
+      let hasMotionTarget = false;
       const MOTION_SMOOTHING = 0.18;
       const motionEuler = new Euler(0, 0, 0, "YXZ");
-      const motionDeviceQuaternion = new Quaternion();
-      const motionBaseDeviceQuaternion = new Quaternion();
-      const motionBaseDeviceQuaternionInverse = new Quaternion();
-      const motionBaseViewQuaternion = new Quaternion();
       const motionTargetQuaternion = new Quaternion();
-      const motionDeltaQuaternion = new Quaternion();
       const motionScreenQuaternion = new Quaternion();
       const motionZAxis = new Vector3(0, 0, 1);
       const motionCameraAdjustment = new Quaternion(-Math.sqrt(0.5), 0, 0, Math.sqrt(0.5));
@@ -199,7 +194,7 @@ const { src, alt } = Astro.props;
       }
 
       function resetMotionOrigin() {
-        motionHasBaseline = false;
+        hasMotionTarget = false;
         velocityX = 0;
         velocityY = 0;
       }
@@ -213,18 +208,8 @@ const { src, alt } = Astro.props;
       function onDeviceOrientation(e: DeviceOrientationEvent) {
         if (!motionEnabled || e.alpha === null || e.beta === null || e.gamma === null) return;
 
-        setQuaternionFromDeviceOrientation(motionDeviceQuaternion, e);
-
-        if (!motionHasBaseline) {
-          motionBaseDeviceQuaternion.copy(motionDeviceQuaternion);
-          motionBaseDeviceQuaternionInverse.copy(motionBaseDeviceQuaternion).invert();
-          motionBaseViewQuaternion.copy(camera.quaternion);
-          motionTargetQuaternion.copy(motionBaseViewQuaternion);
-          motionHasBaseline = true;
-        }
-
-        motionDeltaQuaternion.copy(motionBaseDeviceQuaternionInverse).multiply(motionDeviceQuaternion);
-        motionTargetQuaternion.copy(motionBaseViewQuaternion).multiply(motionDeltaQuaternion);
+        setQuaternionFromDeviceOrientation(motionTargetQuaternion, e);
+        hasMotionTarget = true;
         needsRender = true;
       }
 
@@ -435,7 +420,7 @@ const { src, alt } = Astro.props;
           }
         }
 
-        if (motionEnabled && !isPointerDown && !isPinching && motionHasBaseline) {
+        if (motionEnabled && !isPointerDown && !isPinching && hasMotionTarget) {
           if (1 - Math.abs(camera.quaternion.dot(motionTargetQuaternion)) > 0.000001) {
             camera.quaternion.slerp(motionTargetQuaternion, MOTION_SMOOTHING);
             syncLonLatFromCamera();
