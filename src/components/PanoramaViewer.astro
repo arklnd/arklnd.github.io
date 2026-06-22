@@ -180,20 +180,16 @@ const { src, alt } = Astro.props;
         return typeof legacyWindow.orientation === "number" ? legacyWindow.orientation : 0;
       }
 
-      function setQuaternionFromDeviceAngles(target: Quaternion, alphaDeg: number, betaDeg: number, gammaDeg: number) {
-        const alpha = alphaDeg * DEG2RAD;
-        const beta = betaDeg * DEG2RAD;
-        const gamma = gammaDeg * DEG2RAD;
+      function setQuaternionFromDeviceOrientation(target: Quaternion, e: DeviceOrientationEvent) {
+        const alpha = (e.alpha ?? 0) * DEG2RAD;
+        const beta = (e.beta ?? 0) * DEG2RAD;
+        const gamma = (e.gamma ?? 0) * DEG2RAD;
         const orient = screenAngle() * DEG2RAD;
 
         motionEuler.set(beta, alpha, -gamma, "YXZ");
         target.setFromEuler(motionEuler);
         target.multiply(motionCameraAdjustment);
         target.multiply(motionScreenQuaternion.setFromAxisAngle(motionZAxis, -orient));
-      }
-
-      function setQuaternionFromDeviceOrientation(target: Quaternion, e: DeviceOrientationEvent) {
-        setQuaternionFromDeviceAngles(target, e.alpha ?? 0, e.beta ?? 0, e.gamma ?? 0);
       }
 
       function syncLonLatFromCamera() {
