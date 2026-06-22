@@ -137,6 +137,7 @@ const { src, alt } = Astro.props;
       const FOV_MIN = 30;
       const FOV_MAX = 110;
       let needsRender = false; // render-on-demand flag
+      let manualViewDirty = false;
       let paused = false; // tab visibility pause
       let destroyed = false;
       const DEG2RAD = Math.PI / 180;
@@ -164,8 +165,8 @@ const { src, alt } = Astro.props;
       const MOTION_SMOOTHING = 0.18;
       const motionEuler = new Euler(0, 0, 0, "YXZ");
       const motionDeviceQuaternion = new Quaternion();
-      const motionReferenceQuaternion = new Quaternion();
-      const motionReferenceQuaternionInverse = new Quaternion();
+      const motionBaseDeviceQuaternion = new Quaternion();
+      const motionBaseDeviceQuaternionInverse = new Quaternion();
       const motionBaseViewQuaternion = new Quaternion();
       const motionTargetQuaternion = new Quaternion();
       const motionDeltaQuaternion = new Quaternion();
@@ -195,11 +196,6 @@ const { src, alt } = Astro.props;
         setQuaternionFromDeviceAngles(target, e.alpha ?? 0, e.beta ?? 0, e.gamma ?? 0);
       }
 
-      function setQuaternionFromLonLat(target: Quaternion) {
-        motionEuler.set(lat * DEG2RAD, -lon * DEG2RAD, 0, "YXZ");
-        target.setFromEuler(motionEuler);
-      }
-
       function syncLonLatFromCamera() {
         motionEuler.setFromQuaternion(camera.quaternion, "YXZ");
         lon = -motionEuler.y / DEG2RAD;
@@ -224,14 +220,14 @@ const { src, alt } = Astro.props;
         setQuaternionFromDeviceOrientation(motionDeviceQuaternion, e);
 
         if (!motionHasBaseline) {
-          setQuaternionFromLonLat(motionBaseViewQuaternion);
+          motionBaseDeviceQuaternion.copy(motionDeviceQuaternion);
+          motionBaseDeviceQuaternionInverse.copy(motionBaseDeviceQuaternion).invert();
+          motionBaseViewQuaternion.copy(camera.quaternion);
           motionTargetQuaternion.copy(motionBaseViewQuaternion);
           motionHasBaseline = true;
         }
 
-        setQuaternionFromDeviceAngles(motionReferenceQuaternion, 0, 90, 0);
-        motionReferenceQuaternionInverse.copy(motionReferenceQuaternion).invert();
-        motionDeltaQuaternion.copy(motionReferenceQuaternionInverse).multiply(motionDeviceQuaternion);
+        motionDeltaQuaternion.copy(motionBaseDeviceQuaternionInverse).multiply(motionDeviceQuaternion);
         motionTargetQuaternion.copy(motionBaseViewQuaternion).multiply(motionDeltaQuaternion);
         needsRender = true;
       }
@@ -291,6 +287,7 @@ const { src, alt } = Astro.props;
         lat = Math.max(-LAT_MAX, Math.min(LAT_MAX, lat));
         pointerX = e.clientX;
         pointerY = e.clientY;
+        manualViewDirty = true;
         needsRender = true;
       });
 
@@ -437,6 +434,7 @@ const { src, alt } = Astro.props;
             lat = Math.max(-LAT_MAX, Math.min(LAT_MAX, lat));
             velocityX *= FRICTION;
             velocityY *= FRICTION;
+            manualViewDirty = true;
             moved = true;
           }
         }
@@ -450,17 +448,18 @@ const { src, alt } = Astro.props;
         }
 
         // Keyboard look
-        if (KEYS["ArrowLeft"]  || KEYS["a"] || KEYS["A"]) { lon -= 0.35; moved = true; }
-        if (KEYS["ArrowRight"] || KEYS["d"] || KEYS["D"]) { lon += 0.35; moved = true; }
-        if (KEYS["ArrowUp"]    || KEYS["w"] || KEYS["W"]) { lat = Math.min(LAT_MAX, lat + 0.35); moved = true; }
-        if (KEYS["ArrowDown"]  || KEYS["s"] || KEYS["S"]) { lat = Math.max(-LAT_MAX, lat - 0.35); moved = true; }
+        if (KEYS["ArrowLeft"]  || KEYS["a"] || KEYS["A"]) { lon -= 0.35; manualViewDirty = true; moved = true; }
+        if (KEYS["ArrowRight"] || KEYS["d"] || KEYS["D"]) { lon += 0.35; manualViewDirty = true; moved = true; }
+        if (KEYS["ArrowUp"]    || KEYS["w"] || KEYS["W"]) { lat = Math.min(LAT_MAX, lat + 0.35); manualViewDirty = true; moved = true; }
+        if (KEYS["ArrowDown"]  || KEYS["s"] || KEYS["S"]) { lat = Math.max(-LAT_MAX, lat - 0.35); manualViewDirty = true; moved = true; }
         if (KEYS["+"] || KEYS["="]) { fov = Math.max(FOV_MIN, fov - 0.5); camera.fov = fov; camera.updateProjectionMatrix(); moved = true; }
         if (KEYS["-"])              { fov = Math.min(FOV_MAX, fov + 0.5); camera.fov = fov; camera.updateProjectionMatrix(); moved = true; }
 
         // Only render when something changed
         if (moved || needsRender) {
-          if (!motionEnabled || !motionHasBaseline || (isPointerDown && !isPinching)) {
+          if (manualViewDirty) {
             camera.rotation.set(lat * DEG2RAD, -lon * DEG2RAD, 0, "YXZ");
+            manualViewDirty = false;
           }
           renderer.render(scene, camera);
           needsRender = false;
