@@ -167,7 +167,9 @@ const { src, alt } = Astro.props;
       const motionEuler = new Euler(0, 0, 0, "YXZ");
       const motionTargetQuaternion = new Quaternion();
       const motionDeviceQuaternion = new Quaternion();
+      const motionHeadingQuaternion = new Quaternion();
       const motionScreenQuaternion = new Quaternion();
+      const motionYAxis = new Vector3(0, 1, 0);
       const motionZAxis = new Vector3(0, 0, 1);
       const motionCameraAdjustment = new Quaternion(-Math.sqrt(0.5), 0, 0, Math.sqrt(0.5));
 
@@ -195,11 +197,6 @@ const { src, alt } = Astro.props;
         lat = Math.max(-LAT_MAX, Math.min(LAT_MAX, motionEuler.x / DEG2RAD));
       }
 
-      function setQuaternionFromMotionView(target: Quaternion, viewLon: number, viewLat: number) {
-        motionEuler.set(viewLat * DEG2RAD, -viewLon * DEG2RAD, 0, "YXZ");
-        target.setFromEuler(motionEuler);
-      }
-
       function resetMotionOrigin() {
         hasMotionTarget = false;
         motionHeadingOffset = 0;
@@ -219,14 +216,14 @@ const { src, alt } = Astro.props;
         setQuaternionFromDeviceOrientation(motionDeviceQuaternion, e);
         motionEuler.setFromQuaternion(motionDeviceQuaternion, "YXZ");
         const deviceLon = -motionEuler.y / DEG2RAD;
-        const deviceLat = Math.max(-LAT_MAX, Math.min(LAT_MAX, motionEuler.x / DEG2RAD));
 
         if (!hasMotionTarget) {
           syncLonLatFromCamera();
           motionHeadingOffset = lon - deviceLon;
         }
 
-        setQuaternionFromMotionView(motionTargetQuaternion, deviceLon + motionHeadingOffset, deviceLat);
+        motionHeadingQuaternion.setFromAxisAngle(motionYAxis, -motionHeadingOffset * DEG2RAD);
+        motionTargetQuaternion.copy(motionHeadingQuaternion).multiply(motionDeviceQuaternion);
         hasMotionTarget = true;
         needsRender = true;
       }
