@@ -10,6 +10,8 @@ const { src, alt } = Astro.props;
   <canvas id="pano-canvas"></canvas>
   <div class="pano-loader" id="pano-loader">
     <div class="pano-spinner"></div>
+    <span class="pano-progress" id="pano-progress">0%</span>
+    <span class="pano-error" id="pano-error" hidden></span>
   </div>
   <div class="pano-hint" id="pano-hint" aria-hidden="true">
     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20A14.5 14.5 0 0 0 12 2"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
@@ -45,6 +47,8 @@ const { src, alt } = Astro.props;
     const wrap = document.getElementById("pano-wrap") as HTMLElement | null;
     const canvas = document.getElementById("pano-canvas");
     const loader = document.getElementById("pano-loader") as HTMLElement | null;
+    const progressEl = document.getElementById("pano-progress") as HTMLElement | null;
+    const errorEl = document.getElementById("pano-error") as HTMLElement | null;
     const hint = document.getElementById("pano-hint") as HTMLElement | null;
     const motionButton = document.getElementById("pano-motion") as HTMLButtonElement | null;
 
@@ -69,9 +73,23 @@ const { src, alt } = Astro.props;
 
       // ── Load texture, then build geometry based on aspect ratio ──
       const texLoader = new TextureLoader();
+
+      // Timeout: if loading takes too long, show a warning
+      const LOAD_TIMEOUT_MS = 30000;
+      let loadTimedOut = false;
+      const loadTimer = setTimeout(() => {
+        loadTimedOut = true;
+        if (progressEl) progressEl.textContent = "";
+        if (errorEl) {
+          errorEl.hidden = false;
+          errorEl.textContent = "Loading is taking longer than expected. Please check your connection.";
+        }
+      }, LOAD_TIMEOUT_MS);
+
       texLoader.load(
         src,
         (tex) => {
+          clearTimeout(loadTimer);
           tex.colorSpace = SRGBColorSpace;
           tex.generateMipmaps = false;
           tex.minFilter = LinearFilter;
@@ -122,10 +140,39 @@ const { src, alt } = Astro.props;
             if (hint) hint.style.opacity = "0";
           }, 3500);
         },
-        undefined,
+        (progressEvent) => {
+          // Progress callback
+          if (progressEvent.lengthComputable && progressEvent.total > 0) {
+            const pct = Math.round((progressEvent.loaded / progressEvent.total) * 100);
+            if (progressEl) progressEl.textContent = `${pct}%`;
+          } else if (progressEvent.loaded > 0) {
+            // Server didn't send Content-Length; show bytes loaded
+            const mb = (progressEvent.loaded / (1024 * 1024)).toFixed(1);
+            if (progressEl) progressEl.textContent = `${mb} MB`;
+          }
+        },
         (err) => {
+          clearTimeout(loadTimer);
           console.error("PanoramaViewer: texture load error", err);
-          loader.style.display = "none";
+
+          // Hide spinner and progress, show error message
+          const spinner = loader.querySelector(".pano-spinner") as HTMLElement | null;
+          if (spinner) spinner.style.display = "none";
+          if (progressEl) progressEl.textContent = "";
+
+          let message = "Failed to load panorama.";
+          if (!navigator.onLine) {
+            message = "You appear to be offline. Please check your internet connection.";
+          } else if (loadTimedOut) {
+            message = "Loading timed out. The image may be too large or the connection too slow.";
+          } else {
+            message = "Failed to load panorama. The file may be missing or inaccessible.";
+          }
+
+          if (errorEl) {
+            errorEl.hidden = false;
+            errorEl.textContent = message;
+          }
         }
       );
 
@@ -489,11 +536,35 @@ const { src, alt } = Astro.props;
     position: absolute;
     inset: 0;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 0.75rem;
     z-index: 2;
     background: #0d0d0d;
     pointer-events: none;
+  }
+
+  .pano-progress {
+    font-family: var(--font-heading, system-ui);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.7);
+    letter-spacing: 0.04em;
+  }
+
+  .pano-error {
+    font-family: var(--font-heading, system-ui);
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #f87171;
+    text-align: center;
+    max-width: 80%;
+    line-height: 1.4;
+  }
+
+  .pano-error[hidden] {
+    display: none;
   }
 
   .pano-spinner {
