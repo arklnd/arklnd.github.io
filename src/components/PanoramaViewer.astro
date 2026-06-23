@@ -190,7 +190,7 @@ const { src, alt } = Astro.props;
       const DEG2RAD = Math.PI / 180;
 
       // ── Mouse drag ──
-      let isPointerDown = false;
+      const activePointers = new Set<number>(); // track all active pointer IDs
       let isPinching = false; // suppress drag during pinch zoom
       let pointerX = 0;
       let pointerY = 0;
@@ -201,6 +201,7 @@ const { src, alt } = Astro.props;
       const DRAG_SENSITIVITY = 0.105;
       const FRICTION = 0.924;  // decay per frame (0 = instant stop, 1 = no friction)
       const MIN_VELOCITY = 0.01;
+      let cachedScreenAngle: number | null = null; // locked during pinch
 
       // ── Device motion look ──
       type DeviceOrientationEventWithPermission = typeof DeviceOrientationEvent & {
@@ -221,6 +222,8 @@ const { src, alt } = Astro.props;
       const motionCameraAdjustment = new Quaternion(-Math.sqrt(0.5), 0, 0, Math.sqrt(0.5));
 
       function screenAngle() {
+        // During pinch, use cached angle to prevent mid-gesture orientation jumps
+        if (cachedScreenAngle !== null) return cachedScreenAngle;
         if (typeof screen.orientation?.angle === "number") return screen.orientation.angle;
         const legacyWindow = window as Window & { orientation?: number };
         return typeof legacyWindow.orientation === "number" ? legacyWindow.orientation : 0;
@@ -259,6 +262,8 @@ const { src, alt } = Astro.props;
 
       function onDeviceOrientation(e: DeviceOrientationEvent) {
         if (!motionEnabled || e.alpha === null || e.beta === null || e.gamma === null) return;
+        // Suppress orientation updates during pinch to prevent jumps
+        if (isPinching) return;
 
         setQuaternionFromDeviceOrientation(motionDeviceQuaternion, e);
         motionEuler.setFromQuaternion(motionDeviceQuaternion, "YXZ");
@@ -304,11 +309,11 @@ const { src, alt } = Astro.props;
       }
 
       el.addEventListener("pointerdown", (e) => {
-        if (!isPointerDown) {
+        if (activePointers.size === 0) {
           didDrag = false;
           didPinch = false;
         }
-        isPointerDown = true;
+        activePointers.add(e.pointerId);
         pointerX = e.clientX;
         pointerY = e.clientY;
         velocityX = 0;
@@ -318,7 +323,7 @@ const { src, alt } = Astro.props;
       });
 
       el.addEventListener("pointermove", (e) => {
-        if (!isPointerDown || isPinching) return;
+        if (activePointers.size === 0 || isPinching) return;
         const fovScale = fov / 90; // finer control when zoomed in
         const dx = (e.clientX - pointerX) * DRAG_SENSITIVITY * fovScale;
         const dy = (e.clientY - pointerY) * DRAG_SENSITIVITY * fovScale;
@@ -334,17 +339,21 @@ const { src, alt } = Astro.props;
         needsRender = true;
       });
 
-      el.addEventListener("pointerup", () => {
-        isPointerDown = false;
-        if (motionEnabled && didDrag && !didPinch) resetMotionOrigin();
-        el.style.cursor = "grab";
+      el.addEventListener("pointerup", (e) => {
+        activePointers.delete(e.pointerId);
+        if (activePointers.size === 0) {
+          if (motionEnabled && didDrag && !didPinch) resetMotionOrigin();
+          el.style.cursor = "grab";
+        }
       });
 
-      el.addEventListener("pointercancel", () => {
-        isPointerDown = false;
-        velocityX = 0;
-        velocityY = 0;
-        el.style.cursor = "grab";
+      el.addEventListener("pointercancel", (e) => {
+        activePointers.delete(e.pointerId);
+        if (activePointers.size === 0) {
+          velocityX = 0;
+          velocityY = 0;
+          el.style.cursor = "grab";
+        }
       });
 
       // ── Scroll / wheel zoom ──
@@ -366,6 +375,8 @@ const { src, alt } = Astro.props;
           didPinch = true;
           velocityX = 0;
           velocityY = 0;
+          // Lock screen angle to prevent orientation jumps during pinch
+          cachedScreenAngle = screenAngle();
           lastPinchDist = Math.hypot(
             e.touches[0].clientX - e.touches[1].clientX,
             e.touches[0].clientY - e.touches[1].clientY
@@ -376,6 +387,10 @@ const { src, alt } = Astro.props;
       el.addEventListener("touchend", (e) => {
         if (e.touches.length < 2 && isPinching) {
           isPinching = false;
+          // Unlock cached screen angle
+          cachedScreenAngle = null;
+          // Re-calibrate heading so motion continues from current view (option A)
+          if (motionEnabled) resetMotionOrigin();
           // Re-sync pointer to remaining finger to prevent jump
           if (e.touches.length === 1) {
             pointerX = e.touches[0].clientX;
@@ -470,7 +485,7 @@ const { src, alt } = Astro.props;
         let moved = false;
 
         // Momentum — apply velocity when not dragging
-        if (!isPointerDown) {
+        if (activePointers.size === 0) {
           if (Math.abs(velocityX) > MIN_VELOCITY || Math.abs(velocityY) > MIN_VELOCITY) {
             lon += velocityX;
             lat += velocityY;
@@ -482,7 +497,7 @@ const { src, alt } = Astro.props;
           }
         }
 
-        if (motionEnabled && !isPointerDown && !isPinching && hasMotionTarget) {
+        if (motionEnabled && activePointers.size === 0 && !isPinching && hasMotionTarget) {
           if (1 - Math.abs(camera.quaternion.dot(motionTargetQuaternion)) > 0.000001) {
             camera.quaternion.slerp(motionTargetQuaternion, MOTION_SMOOTHING);
             syncLonLatFromCamera();
