@@ -223,14 +223,12 @@ const { src, alt } = Astro.props;
 
       let motionEnabled = false;
       let hasMotionTarget = false;
-      let motionHeadingOffset = 0;
       const MOTION_SMOOTHING = 0.18;
       const motionEuler = new Euler(0, 0, 0, "YXZ");
       const motionTargetQuaternion = new Quaternion();
       const motionDeviceQuaternion = new Quaternion();
-      const motionHeadingQuaternion = new Quaternion();
+      const motionCorrectionQuaternion = new Quaternion(); // full 3-axis offset: camera * inverse(device)
       const motionScreenQuaternion = new Quaternion();
-      const motionYAxis = new Vector3(0, 1, 0);
       const motionZAxis = new Vector3(0, 0, 1);
       const motionCameraAdjustment = new Quaternion(-Math.sqrt(0.5), 0, 0, Math.sqrt(0.5));
 
@@ -262,7 +260,6 @@ const { src, alt } = Astro.props;
 
       function resetMotionOrigin() {
         hasMotionTarget = false;
-        motionHeadingOffset = 0;
         velocityX = 0;
         velocityY = 0;
       }
@@ -279,16 +276,19 @@ const { src, alt } = Astro.props;
         if (isPinching) return;
 
         setQuaternionFromDeviceOrientation(motionDeviceQuaternion, e);
-        motionEuler.setFromQuaternion(motionDeviceQuaternion, "YXZ");
-        const deviceLon = -motionEuler.y / DEG2RAD;
 
         if (!hasMotionTarget) {
-          syncLonLatFromCamera();
-          motionHeadingOffset = lon - deviceLon;
+          // Full 3-axis calibration: correction = camera * inverse(device)
+          // This preserves the complete orientation relationship (yaw + pitch + roll)
+          motionCorrectionQuaternion
+            .copy(camera.quaternion)
+            .multiply(motionDeviceQuaternion.clone().invert());
         }
 
-        motionHeadingQuaternion.setFromAxisAngle(motionYAxis, -motionHeadingOffset * DEG2RAD);
-        motionTargetQuaternion.copy(motionHeadingQuaternion).multiply(motionDeviceQuaternion);
+        // target = correction * device  (preserves all 3 axes of offset)
+        motionTargetQuaternion
+          .copy(motionCorrectionQuaternion)
+          .multiply(motionDeviceQuaternion);
         hasMotionTarget = true;
         needsRender = true;
       }
