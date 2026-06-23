@@ -43,6 +43,19 @@ export interface Album {
 }
 
 const photos: GalleryPhoto[] = [
+    // ── Palla, Chhatna, 2026-06-23 ──
+  {
+    slug: "pxl-20260623-175805931",
+    filename: "PXL_20260623_175805931.PHOTOSPHERE.jpg",
+    caption: "Palla, Chhatna — photosphere",
+    alt: "Full photosphere at Palla, Chhatna, Bankura — 360° immersive view of the West Bengal countryside",
+    date: "2026-06-23",
+    place: "Palla, Chhatna, Bankura, West Bengal",
+    tags: ["photosphere", "360", "Bankura", "Chhatna", "West Bengal", "countryside", "rural", "landscape"],
+    camera: "Google Pixel",
+    coords: { lat: 23.333940, lng: 86.874640 },
+    panorama: true,
+  },
   // ── Paharpur, 2026-06-19 ──
   {
     slug: "paharpur-20260619-scene-01",
