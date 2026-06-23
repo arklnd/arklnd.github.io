@@ -24,30 +24,31 @@ We will cover:
 
 The viewer is an Astro component (`PanoramaViewer.astro`) that accepts an image source and renders it inside a WebGL canvas using Three.js.
 
-```
-┌─────────────────────────────────────────────────┐
-│  .pano-wrap (container, pointer/touch events)   │
-│  ┌───────────────────────────────────────────┐  │
-│  │  <canvas id="pano-canvas"> (WebGL ctx)    │  │
-│  └───────────────────────────────────────────┘  │
-│  ┌──────────────────┐                           │
-│  │  .pano-loader     │ ← overlay during load    │
-│  │    .pano-spinner  │                          │
-│  │    .pano-progress │                          │
-│  │    .pano-error    │                          │
-│  └──────────────────┘                           │
-│  [hint badge]  [motion button]  [360° badge]    │
-└─────────────────────────────────────────────────┘
+```mermaid
+graph TD
+    subgraph WRAP[".pano-wrap — container, pointer/touch events"]
+        CANVAS["&lt;canvas id='pano-canvas'&gt;<br/>WebGL context"]
+        subgraph LOADER[".pano-loader — overlay during load"]
+            SPINNER[".pano-spinner"]
+            PROGRESS[".pano-progress"]
+            ERROR[".pano-error"]
+        end
+        HINT[".pano-hint — 'Drag to explore'"]
+        MOTION["button.pano-motion — Motion toggle"]
+        BADGE[".pano-badge — 360°"]
+    end
 ```
 
 ### Lifecycle
 
-1. **Initialization guard** — `data-pano-initialized` prevents double-init on Astro View Transition re-mounts
-2. **WebGL context creation** — fails gracefully if GPU is unavailable
-3. **Texture load** (async, with progress + timeout)
-4. **Geometry construction** — decided by aspect ratio at load time
-5. **Animation loop** — `requestAnimationFrame`-driven, render-on-demand
-6. **Cleanup** — on `astro:before-swap`, dispose all GPU resources
+```mermaid
+flowchart TD
+    A["1. Initialization guard<br/><i>data-pano-initialized prevents double-init</i>"] --> B["2. WebGL context creation<br/><i>fails gracefully if GPU unavailable</i>"]
+    B --> C["3. Texture load<br/><i>async, progress + 30s timeout</i>"]
+    C --> D["4. Geometry construction<br/><i>sphere or cylinder based on aspect ratio</i>"]
+    D --> E["5. Animation loop<br/><i>requestAnimationFrame, render-on-demand</i>"]
+    E --> F["6. Cleanup<br/><i>on astro:before-swap, dispose all GPU resources</i>"]
+```
 
 The component hooks into two Astro lifecycle events:
 - `astro:page-load` — re-run setup after View Transitions navigation
@@ -483,6 +484,13 @@ The Euler rotation order defined by the spec is **Z-X'-Y''** (intrinsic rotation
 
 This is the most mathematically dense part of the viewer. Let us trace through `setQuaternionFromDeviceOrientation` step by step.
 
+```mermaid
+flowchart LR
+    A["Device Euler Angles<br/>α, β, γ (degrees)"] -->|"Convert to radians<br/>Remap to YXZ order"| B["Euler(β, α, -γ, 'YXZ')<br/>→ Quaternion"]
+    B -->|"× CameraAdjust<br/>-90° around X"| C["Device space<br/>→ Camera space"]
+    C -->|"× ScreenRotation<br/>-orient° around Z"| D["Final device<br/>quaternion"]
+```
+
 **Step 1: Euler → Quaternion in device frame**
 
 ```javascript
@@ -524,9 +532,9 @@ In Three.js `Quaternion(x, y, z, w)` format: $(-\sqrt{0.5}, 0, 0, \sqrt{0.5})$.
 
 A phone lying flat has its screen-normal (+Z_device) pointing up (+Y_world). We need to rotate so that "device Z = up" becomes "camera -Z = forward". A -90° pitch around X does exactly this:
 
-```
-Before: camera looking along +Z_device (up toward sky)
-After:  camera looking along -Z_world (forward at horizon)
+```mermaid
+flowchart LR
+    A["Phone flat on table<br/>Camera looks along +Z_device<br/><b>up toward sky</b>"] -->|"-90° around X<br/>motionCameraAdjustment"| B["Phone held upright<br/>Camera looks along -Z_world<br/><b>forward at horizon</b>"]
 ```
 
 **Step 3: Screen orientation compensation**
@@ -595,10 +603,37 @@ function resetMotionOrigin() {
 }
 ```
 
-Recalibration happens after:
-1. **User drags** during motion mode → camera moved manually; device didn't
-2. **Pinch ends** → device may have shifted during the gesture
-3. **Motion mode toggled on** → initial calibration needed
+Recalibration happens after three scenarios:
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Pointer as Pointer Events
+    participant Gyro as Device Orientation
+    participant Cam as Camera
+
+    Note over User,Cam: Scenario 1 — Drag during motion mode
+    User->>Pointer: pointerdown + pointermove
+    Pointer->>Cam: Update lon/lat (Euler path)
+    Note over Gyro: SLERP suppressed (activePointers > 0)
+    User->>Pointer: pointerup
+    Pointer->>Gyro: resetMotionOrigin() — clear hasMotionTarget
+    Gyro->>Gyro: Next event: recalibrate correction quaternion
+    Gyro->>Cam: SLERP resumes from new baseline
+
+    Note over User,Cam: Scenario 2 — Pinch ends
+    User->>Pointer: touchend (< 2 fingers)
+    Pointer->>Gyro: resetMotionOrigin()
+    Note over Gyro: cachedScreenAngle unlocked
+    Gyro->>Gyro: Next event: recalibrate
+    Gyro->>Cam: SLERP resumes seamlessly
+
+    Note over User,Cam: Scenario 3 — Motion mode toggled on
+    User->>Gyro: Button click → motionEnabled = true
+    Gyro->>Gyro: resetMotionOrigin() — fresh calibration
+    Gyro->>Gyro: First event: set correction = camera × device⁻¹
+    Gyro->>Cam: SLERP begins
+```
 
 On the next `deviceorientation` event after `hasMotionTarget = false`:
 
@@ -707,39 +742,47 @@ The interaction between manual drag and gyroscope-driven motion is the most subt
 
 ### 7.1 States
 
-```
-┌──────────────────────────────────────────────────────────┐
-│                   MOTION MODE OFF                         │
-│  Camera controlled by: lon/lat + Euler rotation          │
-│  Input: pointer drag, keyboard, wheel                    │
-└──────────────────────────────────────────────────────────┘
-                    │ toggle on
-                    ▼
-┌──────────────────────────────────────────────────────────┐
-│                   MOTION MODE ON                          │
-│                                                          │
-│  ┌─────────────────┐   pointerdown   ┌───────────────┐  │
-│  │  GYRO TRACKING  │ ──────────────▶ │  USER DRAGGING │  │
-│  │                 │                  │               │  │
-│  │  Camera driven  │                  │  Camera driven │  │
-│  │  by quaternion  │  ◀────────────── │  by lon/lat   │  │
-│  │  SLERP          │   pointerup +   │               │  │
-│  │                 │   recalibrate    │               │  │
-│  └─────────────────┘                  └───────────────┘  │
-│           │                                    │         │
-│           │ 2 fingers down                     │         │
-│           ▼                                    │         │
-│  ┌─────────────────┐                          │         │
-│  │    PINCHING      │ ◀────────────────────────┘         │
-│  │                 │                                     │
-│  │  Gyro SUSPENDED │   touchend (< 2 fingers)           │
-│  │  Screen angle   │ ─────────────────────────────┐      │
-│  │  LOCKED         │                              │      │
-│  └─────────────────┘                              │      │
-│           │                                       │      │
-│           └───── recalibrate ◀────────────────────┘      │
-│                                                          │
-└──────────────────────────────────────────────────────────┘
+```mermaid
+stateDiagram-v2
+    [*] --> MotionOFF
+
+    state "Motion Mode OFF" as MotionOFF {
+        note right of MotionOFF
+            Camera: lon/lat + Euler rotation
+            Input: pointer drag, keyboard, wheel
+        end note
+    }
+
+    MotionOFF --> MotionON : toggle on
+
+    state "Motion Mode ON" as MotionON {
+        state "Gyro Tracking" as GYRO {
+            note right of GYRO
+                Camera driven by quaternion SLERP
+            end note
+        }
+
+        state "User Dragging" as DRAG {
+            note right of DRAG
+                Camera driven by lon/lat Euler
+            end note
+        }
+
+        state "Pinching" as PINCH {
+            note right of PINCH
+                Gyro SUSPENDED
+                Screen angle LOCKED
+            end note
+        }
+
+        GYRO --> DRAG : pointerdown
+        DRAG --> GYRO : pointerup + recalibrate
+        GYRO --> PINCH : 2 fingers down
+        DRAG --> PINCH : 2 fingers down
+        PINCH --> GYRO : touchend (< 2 fingers) + recalibrate
+    }
+
+    MotionON --> MotionOFF : toggle off
 ```
 
 ### 7.2 Dual Representation Problem
@@ -800,6 +843,29 @@ A pinch gesture involves two fingers and often causes the user to inadvertently 
 
 **Three-layer protection:**
 
+```mermaid
+flowchart TD
+    PINCH["User starts pinch<br/>(2 fingers down)"] --> L1
+    subgraph L1["Layer 1 — Suppress orientation events"]
+        L1A["onDeviceOrientation checks isPinching"]
+        L1B["If isPinching → return immediately"]
+        L1A --> L1B
+    end
+    L1 --> L2
+    subgraph L2["Layer 2 — Lock screen angle"]
+        L2A["cachedScreenAngle = screenAngle()"]
+        L2B["screenAngle() returns cached value during pinch"]
+        L2A --> L2B
+    end
+    L2 --> L3
+    subgraph L3["Layer 3 — Recalibrate on pinch end"]
+        L3A["touchend: isPinching = false"]
+        L3B["cachedScreenAngle = null (unlock)"]
+        L3C["resetMotionOrigin() → recalibrate"]
+        L3A --> L3B --> L3C
+    end
+```
+
 **Layer 1 — Suppress orientation events during pinch:**
 ```javascript
 function onDeviceOrientation(e) {
@@ -854,12 +920,16 @@ if (e.touches.length === 1) {
 
 When motion mode is active and the user flicks (drag-release with velocity), both momentum and SLERP want to control the camera. The order of operations in `animate()`:
 
-```
-1. Apply momentum (if activePointers.size === 0 and velocity > threshold)
-   → updates lon/lat, sets manualViewDirty
-2. Apply SLERP (if motionEnabled and hasMotionTarget)
-   → updates camera.quaternion directly
-3. Render (if manualViewDirty → apply Euler; else SLERP already set quaternion)
+```mermaid
+flowchart TD
+    A["1. Apply Momentum"] -->|"activePointers === 0<br/>velocity > threshold"| B["Updates lon/lat<br/>Sets manualViewDirty"]
+    B --> C["2. Apply SLERP"]
+    C -->|"motionEnabled<br/>hasMotionTarget<br/>not dragging"| D["Updates camera.quaternion<br/>directly"]
+    D --> E["3. Render"]
+    E -->|"manualViewDirty?"| F["Apply Euler:<br/>camera.rotation.set(lat, -lon, 0)"]
+    E -->|"SLERP set quaternion"| G["Quaternion already correct"]
+    F --> H["renderer.render(scene, camera)"]
+    G --> H
 ```
 
 But after a drag+release, `resetMotionOrigin()` clears `hasMotionTarget`. So SLERP is skipped until the next orientation event triggers recalibration. During this gap (typically 1 frame at 60Hz), momentum runs freely. Then the first recalibrated SLERP smoothly takes over, incorporating the momentum-shifted position as the new baseline.
@@ -1050,35 +1120,27 @@ Clamping at 2× ensures sharp rendering on most devices while preventing the pat
 
 The animation loop runs at the display refresh rate but only issues GPU draw calls when necessary:
 
-```javascript
-function animate() {
-  if (destroyed) return;
-  requestAnimationFrame(animate);
-  if (paused) return;
-
-  let moved = false;
-
-  // 1. Momentum
-  if (activePointers.size === 0 && velocity > threshold) {
-    // apply velocity, set moved = true
-  }
-
-  // 2. SLERP
-  if (motionEnabled && hasMotionTarget && notDragging) {
-    // slerp camera, set moved = true
-  }
-
-  // 3. Keyboard
-  if (KEYS["ArrowLeft"]) { lon -= 0.35; moved = true; }
-  // ...
-
-  // 4. Render only if changed
-  if (moved || needsRender) {
-    if (manualViewDirty) camera.rotation.set(...);
-    renderer.render(scene, camera);
-    needsRender = false;
-  }
-}
+```mermaid
+flowchart TD
+    START["requestAnimationFrame(animate)"] --> DEST{"destroyed?"}
+    DEST -->|yes| EXIT["return — loop ends"]
+    DEST -->|no| PAUSE{"paused?<br/>(tab hidden)"}
+    PAUSE -->|yes| NEXT["schedule next frame, skip work"]
+    PAUSE -->|no| M{"Momentum?<br/>velocity > threshold<br/>no active pointers"}
+    M -->|yes| MV["lon += vX, lat += vY<br/>v *= FRICTION<br/>moved = true"]
+    M -->|no| SL
+    MV --> SL{"SLERP?<br/>motionEnabled<br/>hasMotionTarget<br/>not dragging"}
+    SL -->|yes| SLV["camera.quaternion.slerp(target, 0.18)<br/>syncLonLatFromCamera()<br/>moved = true"]
+    SL -->|no| KB
+    SLV --> KB
+    KB["Keyboard check<br/>ArrowKeys / WASD / +/-"]
+    KB --> GATE{"moved OR<br/>needsRender?"}
+    GATE -->|no| IDLE["Skip render — GPU idle"]
+    GATE -->|yes| DIRTY{"manualViewDirty?"}
+    DIRTY -->|yes| EULER["camera.rotation.set(lat, -lon, 0, 'YXZ')"]
+    DIRTY -->|no| QUAT["Quaternion already set by SLERP"]
+    EULER --> DRAW["renderer.render(scene, camera)"]
+    QUAT --> DRAW
 ```
 
 The `needsRender` flag is set by external events (resize, zoom, initial load) that don't flow through the momentum/SLERP/keyboard paths. This ensures a render happens even when the camera didn't move but the viewport changed.
@@ -1089,38 +1151,48 @@ The `needsRender` flag is set by external events (resize, zoom, initial load) th
 
 ## Summary
 
+```mermaid
+flowchart TD
+    IMG["Image File"] --> TEX["TextureLoader<br/><i>async, progress, 30s timeout, offline detection</i>"]
+    TEX --> RATIO{"Aspect Ratio?"}
+    RATIO -->|"≤ 3 : 1"| SPHERE["SphereGeometry<br/><i>partial or full, BackSide, UV-flipped</i>"]
+    RATIO -->|"> 3 : 1"| CYL["CylinderGeometry<br/><i>height from circumference ratio</i>"]
+    SPHERE --> MAT["MeshBasicMaterial<br/><i>no lighting needed</i>"]
+    CYL --> MAT
+    MAT --> SCENE["Scene — single Mesh at origin"]
+    SCENE --> CAM["PerspectiveCamera at origin<br/><i>Euler YXZ from lon/lat<br/>OR quaternion via SLERP<br/>FOV 30°–110°</i>"]
+    CAM --> REND["WebGLRenderer<br/><i>pixel ratio ≤ 2×, render-on-demand</i>"]
+    REND --> LOOP["Animation Loop"]
+
+    LOOP --> MOM["Momentum<br/><i>v × 0.924, stop below 0.01°/frame</i>"]
+    LOOP --> SLERP["SLERP<br/><i>camera.slerp target 0.18<br/>sync lon/lat after</i>"]
+    LOOP --> KBD["Keyboard<br/><i>±0.35°/frame continuous</i>"]
+    LOOP --> GATE{"moved OR<br/>needsRender?"}
+    GATE -->|yes| DRAW["renderer.render()"]
+    GATE -->|no| SKIP["Skip frame — GPU idle"]
 ```
-[Image file]
-    → TextureLoader (async, progress, 30s timeout, offline detection)
-    → Aspect ratio decision:
-        ≤ 3:1 → SphereGeometry (partial or full, BackSide, UV-flipped)
-        > 3:1 → CylinderGeometry (height from circumference ratio)
-    → MeshBasicMaterial (no lighting needed inside a photosphere)
-    → Scene graph: single Mesh at origin
-    → PerspectiveCamera at origin:
-        - Euler rotation "YXZ" from (lon, lat) state
-        - OR quaternion via SLERP from device orientation
-        - FOV 30°–110° (perspective matrix recomputed on change)
-    → WebGLRenderer (canvas, pixel ratio ≤ 2×, render-on-demand)
-    → Animation loop:
-        ├── Momentum: v *= 0.924, stop below 0.01°/frame
-        ├── SLERP: camera.slerp(target, 0.18), sync lon/lat after
-        ├── Keyboard: ±0.35°/frame continuous
-        ├── Render gate: only if (moved || needsRender)
-        └── Pause gate: skip entirely if document.hidden
-    → Interaction synchronization:
-        ├── Drag during gyro → suppress SLERP, recalibrate on release
-        ├── Pinch during gyro → suppress orientation, lock screen angle
-        ├── Finger transition → resync pointer coordinates
-        └── Double-tap → reset FOV
-    → Failure handling:
-        ├── No WebGL → error message, no init
-        ├── Load failure → specific error (offline/timeout/404)
-        ├── No gyro → hide motion button
-        ├── Permission denied → silent fallback to manual
-        ├── Null sensor data → skip frame
-        └── Tab hidden → pause loop, smooth resume
-    → Cleanup: astro:before-swap → dispose geometry, textures, renderer, listeners
+
+```mermaid
+flowchart LR
+    subgraph SYNC["Interaction Synchronization"]
+        S1["Drag during gyro → suppress SLERP, recalibrate on release"]
+        S2["Pinch during gyro → suppress orientation, lock screen angle"]
+        S3["Finger transition → resync pointer coordinates"]
+        S4["Double-tap → reset FOV"]
+    end
+
+    subgraph FAIL["Failure Handling"]
+        F1["No WebGL → error message, no init"]
+        F2["Load failure → specific error (offline / timeout / 404)"]
+        F3["No gyro → hide motion button"]
+        F4["Permission denied → silent fallback to manual"]
+        F5["Null sensor data → skip frame"]
+        F6["Tab hidden → pause loop, smooth resume"]
+    end
+
+    subgraph CLEAN["Cleanup"]
+        C1["astro:before-swap → dispose geometry, textures, renderer, listeners"]
+    end
 ```
 
 The geometry is deceptively simple — a sphere or cylinder with an image on the inside. The real engineering is in the synchronization layer: making quaternion-space gyro tracking coexist peacefully with Euler-space manual control, handling the dozen edge cases where these two systems could conflict, and failing gracefully when hardware or network conditions are not ideal.
