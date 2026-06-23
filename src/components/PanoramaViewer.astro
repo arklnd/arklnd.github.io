@@ -61,7 +61,20 @@ const { src, alt } = Astro.props;
 
     {
       // ── Renderer ──
-      const renderer = new WebGLRenderer({ canvas, antialias: false, alpha: false });
+      let renderer: WebGLRenderer;
+      try {
+        renderer = new WebGLRenderer({ canvas, antialias: false, alpha: false });
+      } catch (e) {
+        console.error("PanoramaViewer: WebGL context creation failed", e);
+        const spinner = loader.querySelector(".pano-spinner") as HTMLElement | null;
+        if (spinner) spinner.style.display = "none";
+        if (progressEl) progressEl.textContent = "";
+        if (errorEl) {
+          errorEl.hidden = false;
+          errorEl.textContent = "WebGL is not available. Your browser or device may not support 3D rendering, or GPU resources are exhausted. Try closing other tabs or restarting your browser.";
+        }
+        return;
+      }
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
       // ── Scene / Camera ──
