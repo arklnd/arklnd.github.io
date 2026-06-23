@@ -34,6 +34,7 @@ const base = import.meta.env.BASE_URL;
                 onload="this.previousElementSibling.style.display='none';this.classList.add('loaded')"
               />
             </a>
+            {photo.panorama && <span class="pano-badge">360°</span>}
             <div class="gallery-reactions">
               <ReactionsBadge slug={`photo:${photo.slug}`} />
             </div>
@@ -192,10 +193,55 @@ const base = import.meta.env.BASE_URL;
     opacity: 0;
   }
 
-  .gallery-item.panorama img {
+  .gallery-item.panorama .gallery-img-wrap a {
     aspect-ratio: 4 / 3;
-    object-fit: cover;
-    object-position: center;
+    overflow: hidden;
+    position: relative;
+    container-type: inline-size;
+  }
+
+  .gallery-item.panorama img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: auto;
+    height: 100%;
+    max-width: none;
+    animation: pano-pan 12s ease-in-out infinite alternate;
+  }
+
+  .gallery-item.panorama:hover img {
+    animation-play-state: paused;
+  }
+
+  .pano-badge {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    z-index: 2;
+    font-family: var(--font-heading);
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    padding: 2px 7px;
+    border-radius: 4px;
+    pointer-events: none;
+  }
+
+  @keyframes pano-pan {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(calc(-100% + 100cqi)); }
+  }
+
+  @supports not (width: 1cqi) {
+    @keyframes pano-pan {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-60%); }
+    }
   }
 
   .gallery-item img.loaded {
