@@ -142,7 +142,7 @@ const albumJsonLd = JSON.stringify({
     <!-- ── Photo grid ── -->
     <div class="gallery-grid">
       {albumPhotos.map((photo) => (
-        <figure class="gallery-item">
+        <figure class:list={["gallery-item", { panorama: photo.panorama }]}>
           <div class="gallery-img-wrap">
             <a href={`${base}photo-gallery/${photo.slug}`}>
               <div class="img-loader"></div>
@@ -503,6 +503,12 @@ const albumJsonLd = JSON.stringify({
     display: block;
     transition: opacity 0.3s ease;
     opacity: 0;
+  }
+
+  .gallery-item.panorama img {
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    object-position: center;
   }
 
   .gallery-item img.loaded {

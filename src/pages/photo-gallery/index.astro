@@ -22,7 +22,7 @@ const base = import.meta.env.BASE_URL;
 
     <div class="gallery-grid">
       {photos.map((photo) => (
-        <figure class="gallery-item">
+        <figure class:list={["gallery-item", { panorama: photo.panorama }]}>
           <div class="gallery-img-wrap">
             <a href={`${base}photo-gallery/${photo.slug}`}>
               <div class="img-loader"></div>
@@ -190,6 +190,12 @@ const base = import.meta.env.BASE_URL;
     display: block;
     transition: opacity 0.3s ease;
     opacity: 0;
+  }
+
+  .gallery-item.panorama img {
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    object-position: center;
   }
 
   .gallery-item img.loaded {
