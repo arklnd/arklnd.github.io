@@ -132,6 +132,9 @@ const bingVerification = import.meta.env.PUBLIC_BING_SITE_VERIFICATION;
     />
   </head>
   <body>
+    <!-- Navigation progress bar -->
+    <div id="nav-progress" class="nav-progress" aria-hidden="true"></div>
+
     <!-- Skip to content link for keyboard users -->
     <a href="#main-content" class="skip-link">Skip to content</a>
 
@@ -147,6 +150,42 @@ const bingVerification = import.meta.env.PUBLIC_BING_SITE_VERIFICATION;
       </main>
       {!bare && <Footer />}
     </div>
+
+    <!-- Navigation progress bar logic -->
+    <script is:inline>
+      (function () {
+        var bar = document.getElementById('nav-progress');
+        var timer = null;
+        var width = 0;
+
+        function setWidth(w) {
+          width = w;
+          bar.style.width = w + '%';
+        }
+
+        function start() {
+          if (timer) clearInterval(timer);
+          setWidth(0);
+          bar.classList.add('nav-progress--active');
+          // Tick toward 85% to fake progress
+          timer = setInterval(function () {
+            if (width < 85) setWidth(width + (85 - width) * 0.12);
+          }, 100);
+        }
+
+        function finish() {
+          if (timer) { clearInterval(timer); timer = null; }
+          setWidth(100);
+          setTimeout(function () {
+            bar.classList.remove('nav-progress--active');
+            setWidth(0);
+          }, 300);
+        }
+
+        document.addEventListener('astro:before-preparation', start);
+        document.addEventListener('astro:page-load', finish);
+      })();
+    </script>
 
     <!-- PWA: Service Worker registration with auto-reload on new build -->
     <script is:inline>
@@ -319,6 +358,25 @@ const bingVerification = import.meta.env.PUBLIC_BING_SITE_VERIFICATION;
 </html>
 
 <style>
+  .nav-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 3px;
+    background: var(--color-link);
+    z-index: 9999;
+    opacity: 0;
+    transition:
+      width 0.1s ease,
+      opacity 0.3s ease;
+    pointer-events: none;
+  }
+
+  .nav-progress--active {
+    opacity: 1;
+  }
+
   .page {
     max-width: var(--width-page);
     margin: 0 auto;
