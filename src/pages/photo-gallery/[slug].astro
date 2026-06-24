@@ -37,6 +37,7 @@ const pageUrl = `${siteUrl}/photo-gallery/${photo.slug}`;
 
 // ── SEO: build rich description & keywords ──
 const photoAlbums = albums.filter((a) => a.photoSlugs.includes(photo.slug));
+const descriptionIsBengali = photo.description ? /[\u0980-\u09FF]/.test(photo.description) : false;
 const altText = photo.alt || photo.caption;
 
 const description = photo.description
@@ -124,7 +125,7 @@ const albumMap: Record<string, string> = Object.fromEntries(
           )}
         </div>
         {photo.description && (
-          <p class="photo-description">{photo.description}</p>
+          <p class={`photo-description${descriptionIsBengali ? " bengali" : ""}`}>{photo.description}</p>
         )}
         {photoAlbums.length > 0 && (
           <div class="photo-albums">
@@ -160,6 +161,26 @@ const albumMap: Record<string, string> = Object.fromEntries(
 </Layout>
 
 <style>
+  @font-face {
+    font-family: "AlinurNakkhatra";
+    src: url("/fonts/AlinurNakkhatra.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "AlinurNakkhatra";
+    src: url("/fonts/AlinurNakkhatra-Italic.ttf") format("truetype");
+    font-weight: normal;
+    font-style: italic;
+    font-display: swap;
+  }
+
+  .photo-description.bengali {
+    font-family: "AlinurNakkhatra", serif;
+  }
+
   :global(.page:has(.photo-viewer)) {
     max-width: 100dvw;
     padding-inline: 0;
@@ -353,7 +374,7 @@ const albumMap: Record<string, string> = Object.fromEntries(
 
   .photo-description {
     font-family: var(--font-body);
-    font-size: clamp(0.68rem, 1.12vw, 0.77rem);
+    font-size: clamp(0.71rem, 1.18vw, 0.81rem);
     color: rgba(255, 255, 255, 0.6);
     max-width: 48ch;
     line-height: 1.5;
