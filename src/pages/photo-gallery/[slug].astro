@@ -114,6 +114,9 @@ const albumMap: Record<string, string> = Object.fromEntries(
             <span class="photo-place">{photo.place}</span>
           )}
         </div>
+        {photo.description && (
+          <p class="photo-description">{photo.description}</p>
+        )}
         {photoAlbums.length > 0 && (
           <div class="photo-albums">
             {photoAlbums.map((album) => (
@@ -337,6 +340,16 @@ const albumMap: Record<string, string> = Object.fromEntries(
     font-size: 0.8rem;
     color: rgba(255, 255, 255, 0.7);
     margin-bottom: var(--space-sm);
+  }
+
+  .photo-description {
+    font-family: var(--font-body);
+    font-size: clamp(0.68rem, 1.12vw, 0.77rem);
+    color: rgba(255, 255, 255, 0.6);
+    max-width: 48ch;
+    line-height: 1.5;
+    margin: 0 0 var(--space-sm);
+    white-space: pre-line;
   }
 
   .photo-place::before {

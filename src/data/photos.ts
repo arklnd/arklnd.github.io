@@ -5,6 +5,8 @@ export interface GalleryPhoto {
   filename: string;
   /** Caption for the photo */
   caption: string;
+  /** Description or additional details for the photo */
+  description?: string;
   /** Date the photo was taken (YYYY-MM-DD) */
   date: string;
   /** Place where the photo was taken (optional) */
@@ -240,7 +242,8 @@ const photos: GalleryPhoto[] = [
   {
     slug: "pxl-20260419-171757455-png",
     filename: "PXL_20260419_171757455.png",
-    caption: "The Dwarakeswar River",
+    caption: "The Dwarakeswar River",    
+    description: "আমাদের ছোটো নদী চলে বাঁকে বাঁকে\nবৈশাখ মাসে তার হাঁটু জল থাকে।\nপার হয়ে যায় গোরু, পার হয় গাড়ি,\nদুই ধার উঁচু তার, ঢালু তার পাড়ি।\n\nচিক্ চিক্ করে বালি, কোথা নাই কাদা,\nএকধারে কাশবন ফুলে ফুলে সাদা।\nকিচিমিচি করে সেথা শালিকের ঝাঁক,\nরাতে ওঠে থেকে থেকে শেয়ালের হাঁক।",
     alt: "The Dwarakeswar River with reflections on the water surface",
     date: "2026-04-19",
     tags: ["river", "Dwarakeswar", "reflections", "water"],
