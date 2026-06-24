@@ -20,6 +20,7 @@ const wordCount = (post.body || "").split(/\s+/).filter(Boolean).length;
 
 const postUrl = new URL(`/posts/${post.id}`, Astro.site).href;
 const siteUrl = Astro.site?.href || "https://arijitk.in";
+const isBengali = post.body ? /[\u0980-\u09FF]/.test(post.body) : false;
 const datePublished = post.data.date.toISOString();
 const dateModified = post.data.lastModified ? post.data.lastModified.toISOString() : datePublished;
 const ogImageUrl = post.data.image ? new URL(post.data.image, Astro.site).href : undefined;
@@ -106,7 +107,7 @@ const finalRelated = relatedPosts.length >= 2
   katex={true}
 >
   <script slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
-  <Article title={post.data.title} date={post.data.date} description={post.data.description} readingTime={readingTime} slug={post.id} projectId={post.data.project} tags={post.data.tags}>
+  <Article title={post.data.title} date={post.data.date} description={post.data.description} readingTime={readingTime} slug={post.id} projectId={post.data.project} tags={post.data.tags} bengali={isBengali}>
     <Content />
   </Article>
 

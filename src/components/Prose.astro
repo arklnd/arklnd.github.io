@@ -1,8 +1,44 @@
-<div class="prose">
+---
+interface Props {
+  bengali?: boolean;
+}
+
+const { bengali = false } = Astro.props;
+---
+
+<div class={`prose${bengali ? " bengali" : ""}`}>
   <slot />
 </div>
 
 <style>
+  @font-face {
+    font-family: "AlinurNakkhatra";
+    src: url("/fonts/AlinurNakkhatra.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "AlinurNakkhatra";
+    src: url("/fonts/AlinurNakkhatra-Italic.ttf") format("truetype");
+    font-weight: normal;
+    font-style: italic;
+    font-display: swap;
+  }
+
+  .prose.bengali {
+    font-family: "AlinurNakkhatra", serif;
+  }
+
+  .prose.bengali :global(h2),
+  .prose.bengali :global(h3),
+  .prose.bengali :global(h4),
+  .prose.bengali :global(h5),
+  .prose.bengali :global(h6) {
+    font-family: "AlinurNakkhatra", serif;
+  }
+
   .prose {
     font-family: var(--font-body);
     font-size: 1rem;

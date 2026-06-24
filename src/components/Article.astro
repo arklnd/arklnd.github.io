@@ -18,9 +18,11 @@ interface Props {
   projectId?: string;
   /** Tags for this post */
   tags?: string[];
+  /** Whether the post content is in Bengali */
+  bengali?: boolean;
 }
 
-const { title, date, description, readingTime, slug, projectId, tags = [] } = Astro.props;
+const { title, date, description, readingTime, slug, projectId, tags = [], bengali = false } = Astro.props;
 const project: Project | undefined = projectId ? getProjectById(projectId) : undefined;
 
 const formattedDate = date.toLocaleDateString("en-US", {
@@ -35,7 +37,7 @@ const formattedDate = date.toLocaleDateString("en-US", {
   <div id="sticky-scroll-crumbs" class="sticky-scroll-crumbs"></div>
 </nav>
 
-<article class="article">
+<article class={`article${bengali ? " bengali" : ""}`}>
   <header class="article-header">
     <Heading as="h1" transition:name={slug ? `post-title-${slug}` : undefined}>{title}</Heading>
     <p class="article-meta">
@@ -108,7 +110,7 @@ const formattedDate = date.toLocaleDateString("en-US", {
     </div>
   </header>
 
-  <Prose>
+  <Prose bengali={bengali}>
     <slot />
   </Prose>
 
@@ -237,6 +239,26 @@ const formattedDate = date.toLocaleDateString("en-US", {
 </div>
 
 <style>
+  @font-face {
+    font-family: "AlinurNakkhatra";
+    src: url("/fonts/AlinurNakkhatra.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "AlinurNakkhatra";
+    src: url("/fonts/AlinurNakkhatra-Italic.ttf") format("truetype");
+    font-weight: normal;
+    font-style: italic;
+    font-display: swap;
+  }
+
+  .article.bengali :global(.heading) {
+    font-family: "AlinurNakkhatra", serif;
+  }
+
   .article {
     max-width: var(--width-content);
     transition: max-width 0.25s ease;
