@@ -118,14 +118,13 @@ const topTags = Array.from(tagMap.entries())
   .post-grid {
     list-style: none;
     padding: 0;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-    gap: var(--space-lg);
+    columns: 3 300px;
+    column-gap: var(--space-lg);
   }
 
   @media (max-width: 640px) {
     .post-grid {
-      grid-template-columns: 1fr;
+      columns: 1;
     }
   }
 
