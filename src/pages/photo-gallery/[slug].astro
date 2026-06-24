@@ -39,11 +39,13 @@ const pageUrl = `${siteUrl}/photo-gallery/${photo.slug}`;
 const photoAlbums = albums.filter((a) => a.photoSlugs.includes(photo.slug));
 const altText = photo.alt || photo.caption;
 
-const description = photo.caption
-  ? `${photo.caption}${photo.place ? ` — ${photo.place}` : ""}`
-  : photo.place
-    ? `Photo taken at ${photo.place} on ${formattedDate}`
-    : `Photo by Arijit Kundu — ${formattedDate}`;
+const description = photo.description
+  ? `${photo.description.replace(/\n+/g, " ").trim()}${photo.place ? ` — ${photo.place}` : ""}`
+  : photo.caption
+    ? `${photo.caption}${photo.place ? ` — ${photo.place}` : ""}`
+    : photo.place
+      ? `Photo taken at ${photo.place} on ${formattedDate}`
+      : `Photo by Arijit Kundu — ${formattedDate}`;
 
 const keywords = [
   ...(photo.tags ?? []),
@@ -62,7 +64,12 @@ const jsonLd = JSON.stringify({
   contentUrl: ogImage,
   url: pageUrl,
   datePublished: photo.date,
-  ...(photo.place && { contentLocation: { "@type": "Place", name: photo.place } }),
+  ...(photo.place && { contentLocation: {
+    "@type": "Place",
+    name: photo.place,
+    ...(photo.coords && { geo: { "@type": "GeoCoordinates", latitude: photo.coords.lat, longitude: photo.coords.lng } }),
+  }}),
+  ...(photo.coords && !photo.place && { contentLocation: { "@type": "Place", geo: { "@type": "GeoCoordinates", latitude: photo.coords.lat, longitude: photo.coords.lng } } }),
   ...(photo.camera && { exifData: [{ "@type": "PropertyValue", name: "camera", value: photo.camera }] }),
   ...(photo.tags?.length && { keywords: photo.tags.join(", ") }),
   ...(photoAlbums.length && { isPartOf: photoAlbums.map((a) => ({ "@type": "ImageGallery", name: a.title, url: `${siteUrl}/photo-albums/${a.slug}` })) }),
