@@ -482,7 +482,7 @@ export const albums: Album[] = [
   {
     slug: "dwarakeswar-river",
     title: "Dwarakeswar River",
-    description: "Photos along the Dwarakeswar River.",
+    description: "আমাদের ছোটো নদী চলে বাঁকে বাঁকে\nবৈশাখ মাসে তার হাঁটু জল থাকে।\nপার হয়ে যায় গোরু, পার হয় গাড়ি,\nদুই ধার উঁচু তার, ঢালু তার পাড়ি।\n\nচিক্ চিক্ করে বালি, কোথা নাই কাদা,\nএকধারে কাশবন ফুলে ফুলে সাদা।\nকিচিমিচি করে সেথা শালিকের ঝাঁক,\nরাতে ওঠে থেকে থেকে শেয়ালের হাঁক।",
     coverSlug: "img-20260617-190601093",
     tags: ["river", "Dwarakeswar", "water", "nature", "West Bengal"],
     location: "Chandidas Setu, Chhatna - Kamalpur Rd",
