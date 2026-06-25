@@ -117,6 +117,11 @@ const albumJsonLd = JSON.stringify({
           </div>
         )}
         <div class="hero-meta">
+          {coverPhoto && (
+            <div class="hero-reactions">
+              <Reactions slug={`photo:${coverPhoto.slug}`} />
+            </div>
+          )}
           <h1 class="hero-title">{album.title}</h1>
           <span class="hero-count">{albumPhotos.length} photo{albumPhotos.length !== 1 ? "s" : ""}</span>
           {album.tags && album.tags.length > 0 && (
@@ -125,11 +130,6 @@ const albumJsonLd = JSON.stringify({
               {album.tags.slice(0, 6).map((tag) => (
                 <span class="hero-tag">{tag}</span>
               ))}
-            </div>
-          )}
-          {coverPhoto && (
-            <div class="hero-reactions">
-              <Reactions slug={`photo:${coverPhoto.slug}`} />
             </div>
           )}
           {album.description && (
@@ -390,12 +390,7 @@ const albumJsonLd = JSON.stringify({
     margin-top: 12px;
   }
 
-  /* Reaction picker opens upward so overflow:hidden on hero-img-wrap doesn't clip it */
   .hero-reactions :global(.reaction-picker) {
-    top: auto;
-    bottom: 100%;
-    margin-top: 0;
-    margin-bottom: var(--space-sm);
     max-height: min(350px, 40vh);
     background: rgba(20, 24, 30, 0.55);
     backdrop-filter: blur(28px) saturate(160%);
