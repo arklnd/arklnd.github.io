@@ -31,6 +31,7 @@ const { title, description, date, tags = [] } = post.data;
 const body = post.body ?? "";
 const wordCount = body.split(/\s+/).filter(Boolean).length;
 const readingTime = getReadingTime(body);
+const isBengali = /[\u0980-\u09FF]/.test(title) || /[\u0980-\u09FF]/.test(description ?? "");
 
 const href = `${import.meta.env.BASE_URL}posts/${slug}`;
 const formattedDate = date.toLocaleDateString("en-US", {
@@ -45,11 +46,11 @@ const iso = date.toISOString();
   <a href={href} aria-label={title} class="pc-link">
     <div class="pc-body">
       <span
-        class="pc-title"
+        class:list={["pc-title", { bengali: isBengali }]}
         transition:name={transition ? `post-title-${slug}` : undefined}
       >{title}</span>
       {(variant === "grid" || variant === "list") && reactions && <ReactionsBadge slug={slug} />}
-      <span class="pc-desc">{description}</span>
+      <span class:list={["pc-desc", { bengali: isBengali }]}>{description}</span>
     </div>
     <div class="pc-footer">
       <span class="pc-meta">
@@ -73,6 +74,31 @@ const iso = date.toISOString();
 
 <!-- Using is:global because these styles must also apply to JS-rendered search cards -->
 <style is:global>
+  @font-face {
+    font-family: "AlinurNakkhatra";
+    src: url("/fonts/AlinurNakkhatra.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "AlinurNakkhatra";
+    src: url("/fonts/AlinurNakkhatra-Italic.ttf") format("truetype");
+    font-weight: normal;
+    font-style: italic;
+    font-display: swap;
+  }
+
+  .pc-title.bengali {
+    font-family: "AlinurNakkhatra", serif;
+    letter-spacing: 0;
+  }
+
+  .pc-desc.bengali {
+    font-family: "AlinurNakkhatra", serif;
+  }
+
   /* ═══════════════════════════════════════
      PostCard — unified post card component
      Variants: grid, list, compact
