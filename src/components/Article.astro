@@ -20,9 +20,11 @@ interface Props {
   tags?: string[];
   /** Whether the post content is in Bengali */
   bengali?: boolean;
+  /** Last modified date — shown as "Updated" when different from published date */
+  lastModified?: Date;
 }
 
-const { title, date, description, readingTime, slug, projectId, tags = [], bengali = false } = Astro.props;
+const { title, date, description, readingTime, slug, projectId, tags = [], bengali = false, lastModified } = Astro.props;
 const project: Project | undefined = projectId ? getProjectById(projectId) : undefined;
 
 const formattedDate = date.toLocaleDateString("en-US", {
@@ -30,6 +32,11 @@ const formattedDate = date.toLocaleDateString("en-US", {
   month: "long",
   day: "numeric",
 });
+
+const showUpdated = lastModified && lastModified.valueOf() !== date.valueOf();
+const formattedLastModified = showUpdated
+  ? lastModified!.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })
+  : undefined;
 ---
 
 <!-- VSCode-style sticky scroll bar -->
@@ -64,6 +71,13 @@ const formattedDate = date.toLocaleDateString("en-US", {
           y2="10"></line></svg
       >
       <time datetime={date.toISOString()} transition:name={slug ? `post-date-${slug}` : undefined}>{formattedDate}</time>
+      {showUpdated && (
+        <>
+          <span class="separator"> · </span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon" aria-hidden="true"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+          <span>Updated </span><time datetime={lastModified!.toISOString()}>{formattedLastModified}</time>
+        </>
+      )}
       {
         readingTime && (
           <>

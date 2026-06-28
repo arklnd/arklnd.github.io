@@ -107,7 +107,7 @@ const finalRelated = relatedPosts.length >= 2
   katex={true}
 >
   <script slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
-  <Article title={post.data.title} date={post.data.date} description={post.data.description} readingTime={readingTime} slug={post.id} projectId={post.data.project} tags={post.data.tags} bengali={isBengali}>
+  <Article title={post.data.title} date={post.data.date} description={post.data.description} readingTime={readingTime} slug={post.id} projectId={post.data.project} tags={post.data.tags} bengali={isBengali} lastModified={post.data.lastModified}>
     <Content />
   </Article>
 
