@@ -622,7 +622,7 @@ sequenceDiagram
     Gyro->>Cam: SLERP resumes from new baseline
 
     Note over User,Cam: Scenario 2 — Pinch ends
-    User->>Pointer: touchend (< 2 fingers)
+    User->>Pointer: touchend (fewer than 2 fingers)
     Pointer->>Gyro: resetMotionOrigin()
     Note over Gyro: cachedScreenAngle unlocked
     Gyro->>Gyro: Next event: recalibrate
@@ -746,40 +746,36 @@ The interaction between manual drag and gyroscope-driven motion is the most subt
 stateDiagram-v2
     [*] --> MotionOFF
 
-    state "Motion Mode OFF" as MotionOFF {
-        note right of MotionOFF
-            Camera: lon/lat + Euler rotation
-            Input: pointer drag, keyboard, wheel
-        end note
-    }
+    state "Motion Mode OFF" as MotionOFF
+    note right of MotionOFF
+        Camera: lon/lat + Euler rotation
+        Input: pointer drag, keyboard, wheel
+    end note
 
     MotionOFF --> MotionON : toggle on
 
     state "Motion Mode ON" as MotionON {
-        state "Gyro Tracking" as GYRO {
-            note right of GYRO
-                Camera driven by quaternion SLERP
-            end note
-        }
+        state "Gyro Tracking" as GYRO
+        note right of GYRO
+            Camera driven by quaternion SLERP
+        end note
 
-        state "User Dragging" as DRAG {
-            note right of DRAG
-                Camera driven by lon/lat Euler
-            end note
-        }
+        state "User Dragging" as DRAG
+        note right of DRAG
+            Camera driven by lon/lat Euler
+        end note
 
-        state "Pinching" as PINCH {
-            note right of PINCH
-                Gyro SUSPENDED
-                Screen angle LOCKED
-            end note
-        }
+        state "Pinching" as PINCH
+        note right of PINCH
+            Gyro SUSPENDED
+            Screen angle LOCKED
+        end note
 
         GYRO --> DRAG : pointerdown
         DRAG --> GYRO : pointerup + recalibrate
         GYRO --> PINCH : 2 fingers down
         DRAG --> PINCH : 2 fingers down
-        PINCH --> GYRO : touchend (< 2 fingers) + recalibrate
+        PINCH --> GYRO : touchend (fewer than 2 fingers) + recalibrate
     }
 
     MotionON --> MotionOFF : toggle off
