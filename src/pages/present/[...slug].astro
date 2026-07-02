@@ -150,7 +150,7 @@ const formattedDate = post.data.date.toLocaleDateString("en-US", {
       </div>
     </div>
 
-    <script define:vars={{ postSlug: post.id, postTitle: post.data.title }}>
+    <script define:vars={{ postSlug: post.id, postTitle: post.data.title, baseUrl: import.meta.env.BASE_URL }}>
       (function () {
         const source = document.getElementById('content-source');
         const viewport = document.getElementById('slides-viewport');
@@ -451,7 +451,7 @@ const formattedDate = post.data.date.toLocaleDateString("en-US", {
             if (document.fullscreenElement) {
               document.exitFullscreen();
             } else {
-              window.location.href = import.meta.env.BASE_URL + 'posts/' + postSlug;
+              window.location.href = baseUrl + 'posts/' + postSlug;
             }
           }
           if (e.key === 'f' || e.key === 'F') { toggleFullscreen(); }
