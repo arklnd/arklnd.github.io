@@ -20,7 +20,11 @@ const wordCount = (post.body || "").split(/\s+/).filter(Boolean).length;
 
 const postUrl = new URL(`/posts/${post.id}`, Astro.site).href;
 const siteUrl = Astro.site?.href || "https://arijitk.in";
-const isBengali = post.body ? /[\u0980-\u09FF]/.test(post.body) : false;
+const isBengali = post.body ? (() => {
+  const bengaliChars = (post.body.match(/[\u0980-\u09FF]/g) ?? []).length;
+  const totalChars = post.body.replace(/\s/g, "").length;
+  return totalChars > 0 && bengaliChars / totalChars > 0.05;
+})() : false;
 const datePublished = post.data.date.toISOString();
 const dateModified = post.data.lastModified ? post.data.lastModified.toISOString() : datePublished;
 const ogImageUrl = post.data.image ? new URL(post.data.image, Astro.site).href : undefined;

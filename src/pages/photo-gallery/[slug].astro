@@ -37,7 +37,7 @@ const pageUrl = `${siteUrl}/photo-gallery/${photo.slug}`;
 
 // ── SEO: build rich description & keywords ──
 const photoAlbums = albums.filter((a) => a.photoSlugs.includes(photo.slug));
-const descriptionIsBengali = photo.description ? /[\u0980-\u09FF]/.test(photo.description) : false;
+const descriptionIsBengali = photo.description ? (() => { const b = (photo.description!.match(/[\u0980-\u09FF]/g) ?? []).length; const t = photo.description!.replace(/\s/g, "").length; return t > 0 && b / t > 0.05; })() : false;
 const altText = photo.alt || photo.caption;
 
 const description = photo.description

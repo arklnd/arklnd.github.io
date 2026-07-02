@@ -31,7 +31,8 @@ const { title, description, date, tags = [] } = post.data;
 const body = post.body ?? "";
 const wordCount = body.split(/\s+/).filter(Boolean).length;
 const readingTime = getReadingTime(body);
-const isBengali = /[\u0980-\u09FF]/.test(title) || /[\u0980-\u09FF]/.test(description ?? "");
+const isBengaliText = (s: string) => { const b = (s.match(/[\u0980-\u09FF]/g) ?? []).length; const t = s.replace(/\s/g, "").length; return t > 0 && b / t > 0.05; };
+const isBengali = isBengaliText(title) || isBengaliText(description ?? "");
 
 const href = `${import.meta.env.BASE_URL}posts/${slug}`;
 const formattedDate = date.toLocaleDateString("en-US", {

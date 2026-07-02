@@ -14,7 +14,7 @@ const albumsWithCards = albums.map((album) => {
   const cards = orderedSlugs
     .map((slug) => photos.find((p) => p.slug === slug))
     .filter(Boolean);
-  const descriptionIsBengali = album.description ? /[\u0980-\u09FF]/.test(album.description) : false;
+  const descriptionIsBengali = album.description ? (() => { const b = (album.description.match(/[\u0980-\u09FF]/g) ?? []).length; const t = album.description.replace(/\s/g, "").length; return t > 0 && b / t > 0.05; })() : false;
   return { album, cards, descriptionIsBengali };
 });
 ---

@@ -51,7 +51,7 @@ const keywords = [...new Set(allKeywords.map((k) => k.toLowerCase()))].join(", "
 const albumDescription =
   album.description ??
   `${album.title} — A photo album with ${albumPhotos.length} photos${uniquePlaces.length ? ` from ${uniquePlaces.join(", ")}` : ""}.`;
-const descriptionIsBengali = album.description ? /[\u0980-\u09FF]/.test(album.description) : false;
+const descriptionIsBengali = album.description ? (() => { const b = (album.description!.match(/[\u0980-\u09FF]/g) ?? []).length; const t = album.description!.replace(/\s/g, "").length; return t > 0 && b / t > 0.05; })() : false;
 const albumJsonLd = JSON.stringify({
   "@context": "https://schema.org",
   "@type": "ImageGallery",
