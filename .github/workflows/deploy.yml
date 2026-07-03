@@ -85,3 +85,92 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+  notify-indexing:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Collect changed post URLs
+        id: urls
+        run: |
+          BASE_URL="https://arijitk.in"
+
+          # On manual dispatch submit all posts; on push only new/modified ones
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            FILES=$(find src/content/posts -name '*.md' -type f)
+          else
+            PARENT=$(git rev-parse --verify HEAD~1 2>/dev/null || echo "")
+            if [ -n "$PARENT" ]; then
+              FILES=$(git diff --name-only --diff-filter=AM "$PARENT" HEAD -- src/content/posts/ || true)
+            else
+              FILES=$(find src/content/posts -name '*.md' -type f)
+            fi
+          fi
+
+          URLS=""
+          while IFS= read -r file; do
+            [ -z "$file" ] && continue
+            slug=$(basename "$file" .md)
+            URLS="$URLS $BASE_URL/posts/$slug/"
+          done <<< "$FILES"
+
+          URLS=$(echo $URLS | xargs)
+          echo "urls=$URLS" >> $GITHUB_OUTPUT
+          echo "Queued for indexing: $URLS"
+
+      - name: Submit URLs to Google Indexing API
+        if: steps.urls.outputs.urls != ''
+        env:
+          GOOGLE_SA_KEY: ${{ secrets.GOOGLE_INDEXING_SA_KEY }}
+          URLS: ${{ steps.urls.outputs.urls }}
+        run: |
+          pip install google-auth --quiet
+          python3 - << 'PYEOF'
+          import json, os, sys, urllib.request
+          import google.auth.transport.requests
+          import google.oauth2.service_account
+
+          sa_key_str = os.environ.get("GOOGLE_SA_KEY", "").strip()
+          if not sa_key_str:
+              print("GOOGLE_INDEXING_SA_KEY secret not configured — skipping indexing.")
+              sys.exit(0)
+
+          sa_key = json.loads(sa_key_str)
+          credentials = google.oauth2.service_account.Credentials.from_service_account_info(
+              sa_key,
+              scopes=["https://www.googleapis.com/auth/indexing"],
+          )
+
+          auth_req = google.auth.transport.requests.Request()
+          credentials.refresh(auth_req)
+
+          urls = os.environ["URLS"].split()
+          errors = []
+
+          for url in urls:
+              data = json.dumps({"url": url, "type": "URL_UPDATED"}).encode()
+              req = urllib.request.Request(
+                  "https://indexing.googleapis.com/v3/urlNotifications:publish",
+                  data=data,
+                  headers={
+                      "Content-Type": "application/json",
+                      "Authorization": f"Bearer {credentials.token}",
+                  },
+                  method="POST",
+              )
+              try:
+                  with urllib.request.urlopen(req) as resp:
+                      print(f"OK  {url}")
+              except urllib.error.HTTPError as e:
+                  body = e.read().decode()
+                  print(f"ERR {url} -> HTTP {e.code}: {body}", file=sys.stderr)
+                  errors.append(url)
+
+          if errors:
+              sys.exit(1)
+          PYEOF
