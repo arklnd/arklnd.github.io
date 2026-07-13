@@ -2,7 +2,7 @@
 title: "How I Opened and Cleaned My Portronics Bubble 2 Keyboard"
 description: "A small teardown note for opening a Portronics Bubble 2 keyboard without breaking the cabinet, with screw positions and circuit photos."
 date: 2026-07-13
-tags: ["keyboard", "teardown", "cleaning", "portronics", "hardware"]
+tags: ["keyboard", "teardown", "cleaning", "portronics", "bubble 2", "hardware", "circuit"]
 image: "/images/protonics-bubble-2-cleaning/back-cover-screw-positions-1-to-6.jpeg"
 ---
 
