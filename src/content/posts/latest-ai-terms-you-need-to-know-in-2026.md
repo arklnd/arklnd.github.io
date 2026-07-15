@@ -30,7 +30,7 @@ If you spent the last couple of years heads-down in an exam, a job, a family sit
 
 This post started with a conversation with a close relative of mine. She had spent the last few years locked into serious exam preparation — the kind where you genuinely disconnect from everything else. When she came out the other side, she asked me a simple question: *"What's going on with all this AI stuff?"* She's curious, and capable — she just hadn't had the bandwidth to follow along while it was happening.
 
-I started searching suitable courses and playlists for het, and that's when I noticed the problem. Every resource I found assumed you'd been watching the space for months or years. The AI development moved so fast that even well-intentioned beginner content from 2023 already feels like it drops you in the middle of a story.
+I started searching suitable courses and playlists for her, and that's when I noticed the problem. Every resource I found assumed you'd been watching the space for months or years. The AI development moved so fast that even well-intentioned beginner content from 2023 already feels like it drops you in the middle of a story.
 
 The problem isn't that you're behind. The problem is that most AI courses and playlists were created *alongside* the development as it happened. That means they assume you've been following along. They go deep fast. They're full of jargon that makes perfect sense if you've watched fifty prior videos — and zero sense if you haven't.
 
