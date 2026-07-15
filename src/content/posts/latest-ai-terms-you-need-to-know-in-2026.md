@@ -3,6 +3,7 @@ title: "Latest AI Terms You Need to Know in 2026"
 description: "A curated YouTube playlist + chronological AI/LLM evolution timeline — from the Transformer paper to Agentic AI and Agent Skills — with a deep-dive curriculum on how MCP tool calls consume your context window."
 date: 2026-07-15
 tags: [
+  "ai",
   "ai-glossary",
   "ai-terms",
   "learn-ai",
@@ -61,7 +62,7 @@ flowchart TD
     F["🔧 2023 · Tool Calling — OpenAI Functions"]
     G["🔌 2024 · MCP — Model Context Protocol"]
     H["🤖 2024-25 · Agentic AI — AutoGPT, CrewAI, Copilot Agents"]
-    I["🎓 2025-26 · Agent Skills — Copilot Skills, Semantic Kernel"]
+    I["🎓 2025-26 · Agent Skills — Copilot Skills, SKILLS.md"]
 
     A -->|"RNNs were slow and lost long-range context"| B
     B -->|"Every task still needed full training from scratch"| C
