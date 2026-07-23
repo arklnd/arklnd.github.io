@@ -4,7 +4,7 @@ import type { APIContext } from "astro";
 import photos from "../data/photos";
 
 export async function GET(context: APIContext) {
-  const posts = (await getCollection("posts", ({ data }) => !data.draft)).sort(
+  const posts = (await getCollection("posts", ({ data }) => import.meta.env.DEV || !data.draft)).sort(
     (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
   );
 
