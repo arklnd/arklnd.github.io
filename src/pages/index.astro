@@ -44,18 +44,18 @@ const topTags = Array.from(tagMap.entries())
       "query-input": "required name=search_term_string",
     },
   })} />
+  <header slot="before-nav" class="home-header">
+    <div class="home-header-top-rule"></div>
+    <div class="home-header-masthead">
+      <Heading as="h1">Arijit's Blog</Heading>
+    </div>
+    <div class="home-header-meta">
+      <span class="home-tagline">A personal blog about technology, systems, tools, ideas, photography and thought sharing.</span>
+      <time class="home-dateline" datetime={new Date().toISOString().slice(0,10)}>{new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</time>
+    </div>
+    <div class="home-header-bottom-rule"></div>
+  </header>
   <section class="home">
-    <header class="home-header">
-      <div class="home-header-top-rule"></div>
-      <div class="home-header-masthead">
-        <Heading as="h1">Arijit's Blog</Heading>
-      </div>
-      <div class="home-header-meta">
-        <span class="home-tagline">A personal blog about technology, systems, tools, ideas, photography and thought sharing.</span>
-        <time class="home-dateline" datetime={new Date().toISOString().slice(0,10)}>{new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</time>
-      </div>
-      <div class="home-header-bottom-rule"></div>
-    </header>
     <ul class="post-grid" role="list">
       {posts.map((post) => (
         <PostCard
@@ -83,7 +83,8 @@ const topTags = Array.from(tagMap.entries())
 
 <style>
   .home-header {
-    margin-bottom: var(--space-xl);
+    margin-top: var(--space-md);
+    margin-bottom: 0;
     padding-bottom: 0;
     border-bottom: none;
   }

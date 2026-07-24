@@ -170,6 +170,7 @@ const ga4Id = import.meta.env.PUBLIC_GA4_MEASUREMENT_ID;
     </div>
 
     <div class="page">
+      <slot name="before-nav" />
       {!bare && <Nav />}
       <main id="main-content">
         <slot />
