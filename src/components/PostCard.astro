@@ -59,7 +59,6 @@ const iso = date.toISOString();
         {" "}&mdash; {readingTime}
         {" "}&mdash; {wordCount.toLocaleString()} words
       </span>
-      {variant === "grid" && <span class="pc-arrow" aria-hidden="true">&rarr;</span>}
     </div>
     {tags.length > 0 && (
       <div class="pc-tags">
@@ -231,18 +230,6 @@ const iso = date.toISOString();
 
   .pc--grid .pc-meta {
     font-size: 0.8125rem;
-  }
-
-  .pc-arrow {
-    font-size: 1rem;
-    color: var(--color-text-tertiary);
-    transition: color 0.15s ease, transform 0.15s ease;
-    display: inline-block;
-  }
-
-  .pc--grid:hover .pc-arrow {
-    color: var(--color-link);
-    transform: translateX(3px);
   }
 
   /* ── List variant (tags, search) ─────── */
