@@ -131,6 +131,10 @@ const topTags = Array.from(tagMap.entries())
     font-style: italic;
     color: var(--color-text-secondary, var(--color-text));
     letter-spacing: 0.01em;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    min-width: 0;
   }
 
   .home-dateline {
@@ -152,6 +156,13 @@ const topTags = Array.from(tagMap.entries())
   @media (max-width: 640px) {
     .post-grid {
       columns: 1;
+    }
+
+    .home-tagline {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      min-width: 0;
     }
   }
 
