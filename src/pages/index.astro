@@ -22,12 +22,12 @@ const topTags = Array.from(tagMap.entries())
   .map(([tag]) => tag);
 ---
 
-<Layout title="Arijit's Blog" description="Arijit Kundu's tech blog — articles on software engineering, system design, authentication, Git workflows, .NET, reverse engineering, and developer tools.">
+<Layout description="A personal blog about technology, systems, tools, ideas, photography and thought sharing.">
   <script slot="head" type="application/ld+json" set:html={JSON.stringify({
     "@context": "https://schema.org",
     "@type": "WebSite",
     "name": "Arijit's Blog",
-    "description": "A tech blog by Arijit Kundu about software engineering, system design, and developer tools.",
+    "description": "A personal blog about technology, systems, tools, ideas, photography and thought sharing.",
     "url": Astro.site?.href,
     "inLanguage": "en",
     "author": {
