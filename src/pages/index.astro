@@ -2,8 +2,10 @@
 import Layout from "../components/Layout.astro";
 import Heading from "../components/Heading.astro";
 import PostCard from "../components/PostCard.astro";
+import AlbumCard from "../components/AlbumCard.astro";
 import TagPill from "../components/TagPill.astro";
 import { getCollection } from "astro:content";
+import photos, { albums } from "../data/photos";
 
 const posts = (await getCollection("posts", ({ data }) => import.meta.env.DEV || !data.draft)).sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
@@ -20,6 +22,22 @@ const topTags = Array.from(tagMap.entries())
   .sort((a, b) => b[1] - a[1])
   .slice(0, 12)
   .map(([tag]) => tag);
+
+// Build a combined chronological feed of posts + albums
+type FeedItem =
+  | { kind: "post"; date: Date; post: (typeof posts)[number] }
+  | { kind: "album"; date: Date; album: (typeof albums)[number]; coverPhoto: (typeof photos)[number] | undefined };
+
+const feedItems: FeedItem[] = [
+  ...posts.map((post) => ({ kind: "post" as const, date: post.data.date, post })),
+  ...albums
+    .filter((album) => album.date)
+    .map((album) => {
+      const coverSlug = album.coverSlug ?? album.photoSlugs[0];
+      const coverPhoto = photos.find((p) => p.slug === coverSlug);
+      return { kind: "album" as const, date: new Date(album.date!), album, coverPhoto };
+    }),
+].sort((a, b) => b.date.valueOf() - a.date.valueOf());
 ---
 
 <Layout description="A personal blog about technology, systems, tools, ideas, photography and thought sharing.">
@@ -57,13 +75,15 @@ const topTags = Array.from(tagMap.entries())
   </header>
   <section class="home">
     <ul class="post-grid" role="list">
-      {posts.map((post) => (
+      {feedItems.map((item) => item.kind === "post" ? (
         <PostCard
-          slug={post.id}
+          slug={item.post.id}
           variant="grid"
           reactions={true}
           transition={true}
         />
+      ) : (
+        <AlbumCard album={item.album} coverPhoto={item.coverPhoto} />
       ))}
     </ul>
 
@@ -223,4 +243,5 @@ const topTags = Array.from(tagMap.entries())
     justify-content: center;
     gap: 0.5rem;
   }
+
 </style>
