@@ -168,8 +168,13 @@ const { bengali = false } = Astro.props;
     margin-bottom: 0.35em;
   }
 
-  .prose :global(li::marker) {
-    color: var(--color-text-tertiary);
+  .prose :global(ol li::marker) {
+    color: var(--color-sem-num);
+    font-weight: 600;
+  }
+
+  .prose :global(ul li::marker) {
+    color: var(--color-sem-brack-0);
   }
 
   /* ── Task lists (GitHub-flavored) ──────── */
