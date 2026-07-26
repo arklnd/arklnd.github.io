@@ -418,6 +418,11 @@ const { bengali = false } = Astro.props;
     font-variant-numeric: tabular-nums;
   }
 
+  /* Semantic quoted-string spans (injected by script) */
+  .prose :global(.sem-quote) {
+    color: var(--color-sem-quote);
+  }
+
   .prose :global(del),
   .prose :global(s) {
     text-decoration: line-through;
@@ -837,6 +842,40 @@ const { bengali = false } = Astro.props;
         if (m.index > lastIdx) parts.push(document.createTextNode(text.slice(lastIdx, m.index)));
         const sp = document.createElement('span');
         sp.className = 'sem-num';
+        sp.textContent = m[0];
+        parts.push(sp);
+        lastIdx = m.index + m[0].length;
+      }
+      if (parts.length > 0) {
+        if (lastIdx < text.length) parts.push(document.createTextNode(text.slice(lastIdx)));
+        const frag = document.createDocumentFragment();
+        parts.forEach(p => frag.appendChild(p));
+        node.parentNode?.replaceChild(frag, node);
+      }
+    }
+
+    // ── Semantic quote highlighting ───────
+    // Matches typographic “…” and straight "..." double-quoted spans.
+    const QUOTE_RE = /(\u201c[^\u201d\u201c]{1,400}\u201d|"[^"]{2,200}")/g;
+
+    const qWalker = document.createTreeWalker(prose, NodeFilter.SHOW_TEXT, null);
+    const qNodes: Text[] = [];
+    let qn: Node | null;
+    while ((qn = qWalker.nextNode())) {
+      const t = qn as Text;
+      if (!shouldSkip(t) && /[\u201c"]/.test(t.textContent ?? '')) qNodes.push(t);
+    }
+
+    for (const node of qNodes) {
+      const text = node.textContent ?? '';
+      QUOTE_RE.lastIndex = 0;
+      const parts: (Text | HTMLElement)[] = [];
+      let lastIdx = 0;
+      let m: RegExpExecArray | null;
+      while ((m = QUOTE_RE.exec(text)) !== null) {
+        if (m.index > lastIdx) parts.push(document.createTextNode(text.slice(lastIdx, m.index)));
+        const sp = document.createElement('span');
+        sp.className = 'sem-quote';
         sp.textContent = m[0];
         parts.push(sp);
         lastIdx = m.index + m[0].length;
