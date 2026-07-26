@@ -811,7 +811,7 @@ const { bengali = false } = Astro.props;
 
     // Match standalone numeric tokens (currency prefix, optional unit suffix).
     // Lookbehind/ahead prevents matching inside identifiers like "v3.0.1", "d3".
-    const NUM_RE = /(?<![a-zA-Z\d./#])([$€£¥]?)(\d[\d,]*(?:\.\d+)?)((?:%|×|x|ms|[KMBT])(?!\w))?(?![a-zA-Z\d])/g;
+    const NUM_RE = /(?<![a-zA-Z\d.#])([$€£¥]?)(\d[\d,]*(?:\.\d+)?)((?:%|×|x|ms|[KMBT])(?!\w))?(?![a-zA-Z\d])/g;
 
     // Matches typographic "…" and straight "..." double-quoted spans.
     // Runs FIRST — the number walker would split "…42…" into separate text nodes,
