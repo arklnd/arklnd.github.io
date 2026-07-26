@@ -110,7 +110,7 @@ const albumMap: Record<string, string> = Object.fromEntries(
     </div>
 
     <div class="viewer-overlay top-bar">
-      <a href={`${base}photo-gallery`} class="back-link" id="back-link">&larr; Back to Gallery</a>
+      <a href={`${base}photo-gallery`} class="back-link" id="back-link">&lt; Back to Gallery</a>
     </div>
 
     <div class="viewer-overlay bottom-bar">
@@ -841,12 +841,12 @@ const albumMap: Record<string, string> = Object.fromEntries(
       const slug = match[1];
       const title = albumMap[slug];
       link.href = title ? `${baseUrl}photo-albums/${slug}` : `${baseUrl}photo-albums`;
-      link.textContent = `\u2190 Back to ${title ?? "Albums"}`;
+      link.textContent = `< Back to ${title ?? "Albums"}`;
     }
     // If referrer was /photo-albums (index), point there
     else if (refUrl.includes("/photo-albums")) {
       link.href = `${baseUrl}photo-albums`;
-      link.textContent = "\u2190 Back to Albums";
+      link.textContent = "< Back to Albums";
     }
     // else keep default "← Back to Gallery"
   }
