@@ -835,6 +835,7 @@ const { bengali = false } = Astro.props;
       let el = node.parentElement;
       while (el && el !== prose) {
         if (SKIP_TAGS.has(el.tagName)) return true;
+        if (el.classList.contains('sem-num')) return true;
         el = el.parentElement;
       }
       return false;
@@ -949,14 +950,14 @@ const { bengali = false } = Astro.props;
     }
 
     // ── Questions and structural separators ──
-    const SEMANTIC_RE = /\?|(?:=>|->|→|—|:)(?!\d)/g;
+    const SEMANTIC_RE = /\?|(?:=>|->|→|—|,|:)(?!\d)/g;
 
     const sWalker = document.createTreeWalker(prose, NodeFilter.SHOW_TEXT, null);
     const sNodes: Text[] = [];
     let sn: Node | null;
     while ((sn = sWalker.nextNode())) {
       const st = sn as Text;
-      if (!shouldSkip(st) && /[?—:→=-]/.test(st.textContent ?? '')) sNodes.push(st);
+      if (!shouldSkip(st) && /[?,—:→=-]/.test(st.textContent ?? '')) sNodes.push(st);
     }
 
     for (const node of sNodes) {
