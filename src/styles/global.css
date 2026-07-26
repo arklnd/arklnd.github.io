@@ -36,6 +36,8 @@
   --color-sem-quote: #1e81a2;
   --color-sem-brack-0: #a05820;
   --color-sem-brack-1: #20608a;
+  --color-sem-question: #9a3a70;
+  --color-sem-separator: #887030;
 
   --width-content: 800px;
   --width-page: 70dvw;
@@ -212,9 +214,11 @@ img {
   --color-sem-code: #c8a830;
   --color-sem-code-bg: #252210;
   --color-sem-code-border: #4a4020;
-    --color-sem-quote: #2dd3f1;
-    --color-sem-brack-0: #e8a050;
-    --color-sem-brack-1: #60b0e0;
+  --color-sem-quote: #2dd3f1;
+  --color-sem-brack-0: #e8a050;
+  --color-sem-brack-1: #60b0e0;
+  --color-sem-question: #f080c0;
+  --color-sem-separator: #d0b860;
   --deco-blob-1: rgba(60, 120, 220, 0.1);
   --deco-blob-2: rgba(130, 80, 200, 0.08);
   --deco-blob-3: rgba(40, 180, 160, 0.06);

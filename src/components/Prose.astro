@@ -432,6 +432,10 @@ const { bengali = false } = Astro.props;
   .prose :global(.sem-b0) { color: var(--color-sem-brack-0); font-weight: 500; }
   .prose :global(.sem-b1) { color: var(--color-sem-brack-1); font-weight: 500; }
 
+  /* Semantic punctuation spans (injected by script) */
+  .prose :global(.sem-question) { color: var(--color-sem-question); font-weight: 600; }
+  .prose :global(.sem-separator) { color: var(--color-sem-separator); font-weight: 600; }
+
   .prose :global(del),
   .prose :global(s) {
     text-decoration: line-through;
@@ -935,6 +939,39 @@ const { bengali = false } = Astro.props;
         sp.textContent = ch;
         parts.push(sp);
         lastIdx = i + 1;
+      }
+      if (parts.length > 0) {
+        if (lastIdx < text.length) parts.push(document.createTextNode(text.slice(lastIdx)));
+        const frag = document.createDocumentFragment();
+        parts.forEach(p => frag.appendChild(p));
+        node.parentNode?.replaceChild(frag, node);
+      }
+    }
+
+    // ── Questions and structural separators ──
+    const SEMANTIC_RE = /\?|(?:=>|->|→|—|:)(?!\d)/g;
+
+    const sWalker = document.createTreeWalker(prose, NodeFilter.SHOW_TEXT, null);
+    const sNodes: Text[] = [];
+    let sn: Node | null;
+    while ((sn = sWalker.nextNode())) {
+      const st = sn as Text;
+      if (!shouldSkip(st) && /[?—:→=-]/.test(st.textContent ?? '')) sNodes.push(st);
+    }
+
+    for (const node of sNodes) {
+      const text = node.textContent ?? '';
+      SEMANTIC_RE.lastIndex = 0;
+      const parts: (Text | HTMLElement)[] = [];
+      let lastIdx = 0;
+      let m: RegExpExecArray | null;
+      while ((m = SEMANTIC_RE.exec(text)) !== null) {
+        if (m.index > lastIdx) parts.push(document.createTextNode(text.slice(lastIdx, m.index)));
+        const sp = document.createElement('span');
+        sp.className = m[0] === '?' ? 'sem-question' : 'sem-separator';
+        sp.textContent = m[0];
+        parts.push(sp);
+        lastIdx = m.index + m[0].length;
       }
       if (parts.length > 0) {
         if (lastIdx < text.length) parts.push(document.createTextNode(text.slice(lastIdx)));
