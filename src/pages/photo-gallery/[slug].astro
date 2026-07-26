@@ -644,6 +644,11 @@ const albumMap: Record<string, string> = Object.fromEntries(
       isPinching = false;
       // Snap back to 1 if barely zoomed
       if (scale < 1.12) resetZoom(true);
+      // Re-anchor pan origin to the remaining finger to prevent a jump
+      if (e.touches.length === 1) {
+        startPanX = e.touches[0].clientX - tx;
+        startPanY = e.touches[0].clientY - ty;
+      }
       touchFingers = 0;
       return; // never navigate after a pinch gesture
     }
