@@ -62,7 +62,7 @@ const { bengali = false } = Astro.props;
     margin-bottom: 0.75em;
     padding-bottom: 0.3em;
     /* border-bottom: 1px solid var(--color-border); */
-    color: var(--color-text);
+    color: var(--color-sem-h2);
   }
 
   .prose :global(h3) {
@@ -73,7 +73,7 @@ const { bengali = false } = Astro.props;
     line-height: 1.4;
     margin-top: 2em;
     margin-bottom: 0.5em;
-    color: var(--color-text);
+    color: var(--color-sem-h3);
   }
 
   .prose :global(h4) {
@@ -82,7 +82,7 @@ const { bengali = false } = Astro.props;
     font-weight: 600;
     margin-top: 1.75em;
     margin-bottom: 0.4em;
-    color: var(--color-text);
+    color: var(--color-sem-h4);
   }
 
   .prose :global(h5) {
@@ -91,7 +91,7 @@ const { bengali = false } = Astro.props;
     font-weight: 600;
     margin-top: 1.5em;
     margin-bottom: 0.35em;
-    color: var(--color-text-secondary);
+    color: var(--color-sem-h5);
     text-transform: uppercase;
     letter-spacing: 0.04em;
   }
@@ -102,7 +102,7 @@ const { bengali = false } = Astro.props;
     font-weight: 600;
     margin-top: 1.5em;
     margin-bottom: 0.35em;
-    color: var(--color-text-tertiary);
+    color: var(--color-sem-h6);
     text-transform: uppercase;
     letter-spacing: 0.04em;
   }
@@ -216,11 +216,12 @@ const { bengali = false } = Astro.props;
   .prose :global(code) {
     font-family: var(--font-mono);
     font-size: 0.85em;
-    background-color: var(--color-code-bg);
+    background-color: var(--color-sem-code-bg);
     padding: 0.15em 0.4em;
     border-radius: 4px;
-    border: 1px solid var(--color-border);
+    border: 1px solid var(--color-sem-code-border);
     word-break: break-word;
+    color: var(--color-sem-code);
   }
 
   /* ── Code blocks ───────────────────────── */
@@ -286,6 +287,7 @@ const { bengali = false } = Astro.props;
     font-size: 0.8125rem;
     word-break: normal;
     counter-reset: line;
+    color: inherit;
   }
 
   .prose :global(pre code > .line::before) {
@@ -360,7 +362,7 @@ const { bengali = false } = Astro.props;
     text-align: left;
     font-weight: 600;
     padding: 0.65em 1em;
-    color: var(--color-text-secondary);
+    color: var(--color-sem-label);
     background-color: var(--color-surface);
     letter-spacing: 0.01em;
     font-size: 0.85em;
@@ -395,11 +397,12 @@ const { bengali = false } = Astro.props;
   /* ── Strong / em / mark ────────────────── */
   .prose :global(strong) {
     font-weight: 700;
-    color: var(--color-text);
+    color: var(--color-sem-strong);
   }
 
   .prose :global(em) {
     font-style: italic;
+    color: var(--color-sem-em);
   }
 
   .prose :global(mark) {
@@ -407,6 +410,12 @@ const { bengali = false } = Astro.props;
     color: #1a1a1a;
     padding: 0.05em 0.2em;
     border-radius: 2px;
+  }
+
+  /* Semantic number spans (injected by script) */
+  .prose :global(.sem-num) {
+    color: var(--color-sem-num);
+    font-variant-numeric: tabular-nums;
   }
 
   .prose :global(del),
@@ -464,7 +473,7 @@ const { bengali = false } = Astro.props;
     font-weight: 600;
     cursor: pointer;
     padding: 0.25em 0;
-    color: var(--color-text);
+    color: var(--color-sem-label);
     list-style: none;
   }
 
@@ -492,7 +501,7 @@ const { bengali = false } = Astro.props;
   .prose :global(dt) {
     font-weight: 600;
     margin-top: 1em;
-    color: var(--color-text);
+    color: var(--color-sem-label);
   }
 
   .prose :global(dt:first-child) {
@@ -791,6 +800,54 @@ const { bengali = false } = Astro.props;
         });
       });
     });
+
+    // ── Semantic number highlighting ──────
+    const SKIP_TAGS = new Set(['CODE', 'PRE', 'A', 'SCRIPT', 'STYLE', 'KBD', 'MARK', 'MATH']);
+    // Match standalone numeric tokens: optional currency prefix, digits with
+    // optional commas/decimal, optional unit suffix (%  x  ms  K M B T).
+    // Negative lookbehind/ahead prevents matching inside identifiers or version
+    // strings like "v3.0.1", "d3", "#ff0000".
+    const NUM_RE = /(?<![a-zA-Z\d./#])([$€£¥]?)(\d[\d,]*(?:\.\d+)?)((?:%|×|x|ms|[KMBT])(?!\w))?(?![a-zA-Z\d])/g;
+
+    function shouldSkip(node: Node): boolean {
+      let el = node.parentElement;
+      while (el && el !== prose) {
+        if (SKIP_TAGS.has(el.tagName)) return true;
+        el = el.parentElement;
+      }
+      return false;
+    }
+
+    const walker = document.createTreeWalker(prose, NodeFilter.SHOW_TEXT, null);
+    const textNodes: Text[] = [];
+    let tn: Node | null;
+    while ((tn = walker.nextNode())) {
+      const t = tn as Text;
+      if (!shouldSkip(t) && /\d/.test(t.textContent ?? '')) textNodes.push(t);
+    }
+
+    for (const node of textNodes) {
+      const text = node.textContent ?? '';
+      NUM_RE.lastIndex = 0;
+      const parts: (Text | HTMLElement)[] = [];
+      let lastIdx = 0;
+      let m: RegExpExecArray | null;
+      while ((m = NUM_RE.exec(text)) !== null) {
+        if (!m[2]) continue;
+        if (m.index > lastIdx) parts.push(document.createTextNode(text.slice(lastIdx, m.index)));
+        const sp = document.createElement('span');
+        sp.className = 'sem-num';
+        sp.textContent = m[0];
+        parts.push(sp);
+        lastIdx = m.index + m[0].length;
+      }
+      if (parts.length > 0) {
+        if (lastIdx < text.length) parts.push(document.createTextNode(text.slice(lastIdx)));
+        const frag = document.createDocumentFragment();
+        parts.forEach(p => frag.appendChild(p));
+        node.parentNode?.replaceChild(frag, node);
+      }
+    }
   }
 
   document.addEventListener('astro:page-load', initProse);
