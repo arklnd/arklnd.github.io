@@ -1,4 +1,4 @@
----
+﻿---
 interface Props {
   bengali?: boolean;
 }
@@ -806,13 +806,17 @@ const { bengali = false } = Astro.props;
       });
     });
 
-    // ── Semantic number highlighting ──────
+    // ── Semantic highlighting ─────────────
     const SKIP_TAGS = new Set(['CODE', 'PRE', 'A', 'SCRIPT', 'STYLE', 'KBD', 'MARK', 'MATH']);
-    // Match standalone numeric tokens: optional currency prefix, digits with
-    // optional commas/decimal, optional unit suffix (%  x  ms  K M B T).
-    // Negative lookbehind/ahead prevents matching inside identifiers or version
-    // strings like "v3.0.1", "d3", "#ff0000".
+
+    // Match standalone numeric tokens (currency prefix, optional unit suffix).
+    // Lookbehind/ahead prevents matching inside identifiers like "v3.0.1", "d3".
     const NUM_RE = /(?<![a-zA-Z\d./#])([$€£¥]?)(\d[\d,]*(?:\.\d+)?)((?:%|×|x|ms|[KMBT])(?!\w))?(?![a-zA-Z\d])/g;
+
+    // Matches typographic "…" and straight "..." double-quoted spans.
+    // Runs FIRST — the number walker would split "…42…" into separate text nodes,
+    // breaking the quote regex match across them.
+    const QUOTE_RE = /(\u201c[^\u201d\u201c]{1,400}\u201d|"[^"]{2,200}")/g;
 
     function shouldSkip(node: Node): boolean {
       let el = node.parentElement;
@@ -822,41 +826,6 @@ const { bengali = false } = Astro.props;
       }
       return false;
     }
-
-    const walker = document.createTreeWalker(prose, NodeFilter.SHOW_TEXT, null);
-    const textNodes: Text[] = [];
-    let tn: Node | null;
-    while ((tn = walker.nextNode())) {
-      const t = tn as Text;
-      if (!shouldSkip(t) && /\d/.test(t.textContent ?? '')) textNodes.push(t);
-    }
-
-    for (const node of textNodes) {
-      const text = node.textContent ?? '';
-      NUM_RE.lastIndex = 0;
-      const parts: (Text | HTMLElement)[] = [];
-      let lastIdx = 0;
-      let m: RegExpExecArray | null;
-      while ((m = NUM_RE.exec(text)) !== null) {
-        if (!m[2]) continue;
-        if (m.index > lastIdx) parts.push(document.createTextNode(text.slice(lastIdx, m.index)));
-        const sp = document.createElement('span');
-        sp.className = 'sem-num';
-        sp.textContent = m[0];
-        parts.push(sp);
-        lastIdx = m.index + m[0].length;
-      }
-      if (parts.length > 0) {
-        if (lastIdx < text.length) parts.push(document.createTextNode(text.slice(lastIdx)));
-        const frag = document.createDocumentFragment();
-        parts.forEach(p => frag.appendChild(p));
-        node.parentNode?.replaceChild(frag, node);
-      }
-    }
-
-    // ── Semantic quote highlighting ───────
-    // Matches typographic “…” and straight "..." double-quoted spans.
-    const QUOTE_RE = /(\u201c[^\u201d\u201c]{1,400}\u201d|"[^"]{2,200}")/g;
 
     const qWalker = document.createTreeWalker(prose, NodeFilter.SHOW_TEXT, null);
     const qNodes: Text[] = [];
@@ -876,6 +845,38 @@ const { bengali = false } = Astro.props;
         if (m.index > lastIdx) parts.push(document.createTextNode(text.slice(lastIdx, m.index)));
         const sp = document.createElement('span');
         sp.className = 'sem-quote';
+        sp.textContent = m[0];
+        parts.push(sp);
+        lastIdx = m.index + m[0].length;
+      }
+      if (parts.length > 0) {
+        if (lastIdx < text.length) parts.push(document.createTextNode(text.slice(lastIdx)));
+        const frag = document.createDocumentFragment();
+        parts.forEach(p => frag.appendChild(p));
+        node.parentNode?.replaceChild(frag, node);
+      }
+    }
+
+    // Numbers run second — inside .sem-quote the .sem-num color wins via CSS cascade.
+    const walker = document.createTreeWalker(prose, NodeFilter.SHOW_TEXT, null);
+    const textNodes: Text[] = [];
+    let tn: Node | null;
+    while ((tn = walker.nextNode())) {
+      const t = tn as Text;
+      if (!shouldSkip(t) && /\d/.test(t.textContent ?? '')) textNodes.push(t);
+    }
+
+    for (const node of textNodes) {
+      const text = node.textContent ?? '';
+      NUM_RE.lastIndex = 0;
+      const parts: (Text | HTMLElement)[] = [];
+      let lastIdx = 0;
+      let m: RegExpExecArray | null;
+      while ((m = NUM_RE.exec(text)) !== null) {
+        if (!m[2]) continue;
+        if (m.index > lastIdx) parts.push(document.createTextNode(text.slice(lastIdx, m.index)));
+        const sp = document.createElement('span');
+        sp.className = 'sem-num';
         sp.textContent = m[0];
         parts.push(sp);
         lastIdx = m.index + m[0].length;
