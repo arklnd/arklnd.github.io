@@ -88,6 +88,10 @@ flowchart LR
     JOR["Jorhat\nD25–26 @ Assam > ferry gateway\ntea city · Nimatighat access"]
     NIM["Nimatighat\nD25–26 @ Assam > Brahmaputra ferry ⛴️\ncrossing to Majuli"]
 
+    %% ══ WFH DAILY ROUTINE NODES (D10–14) ══════════════════════════
+    WFH_M["🚴 Morning rides\nD10–14 @ Meghalaya > before 10AM\nUmiam Lake · Shillong Peak · Elephant Falls · Laitlum Canyon"]
+    WFH_E["🚶 Evening walks\nD10–14 @ Meghalaya > after 6PM\nWard's Lake · Police Bazaar · Laitumkhrah · Iewduh Bazar"]
+
     %% ══ FORWARD JOURNEY ════════════════════════════════════════════
     KOL -->|"D1"| SIL
     SIL -->|"D2"| GHY
@@ -96,6 +100,10 @@ flowchart LR
     CHR -->|"D9"| MWL
     MWL -->|"D9"| DWK
     DWK -->|"D10"| SHL
+    SHL -->|"🚴 before 10AM"| WFH_M
+    WFH_M -->|"🚴 back < 10AM"| SHL
+    SHL -->|"🚶 after 6PM"| WFH_E
+    WFH_E -->|"🚶 back to hotel"| SHL
     SHL -->|"D15"| KRS
     KRS -->|"D15"| DWK
     DWK -->|"D16"| GHY
@@ -146,6 +154,8 @@ flowchart LR
     classDef ml       fill:#a855f7,stroke:#7e22ce,color:#fff
     classDef ap       fill:#ef4444,stroke:#b91c1c,color:#fff
     classDef transit  fill:#cbd5e1,stroke:#94a3b8,color:#1e293b
+    classDef wfh_ride fill:#fed7aa,stroke:#ea580c,color:#7c2d12
+    classDef wfh_walk fill:#ddd6fe,stroke:#7c3aed,color:#2e1065
     classDef opt      fill:#fef08a,stroke:#b45309,color:#1c1917
     classDef ext      fill:#e5e7eb,stroke:#6b7280,color:#374151
 
@@ -154,6 +164,8 @@ flowchart LR
     class CHR ml
     class BHL,BOM,DIR,SEL,TWG,ROI,MAY,ANI ap
     class MWL,KRS,JOR,NIM transit
+    class WFH_M wfh_ride
+    class WFH_E wfh_walk
     class JLD,POB,MWP,KYN,NAR,THB,GNK,ZEM,DIG opt
     class ZUL,MAN ext
 
@@ -162,7 +174,7 @@ flowchart LR
     style ANI fill:#ef4444,stroke:#b91c1c,color:#fff
 ```
 
-**Legend:** 🟢 West Bengal &nbsp;·&nbsp; 🔵 Assam &nbsp;·&nbsp; 🟣 Meghalaya &nbsp;·&nbsp; 🔴 Arunachal Pradesh &nbsp;·&nbsp; 🟠 WFH base (Shillong) &nbsp;·&nbsp; ⬜ Transit node &nbsp;·&nbsp; 🟡 ⚡ Optional &nbsp;·&nbsp; ░ ➕ Extension &nbsp;·&nbsp; Solid = main route · Dashed = optional/extension
+**Legend:** 🟢 West Bengal &nbsp;·&nbsp; 🔵 Assam &nbsp;·&nbsp; 🟣 Meghalaya &nbsp;·&nbsp; 🔴 Arunachal Pradesh &nbsp;·&nbsp; 🟠 WFH base (Shillong) &nbsp;·&nbsp; ⬜ Transit stop &nbsp;·&nbsp; 🟧 🚴 WFH morning rides &nbsp;·&nbsp; 🟦 🚶 WFH evening walks &nbsp;·&nbsp; 🟡 ⚡ Optional &nbsp;·&nbsp; ░ ➕ Extension
 
 > 🗺️ **[Open Full Route on Google Maps →](https://www.google.com/maps/dir/Kolkata,+West+Bengal/Siliguri,+West+Bengal/Guwahati,+Assam/Shillong,+Meghalaya/Cherrapunji,+Meghalaya/Dawki,+Meghalaya/Tezpur,+Assam/Bomdila,+Arunachal+Pradesh/Tawang,+Arunachal+Pradesh/Kaziranga+National+Park,+Assam/Jorhat,+Assam/Majuli,+Assam/Sivasagar,+Assam/Dibrugarh,+Assam/Roing,+Arunachal+Pradesh/Anini,+Arunachal+Pradesh/)** — 16 stops across West Bengal · Assam · Meghalaya · Arunachal Pradesh · ~5,500 km
 
