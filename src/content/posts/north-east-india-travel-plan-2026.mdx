@@ -61,34 +61,73 @@ export const stateColor = {
 
 ```mermaid
 flowchart LR
-    %% ─── MAIN ROUTE ────────────────────────────────────────────────
+    %% ══ MAIN STOPS (overnight stays) ══════════════════════════════
     KOL["1. Kolkata\nD1 · West Bengal"]
-        -->|"D1"| SIL["2. Siliguri\nD1–2 · West Bengal\nDooars gateway · momos · NH junction"]
-    SIL -->|"D2"| GHY["3. Guwahati\nD2–4 · Assam\nKamakhya · Umananda · Brahmaputra · apply ILP"]
-    GHY -->|"D4"| SHL["4. Shillong · WFH base\nD4–5 · D10–14 · Meghalaya\nShillong Peak · Elephant Falls · Don Bosco Museum · Laitlum Canyon"]
-    SHL -->|"D6"| CHR["5. Cherrapunji\nD6–8 · Meghalaya\nNohkalikai · Seven Sisters · Mawsmai Cave · Arwah Cave · Wei Sawdong · Root Bridge trek D8"]
-    CHR -->|"D9"| DWK["6. Dawki\nD9 · D15 · Meghalaya\nUmngot crystal river · Shnongpdeng cliff jump · riverside camp"]
-    DWK -->|"D10\nWFH →"| SHL
-    SHL -->|"D15\nwknd →"| DWK
-    DWK                                             -->|"D16"| GHY
-    GHY -->|"D17"| TEZ["7. Tezpur\nD17 · Assam\nAgnigarh Hill · Da Parbatia ruins · Nameri NP buffer"]
-    TEZ -->|"D18"| BHL["8. Bhalukpong · ILP check\nD18 · Arunachal P.\nKameng river · last plains fuel"]
-    BHL -->|"D18"| BOM["9. Bomdila\nD18 · D22 · Arunachal P.\nGontse Gang monasteries · apple orchards · valley views"]
-    BOM -->|"D18"| DIR["10. Dirang\nD18 · Arunachal P.\nSangti Valley cranes · Dirang Hot Spring · Dzong"]
-    DIR -->|"D19"| SEL["11. Sela Pass · 4170m\nD19 · Arunachal P.\nSela Lake · prayer flags · Jaswant Garh memorial · Nuranang Falls"]
-    SEL -->|"D19"| TWG["12. Tawang\nD19–22 · Arunachal P.\nMonastery · Urgelling · War Memorial · Madhuri Lake · PT Tso · Bum La · Gongkar La"]
-    TWG -->|"D22 · return\nSela Tunnel"| BOM
-    BOM -->|"D23"| KZR["13. Kaziranga NP\nD23–24 · Assam\nCentral Range · Eastern Range · Western Range · rhino · tiger · elephant"]
-    KZR -->|"D25"| MAJ["14. Majuli\nD25–26 · Assam\nKamalabari Satra · Auniati Satra · village cycling · Brahmaputra sunrise"]
-    MAJ -->|"D26"| SIV["15. Sivasagar\nD26 · Assam\nRang Ghar · Talatal Ghar · Shiva Dol · Kareng Ghar"]
-    SIV -->|"D26"| DBR["16. Dibrugarh\nD26–27 · Assam\nAnini supplies · cash · jerry can · offline maps"]
-    DBR -->|"D27"| ROI["17. Roing\nD27 · Arunachal P.\nMehao Lake · last ATM · road conditions intel"]
-    ROI -->|"D28"| MAY["18. Mayudia Pass · 2655m\nD28 · Arunachal P.\noak–rhododendron forest · autumn colour · CRPF post"]
-    MAY -->|"D28"| ANI["19. Anini\nD28–30 · Arunachal P.\nDri River cane bridges · Idu Mishmi homestay · Dibang Wildlife Sanctuary boundary"]
+    SIL["2. Siliguri\nD1–2 · West Bengal\nDooars gateway · momos"]
+    GHY["3. Guwahati\nD2–4 · Assam\nKamakhya · Umananda · Brahmaputra · apply ILP"]
+    SHL["4. Shillong · WFH\nD4–5 · D10–14 · Meghalaya\nShillong Peak · Elephant Falls · Don Bosco · Laitlum"]
+    CHR["5. Cherrapunji\nD6–8 · Meghalaya\nNohkalikai · Seven Sisters · Mawsmai · Arwah · Wei Sawdong · Root Bridge D8"]
+    DWK["6. Dawki\nD9 · D15 · Meghalaya\nUmngot crystal river · Shnongpdeng · camp"]
+    TEZ["7. Tezpur\nD17 · Assam\nAgnigarh Hill · Da Parbatia · Nameri NP buffer"]
+    BHL["8. Bhalukpong · ILP\nD18 · Arunachal P.\nKameng river · last plains fuel"]
+    BOM["9. Bomdila\nD18 · D22 · Arunachal P.\nGontse Gang monasteries · apple orchards"]
+    DIR["10. Dirang\nD18 · Arunachal P.\nSangti Valley cranes · Hot Spring · Dzong"]
+    SEL["11. Sela Pass · 4170m\nD19 · Arunachal P.\nSela Lake · prayer flags · Jaswant Garh · Nuranang Falls"]
+    TWG["12. Tawang\nD19–22 · Arunachal P.\nMonastery · War Memorial · Madhuri Lake · PT Tso · Bum La"]
+    KZR["13. Kaziranga NP\nD23–24 · Assam\nCentral · Eastern · Western range safaris · rhino · tiger"]
+    MAJ["14. Majuli\nD25–26 · Assam\nKamalabari · Auniati satras · cycling · Brahmaputra sunrise"]
+    SIV["15. Sivasagar\nD26 · Assam\nRang Ghar · Talatal Ghar · Shiva Dol · Kareng Ghar"]
+    DBR["16. Dibrugarh\nD26–27 · Assam\nAnini supplies · cash · jerry can · offline maps"]
+    ROI["17. Roing\nD27 · Arunachal P.\nMehao Lake · last ATM · road intel"]
+    MAY["18. Mayudia · 2655m\nD28 · Arunachal P.\noak–rhododendron forest · CRPF post"]
+    ANI["19. Anini\nD28–30 · Arunachal P.\nDri River · Idu Mishmi · Dibang Wildlife Sanctuary"]
 
-    %% ─── ⚡ OPTIONAL — no extra days needed ────────────────────────
+    %% ══ TRANSIT NODES (brief stops, no overnight) ═════════════════
+    MWL["Mawlynnong · D9\nMeghalaya\nAsia's Cleanest Village · Riwai root bridge"]
+    KRS["Krang Suri · D15\nMeghalaya\nturquoise waterfall · jungle swim"]
+    JOR["Jorhat · D25–26\nAssam\ntea city · Nimatighat gateway"]
+    NIM["Nimatighat · D25–26\nAssam\nBrahmaputra ferry ghat ⛴️"]
+
+    %% ══ FORWARD JOURNEY ════════════════════════════════════════════
+    KOL -->|"D1"| SIL
+    SIL -->|"D2"| GHY
+    GHY -->|"D4"| SHL
+    SHL -->|"D6"| CHR
+    CHR -->|"D9"| MWL
+    MWL -->|"D9"| DWK
+    DWK -->|"D10"| SHL
+    SHL -->|"D15"| KRS
+    KRS -->|"D15"| DWK
+    DWK -->|"D16"| GHY
+    GHY -->|"D17"| TEZ
+    TEZ -->|"D18"| BHL
+    BHL -->|"D18"| BOM
+    BOM -->|"D18"| DIR
+    DIR -->|"D19"| SEL
+    SEL -->|"D19"| TWG
+    TWG -->|"D22 · Sela Tunnel"| BOM
+    BOM -->|"D23"| KZR
+    KZR -->|"D25"| JOR
+    JOR -->|"D25"| NIM
+    NIM -->|"D25 ⛴️"| MAJ
+    MAJ -->|"D26 ⛴️"| NIM
+    NIM -->|"D26"| JOR
+    JOR -->|"D26"| SIV
+    SIV -->|"D26"| DBR
+    DBR -->|"D27"| ROI
+    ROI -->|"D28"| MAY
+    MAY -->|"D28"| ANI
+
+    %% ══ RETURN JOURNEY D30–33 ══════════════════════════════════════
+    ANI -->|"D30"| ROI
+    ROI -->|"D30"| DBR
+    DBR -->|"D31"| GHY
+    GHY -->|"D32"| SIL
+    SIL -->|"D33"| KOL
+
+    %% ══ ⚡ OPTIONAL — no extra days needed ═════════════════════════
     SIL -.->|"⚡ +overnight"| JLD(["⚡ Jaldapara NP\nWB Dooars"])
-    GHY -.->|"⚡ D17 +2hrs"| POB(["⚡ Pobitora WLS\nAssam"])
+    GHY -.->|"⚡ D17"| POB(["⚡ Pobitora WLS\nAssam"])
     SHL -.->|"⚡ D10–14 AM"| MWP(["⚡ Mawphlang Forest\nMeghalaya"])
     CHR -.->|"⚡ D6"| KYN(["⚡ Kynrem Falls\nMeghalaya"])
     DWK -.->|"⚡ D16"| NAR(["⚡ Nartiang Monoliths\nMeghalaya"])
@@ -97,22 +136,24 @@ flowchart LR
     TWG -.->|"⚡ D21"| ZEM(["⚡ Zemithang Valley\nArunachal P."])
     DBR -.->|"⚡ D27"| DIG(["⚡ Digboi + Dehing Patkai\nAssam"])
 
-    %% ─── ➕ EXTENSIONS — requires extra days ───────────────────────
-    SIL -.->|"➕ +1–2d\nSikkim permit"| ZUL(["➕ Zuluk · Silk Route\nSikkim"])
+    %% ══ ➕ EXTENSIONS — extra days needed ══════════════════════════
+    SIL -.->|"➕ +1–2d"| ZUL(["➕ Zuluk · Silk Route\nSikkim"])
     GHY -.->|"➕ +1 day"| MAN(["➕ Manas NP · UNESCO\nAssam"])
 
-    %% ─── COLOUR CLASSES ────────────────────────────────────────────
-    classDef wb   fill:#22c55e,stroke:#16a34a,color:#fff
-    classDef as   fill:#3b82f6,stroke:#1d4ed8,color:#fff
-    classDef ml   fill:#a855f7,stroke:#7e22ce,color:#fff
-    classDef ap   fill:#ef4444,stroke:#b91c1c,color:#fff
-    classDef opt  fill:#fef08a,stroke:#b45309,color:#1c1917
-    classDef ext  fill:#e5e7eb,stroke:#6b7280,color:#374151
+    %% ══ COLOUR CLASSES ═════════════════════════════════════════════
+    classDef wb       fill:#22c55e,stroke:#16a34a,color:#fff
+    classDef as       fill:#3b82f6,stroke:#1d4ed8,color:#fff
+    classDef ml       fill:#a855f7,stroke:#7e22ce,color:#fff
+    classDef ap       fill:#ef4444,stroke:#b91c1c,color:#fff
+    classDef transit  fill:#cbd5e1,stroke:#94a3b8,color:#1e293b
+    classDef opt      fill:#fef08a,stroke:#b45309,color:#1c1917
+    classDef ext      fill:#e5e7eb,stroke:#6b7280,color:#374151
 
     class KOL,SIL wb
     class GHY,TEZ,KZR,MAJ,SIV,DBR as
     class CHR ml
     class BHL,BOM,DIR,SEL,TWG,ROI,MAY,ANI ap
+    class MWL,KRS,JOR,NIM transit
     class JLD,POB,MWP,KYN,NAR,THB,GNK,ZEM,DIG opt
     class ZUL,MAN ext
 
@@ -121,7 +162,7 @@ flowchart LR
     style ANI fill:#ef4444,stroke:#b91c1c,color:#fff
 ```
 
-**Legend:** 🟢 West Bengal &nbsp;·&nbsp; 🔵 Assam &nbsp;·&nbsp; 🟣 Meghalaya &nbsp;·&nbsp; 🔴 Arunachal Pradesh &nbsp;·&nbsp; 🟠 WFH base &nbsp;·&nbsp; 🟡 ⚡ Optional / easy add &nbsp;·&nbsp; ⬜ ➕ Requires extra days &nbsp;·&nbsp; `D-n` = travel day &nbsp;·&nbsp; day range in node = days spent at that stop
+**Legend:** 🟢 West Bengal &nbsp;·&nbsp; 🔵 Assam &nbsp;·&nbsp; 🟣 Meghalaya &nbsp;·&nbsp; 🔴 Arunachal Pradesh &nbsp;·&nbsp; 🟠 WFH base (Shillong) &nbsp;·&nbsp; ⬜ Transit node &nbsp;·&nbsp; 🟡 ⚡ Optional &nbsp;·&nbsp; ░ ➕ Extension &nbsp;·&nbsp; Solid = main route · Dashed = optional/extension
 
 > 🗺️ **[Open Full Route on Google Maps →](https://www.google.com/maps/dir/Kolkata,+West+Bengal/Siliguri,+West+Bengal/Guwahati,+Assam/Shillong,+Meghalaya/Cherrapunji,+Meghalaya/Dawki,+Meghalaya/Tezpur,+Assam/Bomdila,+Arunachal+Pradesh/Tawang,+Arunachal+Pradesh/Kaziranga+National+Park,+Assam/Jorhat,+Assam/Majuli,+Assam/Sivasagar,+Assam/Dibrugarh,+Assam/Roing,+Arunachal+Pradesh/Anini,+Arunachal+Pradesh/)** — 16 stops across West Bengal · Assam · Meghalaya · Arunachal Pradesh · ~5,500 km
 
