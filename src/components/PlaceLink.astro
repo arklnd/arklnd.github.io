@@ -80,27 +80,18 @@ const tooltip = '\uD83D\uDCCD ' + tipParts.join(', ') + ' \u2014 Open in Google 
 )}
 
 <style>
-  /* Visually distinct from regular prose <a> (solid underline → dashed here) */
   .place-link {
     display: inline-flex;
     align-items: baseline;
     gap: 0;
     color: var(--color-link);
     text-decoration: none;
-    border-bottom: 1.5px dashed;
-    border-bottom-color: color-mix(in srgb, var(--color-link) 40%, transparent);
-    padding-bottom: 1px;
     white-space: nowrap;
-    transition:
-      border-bottom-color 0.14s ease,
-      border-bottom-style 0.14s ease,
-      opacity            0.14s ease;
+    transition: opacity 0.14s ease;
   }
 
   a.place-link:hover,
   a.place-link:focus-visible {
-    border-bottom-style: solid;
-    border-bottom-color: var(--color-link);
     opacity: 0.82;
     outline: none;
   }
@@ -108,13 +99,11 @@ const tooltip = '\uD83D\uDCCD ' + tipParts.join(', ') + ' \u2014 Open in Google 
   a.place-link:focus-visible {
     outline:       2px solid var(--color-link);
     outline-offset: 2px;
-    border-bottom: none;
   }
 
-  /* non-linked variant — dotted, no pointer */
+  /* non-linked variant — no pointer */
   .place-nomap {
     cursor: default;
-    border-bottom-style: dotted;
     opacity: 0.72;
   }
 
