@@ -181,12 +181,14 @@ const { bengali = false } = Astro.props;
   .prose :global(ul.contains-task-list) {
     list-style: none;
     padding-left: 0;
+    overflow-x: auto;
   }
 
   .prose :global(.task-list-item) {
     display: flex;
     align-items: baseline;
     gap: 0.5em;
+    white-space: nowrap;
   }
 
   .prose :global(.task-list-item input[type="checkbox"]) {
