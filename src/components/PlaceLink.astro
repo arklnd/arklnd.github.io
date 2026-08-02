@@ -1,0 +1,101 @@
+---
+/**
+ * PlaceLink — decorated inline link that opens a place in Google Maps.
+ *
+ * The Google Maps URL is constructed internally from `name` + `state` —
+ * no need to pass a raw URL.
+ *
+ * Usage:
+ *   <PlaceLink name="Tawang" state="Arunachal Pradesh" />
+ *   <PlaceLink name="Some note" gmap={false} />   ← styled text, no link
+ *
+ * Props:
+ *   name   — place display name (required)
+ *   state  — state / region; appended to the search query for precision (optional)
+ *   gmap   — render as a Google Maps link? default: true
+ */
+interface Props {
+  name: string;
+  state?: string;
+  gmap?: boolean;
+}
+const { name, state, gmap = true } = Astro.props;
+
+// Build the search query: "Name, State, India" or "Name, India"
+const queryParts: string[] = [name];
+if (state) queryParts.push(state);
+queryParts.push('India');
+const mapsUrl = 'https://maps.google.com/?q=' + encodeURIComponent(queryParts.join(', '));
+
+// Tooltip — plain string concat, no template-literal edge-cases
+const tooltip = '\uD83D\uDCCD ' + (state ? name + ', ' + state : name) + ' \u2014 Open in Google Maps';
+---
+
+{gmap ? (
+  <a
+    href={mapsUrl}
+    target="_blank"
+    rel="noopener noreferrer"
+    title={tooltip}
+    class="place-link"
+  ><span class="pin" aria-hidden="true">📍</span><span class="place-name">{name}</span></a>
+) : (
+  <span class="place-link place-nomap" title={'📍 ' + name}><span class="pin" aria-hidden="true">📍</span><span class="place-name">{name}</span></span>
+)}
+
+<style>
+  /*
+   * Deliberately different from prose <a> links:
+   *  ‑ dashed underline   (prose uses solid)
+   *  ‑ 📍 prefix icon
+   *  ‑ never inherits the prose link override colour on the icon
+   */
+  .place-link {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.18em;
+    color: var(--color-link);
+    text-decoration: none;
+    border-bottom: 1.5px dashed;
+    border-bottom-color: color-mix(in srgb, var(--color-link) 40%, transparent);
+    padding-bottom: 1px;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+      border-bottom-color 0.14s ease,
+      border-bottom-style 0.14s ease,
+      opacity 0.14s ease;
+  }
+
+  .place-link:not(.place-nomap):hover,
+  .place-link:not(.place-nomap):focus-visible {
+    border-bottom-style: solid;
+    border-bottom-color: var(--color-link);
+    opacity: 0.82;
+    outline: none;
+  }
+
+  .place-link:not(.place-nomap):focus-visible {
+    outline: 2px solid var(--color-link);
+    outline-offset: 2px;
+    border-bottom: none;
+  }
+
+  /* plain-text variant — dashed but not interactive */
+  .place-nomap {
+    cursor: default;
+    border-bottom-style: dotted;
+    opacity: 0.75;
+  }
+
+  .pin {
+    font-size: 0.72em;
+    line-height: 1.5;
+    flex-shrink: 0;
+    opacity: 0.72;
+  }
+
+  .place-name {
+    line-height: inherit;
+  }
+</style>
