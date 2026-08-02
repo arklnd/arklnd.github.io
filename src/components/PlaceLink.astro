@@ -1,34 +1,57 @@
 ---
 /**
- * PlaceLink — decorated inline link that opens a place in Google Maps.
+ * PlaceLink — inline decorated link to Google Maps.
  *
- * The Google Maps URL is constructed internally from `name` + `state` —
- * no need to pass a raw URL.
+ * The URL is constructed internally from name + state + country.
+ * Pass state="HIDE" or country="HIDE" to suppress that part from
+ * both the visible text and the URL.
  *
  * Usage:
+ *   <PlaceLink name="Kolkata" />
+ *   → 📍 Kolkata, West Bengal  (state defaults to "West Bengal")
+ *
  *   <PlaceLink name="Tawang" state="Arunachal Pradesh" />
- *   <PlaceLink name="Some note" gmap={false} />   ← styled text, no link
+ *   → 📍 Tawang, Arunachal Pradesh
+ *
+ *   <PlaceLink name="Sela Pass" state="Arunachal Pradesh" country="HIDE" />
+ *   → 📍 Sela Pass, Arunachal Pradesh  (India excluded from URL too)
+ *
+ *   <PlaceLink name="some note" state="HIDE" country="HIDE" gmap={false} />
+ *   → 📍 some note  (no link, no state, no country)
  *
  * Props:
- *   name   — place display name (required)
- *   state  — state / region; appended to the search query for precision (optional)
- *   gmap   — render as a Google Maps link? default: true
+ *   name     — display text (required)
+ *   state    — appended after name;  default "West Bengal";  "HIDE" = omit
+ *   country  — used in URL + tooltip; default "India";       "HIDE" = omit
+ *   gmap     — render as a link? default true
  */
 interface Props {
-  name: string;
-  state?: string;
-  gmap?: boolean;
+  name:     string;
+  state?:   string;   // default: "West Bengal"
+  country?: string;   // default: "India"
+  gmap?:    boolean;  // default: true
 }
-const { name, state, gmap = true } = Astro.props;
+const {
+  name,
+  state   = 'West Bengal',
+  country = 'India',
+  gmap    = true,
+} = Astro.props;
 
-// Build the search query: "Name, State, India" or "Name, India"
+const showState   = state   !== 'HIDE';
+const showCountry = country !== 'HIDE';
+
+// Google Maps URL
 const queryParts: string[] = [name];
-if (state) queryParts.push(state);
-queryParts.push('India');
+if (showState)   queryParts.push(state);
+if (showCountry) queryParts.push(country);
 const mapsUrl = 'https://maps.google.com/?q=' + encodeURIComponent(queryParts.join(', '));
 
-// Tooltip — plain string concat, no template-literal edge-cases
-const tooltip = '\uD83D\uDCCD ' + (state ? name + ', ' + state : name) + ' \u2014 Open in Google Maps';
+// Tooltip — plain concatenation, no template-literal edge-cases
+const tipParts: string[] = [name];
+if (showState)   tipParts.push(state);
+if (showCountry) tipParts.push(country);
+const tooltip = '\uD83D\uDCCD ' + tipParts.join(', ') + ' \u2014 Open in Google Maps';
 ---
 
 {gmap ? (
@@ -38,64 +61,73 @@ const tooltip = '\uD83D\uDCCD ' + (state ? name + ', ' + state : name) + ' \u201
     rel="noopener noreferrer"
     title={tooltip}
     class="place-link"
-  ><span class="pin" aria-hidden="true">📍</span><span class="place-name">{name}</span></a>
+  >
+    <span class="pin" aria-hidden="true">📍</span
+    ><span class="pname">{name}</span
+    >{showState && <span class="pstate">, {state}</span>}
+  </a>
 ) : (
-  <span class="place-link place-nomap" title={'📍 ' + name}><span class="pin" aria-hidden="true">📍</span><span class="place-name">{name}</span></span>
+  <span class="place-link place-nomap" title={'\uD83D\uDCCD ' + name}>
+    <span class="pin" aria-hidden="true">📍</span
+    ><span class="pname">{name}</span
+    >{showState && <span class="pstate">, {state}</span>}
+  </span>
 )}
 
 <style>
-  /*
-   * Deliberately different from prose <a> links:
-   *  ‑ dashed underline   (prose uses solid)
-   *  ‑ 📍 prefix icon
-   *  ‑ never inherits the prose link override colour on the icon
-   */
+  /* Visually distinct from regular prose links (solid underline → dashed here) */
   .place-link {
     display: inline-flex;
     align-items: baseline;
-    gap: 0.18em;
+    gap: 0;
     color: var(--color-link);
     text-decoration: none;
     border-bottom: 1.5px dashed;
     border-bottom-color: color-mix(in srgb, var(--color-link) 40%, transparent);
     padding-bottom: 1px;
     white-space: nowrap;
-    cursor: pointer;
     transition:
       border-bottom-color 0.14s ease,
       border-bottom-style 0.14s ease,
-      opacity 0.14s ease;
+      opacity            0.14s ease;
   }
 
-  .place-link:not(.place-nomap):hover,
-  .place-link:not(.place-nomap):focus-visible {
-    border-bottom-style: solid;
-    border-bottom-color: var(--color-link);
+  a.place-link:hover,
+  a.place-link:focus-visible {
+    border-bottom-style:  solid;
+    border-bottom-color:  var(--color-link);
     opacity: 0.82;
     outline: none;
   }
 
-  .place-link:not(.place-nomap):focus-visible {
-    outline: 2px solid var(--color-link);
+  a.place-link:focus-visible {
+    outline:       2px solid var(--color-link);
     outline-offset: 2px;
     border-bottom: none;
   }
 
-  /* plain-text variant — dashed but not interactive */
+  /* non-linked variant */
   .place-nomap {
     cursor: default;
     border-bottom-style: dotted;
-    opacity: 0.75;
-  }
-
-  .pin {
-    font-size: 0.72em;
-    line-height: 1.5;
-    flex-shrink: 0;
     opacity: 0.72;
   }
 
-  .place-name {
+  .pin {
+    font-size:   0.72em;
+    line-height: 1.5;
+    flex-shrink: 0;
+    opacity:     0.7;
+    margin-right: 0.18em;
+  }
+
+  .pname {
     line-height: inherit;
+  }
+
+  /* state label — slightly muted so the place name stays primary */
+  .pstate {
+    font-size: 0.88em;
+    opacity:   0.72;
   }
 </style>
