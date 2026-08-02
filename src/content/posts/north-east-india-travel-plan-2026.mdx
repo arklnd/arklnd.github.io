@@ -61,27 +61,66 @@ export const stateColor = {
 
 ```mermaid
 flowchart LR
+    %% ─── MAIN ROUTE ────────────────────────────────────────────────
     KOL["Kolkata\nWest Bengal"] --> SIL["Siliguri\nWest Bengal"]
     SIL --> GHY["Guwahati\nAssam"]
-    GHY --> SHL["Shillong\nMeghalaya"]
+    GHY --> SHL["Shillong · WFH\nMeghalaya"]
     SHL --> CHR["Cherrapunji\nMeghalaya"]
-    CHR --> DWK["Dawki WFH\nMeghalaya"]
+    CHR --> DWK["Dawki\nMeghalaya"]
     DWK --> GHY
     GHY --> TEZ["Tezpur\nAssam"]
-    TEZ --> DIR["Dirang\nArunachal P."]
-    DIR --> TWG["Tawang\nArunachal P."]
-    TWG --> BOM["Bomdila\nArunachal P."]
-    BOM --> KZR["Kaziranga\nAssam"]
+    TEZ --> BHL["Bhalukpong · ILP\nArunachal P."]
+    BHL --> BOM["Bomdila\nArunachal P."]
+    BOM --> DIR["Dirang\nArunachal P."]
+    DIR --> SEL["Sela Pass · 4170m\nArunachal P."]
+    SEL --> TWG["Tawang\nArunachal P."]
+    TWG -->|"return via\nSela Tunnel"| BOM
+    BOM --> KZR["Kaziranga NP\nAssam"]
     KZR --> MAJ["Majuli\nAssam"]
-    MAJ --> DBR["Dibrugarh\nAssam"]
+    MAJ --> SIV["Sivasagar\nAssam"]
+    SIV --> DBR["Dibrugarh\nAssam"]
     DBR --> ROI["Roing\nArunachal P."]
-    ROI --> ANI["Anini\nArunachal P."]
-    style DWK fill:#fb923c,stroke:#ea580c
-    style ANI fill:#f87171,stroke:#dc2626
-    style KOL fill:#4ade80,stroke:#16a34a
+    ROI --> MAY["Mayudia · 2655m\nArunachal P."]
+    MAY --> ANI["Anini\nArunachal P."]
+
+    %% ─── ⚡ OPTIONAL — no extra days needed ────────────────────────
+    SIL -.->|"⚡ +overnight\nDooars"| JLD(["Jaldapara NP\nWB Dooars"])
+    GHY -.->|"⚡ Day 17\n+2 hrs"| POB(["Pobitora WLS\nAssam"])
+    SHL -.->|"⚡ WFH\nmorning"| MWP(["Mawphlang\nSacred Forest"])
+    CHR -.->|"⚡ Day 6"| KYN(["Kynrem Falls\nMeghalaya"])
+    DWK -.->|"⚡ Day 16"| NAR(["Nartiang\nMonoliths"])
+    BOM -.->|"⚡ Day 18"| THB(["Thembang\nFortified Village"])
+    TWG -.->|"⚡ any\nTawang day"| GNK(["Gongkar La\n~4500m"])
+    TWG -.->|"⚡ Day 21"| ZEM(["Zemithang\nValley"])
+    DBR -.->|"⚡ Day 27"| DIG(["Digboi +\nDehing Patkai"])
+
+    %% ─── ➕ EXTENSIONS — requires extra days ───────────────────────
+    SIL -.->|"➕ +1–2d\nSikkim permit"| ZUL(["Zuluk · Silk Route\nSikkim"])
+    GHY -.->|"➕ +1 day"| MAN(["Manas NP\nUNESCO WHS"])
+
+    %% ─── COLOUR CLASSES ────────────────────────────────────────────
+    classDef wb   fill:#22c55e,stroke:#16a34a,color:#fff
+    classDef as   fill:#3b82f6,stroke:#1d4ed8,color:#fff
+    classDef ml   fill:#a855f7,stroke:#7e22ce,color:#fff
+    classDef ap   fill:#ef4444,stroke:#b91c1c,color:#fff
+    classDef opt  fill:#fef08a,stroke:#b45309,color:#1c1917
+    classDef ext  fill:#e5e7eb,stroke:#6b7280,color:#374151
+
+    class KOL,SIL wb
+    class GHY,TEZ,KZR,MAJ,SIV,DBR as
+    class CHR ml
+    class BHL,BOM,DIR,SEL,TWG,ROI,MAY,ANI ap
+    class JLD,POB,MWP,KYN,NAR,THB,GNK,ZEM,DIG opt
+    class ZUL,MAN ext
+
+    style SHL fill:#fb923c,stroke:#ea580c,color:#fff
+    style DWK fill:#fb923c,stroke:#ea580c,color:#fff
+    style ANI fill:#ef4444,stroke:#b91c1c,color:#fff
 ```
 
-> 🗺️ **[Open Full Route on Google Maps →](https://www.google.com/maps/dir/Kolkata,+West+Bengal/Siliguri,+West+Bengal/Guwahati,+Assam/Shillong,+Meghalaya/Cherrapunji,+Meghalaya/Dawki,+Meghalaya/Tezpur,+Assam/Bomdila,+Arunachal+Pradesh/Tawang,+Arunachal+Pradesh/Kaziranga+National+Park,+Assam/Jorhat,+Assam/Majuli,+Assam/Dibrugarh,+Assam/Roing,+Arunachal+Pradesh/Anini,+Arunachal+Pradesh/)** — 15 stops across West Bengal · Assam · Meghalaya · Arunachal Pradesh · ~5,500 km
+**Legend:** 🟢 West Bengal &nbsp;·&nbsp; 🔵 Assam &nbsp;·&nbsp; 🟣 Meghalaya &nbsp;·&nbsp; 🔴 Arunachal Pradesh &nbsp;·&nbsp; 🟠 WFH base &nbsp;·&nbsp; 🟡 ⚡ Optional / easy add &nbsp;·&nbsp; ⬜ ➕ Requires extra days
+
+> 🗺️ **[Open Full Route on Google Maps →](https://www.google.com/maps/dir/Kolkata,+West+Bengal/Siliguri,+West+Bengal/Guwahati,+Assam/Shillong,+Meghalaya/Cherrapunji,+Meghalaya/Dawki,+Meghalaya/Tezpur,+Assam/Bomdila,+Arunachal+Pradesh/Tawang,+Arunachal+Pradesh/Kaziranga+National+Park,+Assam/Jorhat,+Assam/Majuli,+Assam/Sivasagar,+Assam/Dibrugarh,+Assam/Roing,+Arunachal+Pradesh/Anini,+Arunachal+Pradesh/)** — 16 stops across West Bengal · Assam · Meghalaya · Arunachal Pradesh · ~5,500 km
 
 ---
 
@@ -1134,7 +1173,7 @@ Gongkar La (~4,500m) requires only the standard ILP — no Bum La special permit
 <details>
 <summary><strong>🗺️ Full Route & Main Stops</strong></summary>
 
-> **[Open Full 15-stop Route in Google Maps →](https://www.google.com/maps/dir/Kolkata,+West+Bengal/Siliguri,+West+Bengal/Guwahati,+Assam/Shillong,+Meghalaya/Cherrapunji,+Meghalaya/Dawki,+Meghalaya/Tezpur,+Assam/Bomdila,+Arunachal+Pradesh/Tawang,+Arunachal+Pradesh/Kaziranga+National+Park,+Assam/Jorhat,+Assam/Majuli,+Assam/Dibrugarh,+Assam/Roing,+Arunachal+Pradesh/Anini,+Arunachal+Pradesh/)**
+> **[Open Full 16-stop Route in Google Maps →](https://www.google.com/maps/dir/Kolkata,+West+Bengal/Siliguri,+West+Bengal/Guwahati,+Assam/Shillong,+Meghalaya/Cherrapunji,+Meghalaya/Dawki,+Meghalaya/Tezpur,+Assam/Bomdila,+Arunachal+Pradesh/Tawang,+Arunachal+Pradesh/Kaziranga+National+Park,+Assam/Jorhat,+Assam/Majuli,+Assam/Sivasagar,+Assam/Dibrugarh,+Assam/Roing,+Arunachal+Pradesh/Anini,+Arunachal+Pradesh/)**
 
 | Status | Place | Elev. | Oct–Nov Temp | Type | People / Character | Key Facilities |
 |:---:|---|---|---|---|---|---|
