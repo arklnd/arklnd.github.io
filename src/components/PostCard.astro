@@ -27,7 +27,7 @@ const {
 const post = await getEntry("posts", slug);
 if (!post) throw new Error(`PostCard: post not found for slug "${slug}"`);
 
-const { title, description, date, tags = [] } = post.data;
+const { title, description, date, tags = [], draft = false } = post.data;
 const body = post.body ?? "";
 const wordCount = body.split(/\s+/).filter(Boolean).length;
 const readingTime = getReadingTime(body);
@@ -43,7 +43,7 @@ const formattedDate = date.toLocaleDateString("en-US", {
 const iso = date.toISOString();
 ---
 
-<li class:list={["pc", `pc--${variant}`]}>
+<li class:list={["pc", `pc--${variant}`, { "pc--draft": draft }]}>
   <a href={href} aria-label={title} class="pc-link">
     <div class="pc-body">
       <span
@@ -127,6 +127,16 @@ const iso = date.toISOString();
     line-height: 1.35;
     color: var(--color-text);
     transition: color 0.15s ease;
+  }
+
+  .pc--draft {
+    background: color-mix(in srgb, #b45309 18%, var(--color-surface, transparent)) !important;
+    border-color: color-mix(in srgb, #b45309 55%, transparent) !important;
+  }
+
+  [data-theme="dark"] .pc--draft {
+    background: color-mix(in srgb, #f59e0b 8%, var(--color-surface, transparent));
+    border-color: color-mix(in srgb, #f59e0b 30%, transparent) !important;
   }
 
   .pc:hover .pc-title {
