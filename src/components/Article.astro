@@ -1033,7 +1033,7 @@ const formattedLastModified = showUpdated
         }
 
         const clone = h.el.cloneNode(true) as HTMLElement;
-        clone.querySelectorAll("a, .sr-only").forEach((el) => el.remove());
+        clone.querySelectorAll(".heading-anchor, .sr-only, [aria-hidden='true']").forEach((el) => el.remove());
         const text = document.createTextNode(clone.textContent?.trim() ?? "");
         crumb.appendChild(text);
 
