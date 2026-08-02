@@ -2,80 +2,85 @@
 /**
  * PlaceLink — inline decorated link to Google Maps.
  *
- * The URL is constructed internally from name + state + country.
+ * Google Maps URL is auto-constructed from name + state + country.
  * Pass state="HIDE" or country="HIDE" to suppress that part from
- * both the visible text and the URL.
+ * the visible text and the URL.
  *
- * Usage:
+ * The `gmap` prop is an optional override:
+ *   omitted            → auto-construct URL from name + state + country
+ *   gmap="https://…"   → use this URL instead of the auto-constructed one
+ *   gmap="HIDE"        → render as plain styled text, no link at all
+ *
+ * Examples:
  *   <PlaceLink name="Kolkata" />
- *   → 📍 Kolkata, West Bengal  (state defaults to "West Bengal")
+ *   → 📍 Kolkata, West Bengal   (auto URL, WB default)
  *
- *   <PlaceLink name="Tawang" state="Arunachal Pradesh" />
- *   → 📍 Tawang, Arunachal Pradesh
+ *   <PlaceLink name="Anini" state="Arunachal Pradesh" gmap="https://maps.app.goo.gl/pcS1ioGvEHsQsh39A" />
+ *   → 📍 Anini, Arunachal Pradesh   (custom short link used)
  *
- *   <PlaceLink name="Sela Pass" state="Arunachal Pradesh" country="HIDE" />
- *   → 📍 Sela Pass, Arunachal Pradesh  (India excluded from URL too)
- *
- *   <PlaceLink name="some note" state="HIDE" country="HIDE" gmap={false} />
- *   → 📍 some note  (no link, no state, no country)
- *
- * Props:
- *   name     — display text (required)
- *   state    — appended after name;  default "West Bengal";  "HIDE" = omit
- *   country  — used in URL + tooltip; default "India";       "HIDE" = omit
- *   gmap     — render as a link? default true
+ *   <PlaceLink name="some note" state="HIDE" country="HIDE" gmap="HIDE" />
+ *   → 📍 some note   (no state, no link)
  */
 interface Props {
   name:     string;
-  state?:   string;   // default: "West Bengal"
-  country?: string;   // default: "India"
-  gmap?:    boolean;  // default: true
+  state?:   string;  // default "West Bengal";  "HIDE" = omit from text + URL
+  country?: string;  // default "India";        "HIDE" = omit from URL + tooltip
+  gmap?:    string;  // override URL | "HIDE" (no link) | omit (auto-construct)
 }
 const {
   name,
   state   = 'West Bengal',
   country = 'India',
-  gmap    = true,
+  gmap,
 } = Astro.props;
 
 const showState   = state   !== 'HIDE';
 const showCountry = country !== 'HIDE';
 
-// Google Maps URL
-const queryParts: string[] = [name];
-if (showState)   queryParts.push(state);
-if (showCountry) queryParts.push(country);
-const mapsUrl = 'https://maps.google.com/?q=' + encodeURIComponent(queryParts.join(', '));
+// Determine href
+let href: string | null;
+if (gmap === 'HIDE') {
+  href = null;                   // plain text, no link
+} else if (gmap) {
+  href = gmap;                   // caller-supplied URL takes precedence
+} else {
+  // auto-construct Google Maps search URL
+  const parts: string[] = [name];
+  if (showState)   parts.push(state);
+  if (showCountry) parts.push(country);
+  href = 'https://maps.google.com/?q=' + encodeURIComponent(parts.join(', '));
+}
 
-// Tooltip — plain concatenation, no template-literal edge-cases
+// Tooltip — plain string concat, no template-literal edge-cases
 const tipParts: string[] = [name];
 if (showState)   tipParts.push(state);
 if (showCountry) tipParts.push(country);
 const tooltip = '\uD83D\uDCCD ' + tipParts.join(', ') + ' \u2014 Open in Google Maps';
 ---
 
-{gmap ? (
+{href ? (
   <a
-    href={mapsUrl}
+    href={href}
     target="_blank"
     rel="noopener noreferrer"
     title={tooltip}
     class="place-link"
-  >
-    <span class="pin" aria-hidden="true">📍</span
-    ><span class="pname">{name}</span
-    >{showState && <span class="pstate">, {state}</span>}
+  ><span class="pin" aria-hidden="true">📍</span
+  ><span class="pname">{name}</span
+  >{showState && <span class="pstate">, {state}</span>}
   </a>
 ) : (
-  <span class="place-link place-nomap" title={'\uD83D\uDCCD ' + name}>
-    <span class="pin" aria-hidden="true">📍</span
-    ><span class="pname">{name}</span
-    >{showState && <span class="pstate">, {state}</span>}
+  <span
+    class="place-link place-nomap"
+    title={'\uD83D\uDCCD ' + name}
+  ><span class="pin" aria-hidden="true">📍</span
+  ><span class="pname">{name}</span
+  >{showState && <span class="pstate">, {state}</span>}
   </span>
 )}
 
 <style>
-  /* Visually distinct from regular prose links (solid underline → dashed here) */
+  /* Visually distinct from regular prose <a> (solid underline → dashed here) */
   .place-link {
     display: inline-flex;
     align-items: baseline;
@@ -94,8 +99,8 @@ const tooltip = '\uD83D\uDCCD ' + tipParts.join(', ') + ' \u2014 Open in Google 
 
   a.place-link:hover,
   a.place-link:focus-visible {
-    border-bottom-style:  solid;
-    border-bottom-color:  var(--color-link);
+    border-bottom-style: solid;
+    border-bottom-color: var(--color-link);
     opacity: 0.82;
     outline: none;
   }
@@ -106,7 +111,7 @@ const tooltip = '\uD83D\uDCCD ' + tipParts.join(', ') + ' \u2014 Open in Google 
     border-bottom: none;
   }
 
-  /* non-linked variant */
+  /* non-linked variant — dotted, no pointer */
   .place-nomap {
     cursor: default;
     border-bottom-style: dotted;
@@ -114,10 +119,10 @@ const tooltip = '\uD83D\uDCCD ' + tipParts.join(', ') + ' \u2014 Open in Google 
   }
 
   .pin {
-    font-size:   0.72em;
-    line-height: 1.5;
-    flex-shrink: 0;
-    opacity:     0.7;
+    font-size:    0.72em;
+    line-height:  1.5;
+    flex-shrink:  0;
+    opacity:      0.7;
     margin-right: 0.18em;
   }
 
