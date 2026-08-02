@@ -6,6 +6,14 @@ tags: ["personal", "travel", "wishlist"]
 draft: true
 ---
 
+## Index
+
+1. [Landour, Mussoorie, Uttarakhand](#1-landour-mussoorie-uttarakhand)
+2. [Narkanda, Himachal Pradesh](#2-narkanda-himachal-pradesh)
+3. [Anini, Arunachal Pradesh](#3-anini-arunachal-pradesh)
+
+---
+
 ## Wishlist
 
 ### 1. Landour, Mussoorie, Uttarakhand
@@ -27,3 +35,9 @@ A small town on the old Hindustan-Tibet road in the Shimla district, known for a
 The headquarters of Dibang Valley district — one of the most remote and least visited places in India. Near the McMahon Line. Requires an Inner Line Permit.
 
 [Google Maps](https://maps.app.goo.gl/pcS1ioGvEHsQsh39A)
+
+---
+
+## Active Plans
+
+- [North-East India — Assam, Meghalaya, Arunachal Pradesh (2026)](/posts/north-east-india-travel-plan-2026)
