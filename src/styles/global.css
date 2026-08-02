@@ -71,7 +71,8 @@
 }
 
 html {
-  font-size: 18px;
+  /* fluid: 14.4px at ≤576px → 18px at ≥720px */
+  font-size: clamp(14.4px, 2.5vw, 18px);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
