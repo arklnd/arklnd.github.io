@@ -60,66 +60,175 @@ export const stateColor = {
 ### Route Diagram
 
 ```mermaid
-flowchart LR
-    %% ─── MAIN ROUTE ────────────────────────────────────────────────
-    KOL["1. Kolkata\nD1 · West Bengal"]
-        -->|"D1"| SIL["2. Siliguri\nD1–2 · West Bengal\nDooars gateway · momos · NH junction"]
-    SIL -->|"D2"| GHY["3. Guwahati\nD2–4 · Assam\nKamakhya · Umananda · Brahmaputra · apply ILP"]
-    GHY -->|"D4"| SHL["4. Shillong · WFH base\nD4–5 · D10–14 · Meghalaya\nShillong Peak · Elephant Falls · Don Bosco Museum · Laitlum Canyon"]
-    SHL -->|"D6"| CHR["5. Cherrapunji\nD6–8 · Meghalaya\nNohkalikai · Seven Sisters · Mawsmai Cave · Arwah Cave · Wei Sawdong · Root Bridge trek D8"]
-    CHR -->|"D9"| DWK["6. Dawki\nD9 · D15 · Meghalaya\nUmngot crystal river · Shnongpdeng cliff jump · riverside camp"]
-    DWK -->|"D16"| GHY
-    GHY -->|"D17"| TEZ["7. Tezpur\nD17 · Assam\nAgnigarh Hill · Da Parbatia ruins · Nameri NP buffer"]
-    TEZ -->|"D18"| BHL["8. Bhalukpong · ILP check\nD18 · Arunachal P.\nKameng river · last plains fuel"]
-    BHL -->|"D18"| BOM["9. Bomdila\nD18 · D22 · Arunachal P.\nGontse Gang monasteries · apple orchards · valley views"]
-    BOM -->|"D18"| DIR["10. Dirang\nD18 · Arunachal P.\nSangti Valley cranes · Dirang Hot Spring · Dzong"]
-    DIR -->|"D19"| SEL["11. Sela Pass · 4170m\nD19 · Arunachal P.\nSela Lake · prayer flags · Jaswant Garh memorial · Nuranang Falls"]
-    SEL -->|"D19"| TWG["12. Tawang\nD19–22 · Arunachal P.\nMonastery · Urgelling · War Memorial · Madhuri Lake · PT Tso · Bum La · Gongkar La"]
-    TWG -->|"D22 · return\nSela Tunnel"| BOM
-    BOM -->|"D23"| KZR["13. Kaziranga NP\nD23–24 · Assam\nCentral Range · Eastern Range · Western Range · rhino · tiger · elephant"]
-    KZR -->|"D25"| MAJ["14. Majuli\nD25–26 · Assam\nKamalabari Satra · Auniati Satra · village cycling · Brahmaputra sunrise"]
-    MAJ -->|"D26"| SIV["15. Sivasagar\nD26 · Assam\nRang Ghar · Talatal Ghar · Shiva Dol · Kareng Ghar"]
-    SIV -->|"D26"| DBR["16. Dibrugarh\nD26–27 · Assam\nAnini supplies · cash · jerry can · offline maps"]
-    DBR -->|"D27"| ROI["17. Roing\nD27 · Arunachal P.\nMehao Lake · last ATM · road conditions intel"]
-    ROI -->|"D28"| MAY["18. Mayudia Pass · 2655m\nD28 · Arunachal P.\noak–rhododendron forest · autumn colour · CRPF post"]
-    MAY -->|"D28"| ANI["19. Anini\nD28–30 · Arunachal P.\nDri River cane bridges · Idu Mishmi homestay · Dibang Wildlife Sanctuary boundary"]
+flowchart TB
 
-    %% ─── ⚡ OPTIONAL — no extra days needed ────────────────────────
-    SIL -.->|"⚡ +overnight"| JLD(["⚡ Jaldapara NP\nWB Dooars"])
-    GHY -.->|"⚡ D17 +2hrs"| POB(["⚡ Pobitora WLS\nAssam"])
-    SHL -.->|"⚡ D10–14 AM"| MWP(["⚡ Mawphlang Forest\nMeghalaya"])
-    CHR -.->|"⚡ D6"| KYN(["⚡ Kynrem Falls\nMeghalaya"])
-    DWK -.->|"⚡ D16"| NAR(["⚡ Nartiang Monoliths\nMeghalaya"])
-    BOM -.->|"⚡ D18"| THB(["⚡ Thembang Village\nArunachal P."])
-    TWG -.->|"⚡ D20–21"| GNK(["⚡ Gongkar La ~4500m\nArunachal P."])
-    TWG -.->|"⚡ D21"| ZEM(["⚡ Zemithang Valley\nArunachal P."])
-    DBR -.->|"⚡ D27"| DIG(["⚡ Digboi + Dehing Patkai\nAssam"])
+%% ══════════════════════════════════════════════════════════════
+%%  PHASE 1 — KOLKATA → MEGHALAYA  D1–D9
+%% ══════════════════════════════════════════════════════════════
+subgraph PH1["🟢🟣  PHASE 1 — Kolkata to Meghalaya  (D1–D9)"]
+direction TB
 
-    %% ─── ➕ EXTENSIONS — requires extra days ───────────────────────
-    SIL -.->|"➕ +1–2d\nSikkim permit"| ZUL(["➕ Zuluk · Silk Route\nSikkim"])
-    GHY -.->|"➕ +1 day"| MAN(["➕ Manas NP · UNESCO\nAssam"])
+D1["☀️ Day 1 · Kolkata → Siliguri  570 km\n• 6:00 AM depart Kolkata NH12 via Dankuni Expressway\n• 8:30 AM Bardhaman (~180 km) — tea + paratha dhaba stop\n• 12:00 PM ⛽ Raiganj/Dalkhola (~370 km) — fuel + lunch\n• 4:30 PM enter Siliguri\n• 5:30 PM check in Hill Cart Road\n• Evening: Siliguri momos + Hill Cart Road dinner"]
 
-    %% ─── COLOUR CLASSES ────────────────────────────────────────────
-    classDef wb   fill:#22c55e,stroke:#16a34a,color:#fff
-    classDef as   fill:#3b82f6,stroke:#1d4ed8,color:#fff
-    classDef ml   fill:#a855f7,stroke:#7e22ce,color:#fff
-    classDef ap   fill:#ef4444,stroke:#b91c1c,color:#fff
-    classDef opt  fill:#fef08a,stroke:#b45309,color:#1c1917
-    classDef ext  fill:#e5e7eb,stroke:#6b7280,color:#374151
+D2["☀️ Day 2 · Siliguri → Guwahati  430 km\n• NH27 through Dooars — tea gardens · elephant crossings · forest\n• 8:30 AM Cooch Behar (~80 km) — optional 30-min Palace detour\n• 11:30 AM cross into Assam — Brahmaputra plains open up\n• 1:00 PM ⛽ Bongaigaon — fuel + Assamese thali (rice · dal · mustard fish)\n• 5:30 PM arrive Guwahati south bank\n• Evening: Brahmaputra riverfront (Uzan Bazar ghat) · sunset"]
 
-    class KOL,SIL wb
-    class GHY,TEZ,KZR,MAJ,SIV,DBR as
-    class CHR ml
-    class BHL,BOM,DIR,SEL,TWG,ROI,MAY,ANI ap
-    class JLD,POB,MWP,KYN,NAR,THB,GNK,ZEM,DIG opt
-    class ZUL,MAN ext
+D3["☀️ Day 3 · Guwahati — City Exploration\n• 7:00 AM Kamakhya Temple (one of 51 Shakti Peethas · arrive early for queue)\n• 10:00 AM Umananda Island — ferry from Kachari Ghat · golden langur monkeys\n• 12:00 PM lunch — Paradise Restaurant or Anand Bhavan\n• 2:00 PM Assam State Museum (NE India archaeology + tribal culture · 1.5 hrs)\n• 4:00 PM Brahmaputra cruise from Fancy Bazar ghat\n• Evening: Pan Bazaar street food (lakhi pitha · khar fish curry)\n• 📋 Apply ILP today at eilp.arunachal.gov.in — needed from D18"]
 
-    style SHL fill:#fb923c,stroke:#ea580c,color:#fff
-    style DWK fill:#fb923c,stroke:#ea580c,color:#fff
-    style ANI fill:#ef4444,stroke:#b91c1c,color:#fff
+D4["☀️ Day 4 · Guwahati → Shillong  100 km\n• ⛽ fill at Jorabat — last Assam pump before Meghalaya hills\n• 10:00 AM Umiam Lake (Barapani) — pine viewpoint (30 min)\n• 11:00 AM arrive Shillong · check in Police Bazaar area\n• 2:30 PM Police Bazaar on foot — Khasi shawls · bamboo crafts · jadoh rice + pork\n• 5:00 PM Ward's Lake — boating + flower gardens\n• 7:00 PM café culture — Dylan's Café or ML05 Café (Laitumkhrah)"]
+
+D5["☀️ Day 5 · Shillong — Full Day Exploration\n• 6:30 AM Shillong Peak (1965 m) — IAF viewpoint · panoramic city + Bangladesh plains\n• 9:00 AM Elephant Falls (12 km) — 3-tier · fern-covered rocks · entry ₹20\n• 11:00 AM Don Bosco Museum — 7 floors NE India cultures (best museum in region · 2 hrs)\n• 2:00 PM Police Bazaar lunch — smoked pork · sticky rice\n• 4:00 PM Laitlum Canyon (24 km) — sunset in deep V-valleys · cloud ridges"]
+
+D6["☀️ Day 6 · Shillong → Cherrapunji  55 km\n• 8:00 AM depart via Mawkdok Dympep Valley — gorge edge · zipline option\n• 10:00 AM arrive Sohra · check in Cherrapunjee Holiday Resort or budget homestay\n• 12:00 PM Nohkalikai Falls (340 m drop — India's tallest plunge waterfall)\n• 1:30 PM Seven Sisters Falls (Nohsngithiang) — 7 streams · 1033 m wide\n• 3:00 PM Eco Park — cliff edge · Bangladesh plains visible\n• 4:30 PM Mawsmai Cave — 150 m lit limestone cave\n• ⚡ Kynrem Falls (Thangkharang Park · 305 m · 12 km toward Shella — slot Day 6 late)"]
+
+D7["☀️ Day 7 · Cherrapunji — Waterfalls and Caves\n• 7:00 AM Wei Sawdong Falls — 3-tier hidden fall · 30-min forest trek · aquamarine pool · swim\n• 10:00 AM Arwah Cave — 65–70 M year marine fossils embedded in limestone\n• 1:00 PM lunch at guesthouse\n• 2:30 PM Garden of Caves — caves + streams + waterfalls trail\n• 4:00 PM Dainthlen Falls — rocky gorge · Khasi serpent legend\n• Evening: plan root bridge trek · download Tyrna trail · lay out gear"]
+
+D8["🥾 Day 8 (Sat) · Double Decker Root Bridge Trek — Full Day\n• 6:00 AM drive to Tyrna village (20 km) · park bike safely\n• 6:30 AM descend 3500 stone steps through dense rainforest\n• 9:00 AM Single Root Bridge en route — rubber fig roots trained across stream\n• 10:45 AM Double Decker Living Root Bridge (Nongriat) — 2 stacked bridges · 150+ yrs old · entry ₹50\n• 12:00 PM natural pools below Nongriat — turquoise freshwater · swim and rest\n• 2:00 PM climb back — 3500 steps upward · serious effort · break every 500\n• 4:00 PM reach Tyrna · drink something sweet immediately\n• Evening: return Cherrapunji · early sleep"]
+
+D9["🏕️ Day 9 (Sun) · Cherrapunji → Mawlynnong → Dawki  85 km\n• 8:00 AM depart toward Pynursla · ⛽ fill at Sohra market\n• 10:30 AM Mawlynnong — Asia's Cleanest Village (2003)\n• 10:35 AM Riwai Living Root Bridge — 5-min walk from Mawlynnong · entry included\n• Bamboo skywalk · bamboo dustbins · Khasi matrilineal community\n• 1:00 PM lunch in Mawlynnong\n• 2:00 PM ride to Dawki — steep winding descent · Umngot river appears through trees\n• 3:00 PM arrive Dawki · check in TOWN HOMESTAY (not riverside — need signal for D10)\n• 4:30 PM boat on Umngot River — riverbed visible 5 m down · crystal clear water\n• Evening: riverside · campfire · Bangladesh hills across water\n• Before sleep: confirm D10 plan · pre-book Shillong hotel · set alarm 6 AM"]
+
+D1 --> D2 --> D3 --> D4 --> D5 --> D6 --> D7 --> D8 --> D9
+end
+
+
+%% ══════════════════════════════════════════════════════════════
+%%  WFH WEEK — SHILLONG  D10–D14
+%% ══════════════════════════════════════════════════════════════
+subgraph WFH["🟠  WFH WEEK — Shillong  (D10–D14)  ·  10 AM–6 PM NO RIDING on workdays"]
+direction TB
+
+D10["💻 Day 10 (Mon) · Dawki → Shillong 75 km  +  WFH Day 1\n• 6:00 AM depart Dawki · NH206 north via Amlarem · cool misty dawn\n• 8:00–8:30 AM arrive Shillong · check in pre-booked hotel\n• 8:30 AM hot shower · breakfast\n• 9:00 AM setup workspace · run speedtest (need ≥10 Mbps upload) · Jio 4G hotspot backup\n• 9:30 AM final prep — emails · calendar · stand-ups\n• 10:00 AM – 6:00 PM 🖥️  W O R K\n• 6:15 PM Ward's Lake perimeter walk (10 min on foot from Police Bazaar)\n• 7:00 PM Police Bazaar street food — smoked pork · jadoh · black sesame rice cakes"]
+
+D11["💻 Day 11 (Tue) · WFH Day 2 — Shillong\n• 6:30 AM quick ride to Umiam Lake (15 km · 25 min) — pine-scented air · still water · no tourists\n• 8:00 AM back · breakfast · workspace ready\n• 10:00 AM – 6:00 PM 🖥️  W O R K\n• 6:15 PM Khyndailad Market (Police Bazaar) — evening Khasi market · women vendors · dried fish\n• 7:30 PM Café Shillong Heritage (GS Road · heritage building · warm + unhurried · closes 9 PM)"]
+
+D12["💻 Day 12 (Wed) · WFH Day 3 — Shillong\n• 6:30 AM ride to Shillong Peak (10 km · IAF viewpoint · panoramic city + Bangladesh plains)\n• 8:00 AM back · breakfast · workspace ready\n• 10:00 AM – 6:00 PM 🖥️  W O R K\n• 6:15 PM Laitumkhrah neighbourhood — cafés · music scene · independent shops · 10–15 min walk\n• 6:30 PM Dylan's Café — live acoustic check · WiFi for late calls · open till ~10 PM"]
+
+D13["💻 Day 13 (Thu) · WFH Day 4 — Shillong\n• 6:30 AM ride to Elephant Falls (12 km) — mist on water · empty steps at dawn\n• 8:15 AM back · breakfast · workspace ready\n• ⚡ Alternatively: Mawphlang Sacred Forest (25 km · 400-yr Khasi sacred grove · custodian guide required)\n• 10:00 AM – 6:00 PM 🖥️  W O R K\n• 6:15 PM Iewduh Bazar (Lewduh) — Shillong's largest traditional market · Khasi women-run · open till 7:30 PM\n• 8:00 PM Cloud 9 Restaurant — rooftop · city view at night"]
+
+D14["💻 Day 14 (Fri) · WFH Day 5 — Shillong\n• 6:30 AM Laitlum Canyon (24 km) — sunrise · canyon in early light with clouds in valley below\n• 8:45 AM back · breakfast · workspace ready\n• 10:00 AM – 6:00 PM 🖥️  W O R K\n• 7:00 PM Cloud 9 Restaurant — final Shillong work-night dinner\n• 9:00 PM pack for tomorrow · ⛽ fuel check Scram 440 · confirm Guwahati hotel Sunday night\n• WFH week complete — 5 full working days done"]
+
+D10 --> D11 --> D12 --> D13 --> D14
+end
+
+
+%% ══════════════════════════════════════════════════════════════
+%%  WEEKEND 2 — KRANG SURI · DAWKI · GUWAHATI  D15–D16
+%% ══════════════════════════════════════════════════════════════
+subgraph WKD2["🟣🔵  Weekend 2 — Krang Suri · Dawki · Guwahati  (D15–D16)"]
+direction TB
+
+D15["🏕️ Day 15 (Sat) · Shillong → Krang Suri → Dawki  170 km\n• 7:00 AM depart Shillong · NH6 south toward Amlarem\n• 9:30 AM Krang Suri Falls (~95 km) — turquoise pool · dense jungle · swim\n  Most visually striking waterfall in Meghalaya · entry ₹50\n• 12:30 PM depart Krang Suri · continue south to Dawki (~45 km)\n• ⚡ Phe Phe Falls optional detour (near Amlarem · hidden 3-tier cascade · 20-min jungle walk · free)\n• 3:00 PM arrive Dawki · check in riverside camp or town homestay\n• 4:00 PM Umngot River sunset boat ride — late afternoon light on crystal water · coracle ₹800–1500\n• Evening: Shnongpdeng cliff jumping (guided · ₹300) or campfire riverside"]
+
+D16["☀️ Day 16 (Sun) · Dawki → Guwahati  180 km\n• 7:00 AM depart Dawki via Amlarem — forested · quiet Sunday morning\n• ⚡ Nartiang Monoliths (22 km BEFORE Jowai on Dawki–Jowai road)\n  Asia's largest prehistoric standing-stone site (100+ menhirs + 16th-c Durga temple) · free\n• 11:00 AM Jowai (West Jaintia Hills HQ) — ⛽ fuel + 30-min market explore\n• ⚡ Thadlaskein Lake (5 km from Jowai) — sacred Jaintia lake with solitary megalith in water\n• 2:30 PM arrive Guwahati · check in\n• Afternoon: cash withdrawal · stock up supplies · confirm ILP status (needed D18+)"]
+
+D15 --> D16
+end
+
+
+%% ══════════════════════════════════════════════════════════════
+%%  PHASE 3 — TAWANG CIRCUIT  D17–D22
+%% ══════════════════════════════════════════════════════════════
+subgraph TAWANG["🔴  TAWANG CIRCUIT  (D17–D22)"]
+direction TB
+
+D17["☀️ Day 17 · Guwahati → Tezpur  180 km\n• ⚡ Pobitora WLS option: 5:30 AM depart → morning jeep safari\n  (highest one-horned rhino density per km² in world · entry ₹50 · jeep ~₹800)\n  back on highway by 10 AM → arrive Tezpur 1:30 PM\n• Standard: 8:00 AM depart NH15 · flat Assam plains\n• 12:00 PM arrive Tezpur — gateway to AP on Brahmaputra south bank\n• 1:00 PM lunch in town\n• 2:30 PM Agnigarh Hill — Brahmaputra valley views · Mahabharata legend\n• 3:30 PM Da Parbatia ruins — 5th-century Gupta temple doorway (oldest sculpture in Assam)\n• 5:30 PM Nameri NP buffer zone — birdwatch at dusk\n• ➕ Manas NP option: overnight at Bansbari Lodge (+1 day extension required)"]
+
+D18["☀️ Day 18 · Tezpur → Dirang  200 km  — AP ENTRY\n• 6:30 AM early start\n• 8:30 AM Bhalukpong — ILP checkpoint (20–30 min · police register bike)\n  ⛽ FILL FUEL HERE — last plains-level pump\n• ⚡ Kameng river rafting at Bhalukpong\n• Road climbs through Arunachal foothills · increasingly dramatic views\n• 12:00 PM Bomdila (2415 m) — ⛽ FILL FUEL\n  Visit Upper or Middle Gontse Gang monastery (30 min) · apple orchards in season\n• 2:00 PM lunch Bomdila market — momos · thukpa · pork\n• ⚡ Thembang Fortified Village (25 km off NH13 · rough road · UNESCO Asia-Pacific Award)\n  Complete Monpa village enclosed in intact medieval stone defensive walls · still inhabited · free\n• 3:30–5:00 PM descend to Dirang (1450 m) · check in\n• 5:30 PM Dirang Hot Spring (2 km) — sulphurous natural spring · muscle recovery\n• Evening: Dirang Dzong (medieval Monpa stone fort village · traditional homes · narrow alleys)"]
+
+D19["🏔️ Day 19 · Dirang → Sela Pass → Tawang  140 km  — MAX ALTITUDE DAY\n• 7:00 AM depart before dawn · ⛽ FILL FULLY AT BOMDILA/DIRANG — NO PUMP for 140 km\n• 7:30 AM Sangti Valley (12 km from Dirang) — open meadow · black-necked cranes Oct–Mar\n• 9:00 AM road begins aggressive climb toward Sela\n• 10:30 AM Sela Pass (4170 m / 13680 ft) — DO NOT RUSH\n  Sela Lake (large alpine lake · partially iced from late October)\n  Prayer flags · CRPF post · −5°C to +5°C · wind chill −10°C — wear ALL layers\n  Named after Monpa girl Sela who helped soldier Jaswant Singh hold off PLA alone (1962)\n• 11:30 AM descend into rhododendron forest · temperate broadleaf\n• 12:30 PM Jaswant Garh War Memorial — army maintains his room as if on active duty\n• 1:00 PM Jang town — momo + rice lunch\n• 1:30 PM Nuranang Falls (Jang Falls · named after Monpa girl Noora)\n• 3:00 PM arrive Tawang (2669 m) · check in Hotel Tawang Heights or Hotel Sangay\n• Evening: Tawang market — thangka paintings · prayer wheels · yak wool · local honey\n• ❗ Apply Bum La permit at DC office BY 4–5 PM TODAY\n  Bring: original ILP · Aadhaar · vehicle registration · driver name\n  Clearance from Brigadier at War Memorial · permit ready by 9 AM tomorrow"]
+
+D20["🙏 Day 20 · Tawang — Monastery and Memorials\n• 7:00 AM Tawang Monastery (Galden Namgey Lhatse) — India's largest · founded 1681\n  500 monks · 8 m gold-painted Buddha · 400-year manuscripts · arrive early for empty courtyards\n• 10:00 AM Urgelling Monastery — exact birthplace of 6th Dalai Lama · quieter · more intimate\n• 11:30 AM Gyangong Ani Gompa — Buddhist nunnery on cliff ledge (5 km from town)\n  60–70 nuns · building clings to rock face · resembles Bhutan's Paro Taktsang · free\n• 12:00 PM Tawang War Memorial — 2420 soldiers of the 1962 Sino-Indian War · inscribed walls\n• 2:00 PM lunch in Tawang market — thukpa · butter tea (try at least once)\n• 3:30 PM PT Tso Lake (Pankang Teng Tso) — 17 km · ~4000 m · army road · carry ILP\n  On route: Khedbari Lake (12 km · quieter · fewer visitors · same army road)\n• Evening: Sound and Light show at War Memorial at dusk"]
+
+D21["🏔️ Day 21 · Tawang — High Passes\n─── IF Bum La permit received ───\n• 6:00 AM depart with registered guide — Bum La Pass (4793 m · India–China border)\n  40 km rough military road · Chinese bunkers visible 200 m across LAC\n  Army personnel at gate · one of the strangest experiences on this trip\n• 1:00 PM return Tawang · lunch\n• 3:00 PM Madhuri Lake / Sangetsar Tso (35 km · 4000 m · yak herds · ringed by snow peaks)\n─── IF no Bum La permit ───\n• 8:00 AM ride to Madhuri Lake — 2 hrs each way · silent · cold · one of the trip's best moments\n• Midday at lake\n• Afternoon: Zemithang Valley (80 km · Bhutan border · remote Monpa villages)\n──────────────────────────────────────\n⚡ Any Tawang day: Gongkar La (~4500 m)\n  ILP only — NO Bum La permit required · rough military track from town\n  Sweeping Himalayan ridge views · almost no visitors · ask locally about road access"]
+
+D22["☀️ Day 22 · Tawang → Bomdila  165 km — Return leg\n• 7:00 AM depart Tawang — final look at monastery valley in morning light\n• ⛽ fill at Tawang govt pump (queue early · may be dry · take what is available)\n• Take SELA TUNNEL on return (opened March 2024 · 3000 m · bypasses closed pass road · saves 10 km)\n• 12:30 PM Dirang — tea stop\n• 2:30 PM Bomdila — ⛽ FILL FUEL · check in\n• Evening: Lower Gontse Gang Monastery — best of 3 Bomdila monasteries · valley views of Kameng foothills"]
+
+D17 --> D18 --> D19 --> D20 --> D21 --> D22
+end
+
+
+%% ══════════════════════════════════════════════════════════════
+%%  ASSAM LOOP  D23–D27
+%% ══════════════════════════════════════════════════════════════
+subgraph ASSAM2["🔵  ASSAM LOOP — Kaziranga · Majuli · Sivasagar  (D23–D27)"]
+direction TB
+
+D23["☀️ Day 23 · Bomdila → Kaziranga  360 km\n• 6:00 AM depart Bomdila · descend through Bhalukpong back to Assam plains\n• 9:00 AM exit AP at Bhalukpong — show ILP at exit checkpoint\n• 12:00 PM ⛽ Tezpur fuel + lunch\n• 3:00 PM arrive Kaziranga (Kohora gate area) — check in Iora Resort or Infinity Kaziranga\n• Book morning jeep safari at front desk — Central Range best for rhinos\n• Evening: walk road near park boundary at dusk · elephants sometimes cross"]
+
+D24["🦏 Day 24 · Kaziranga NP — Full Safari Day  (UNESCO WHS)\n• 5:30 AM Morning jeep safari — Central Range (Kohora)\n  Open grasslands · jhils · tall elephant grass\n  One-horned rhino (2400+ in 430 km²) · wild water buffalo · swamp deer · fishing cat\n  Best chance of tiger at dawn in entire trip\n• 9:00 AM return · breakfast\n• 10:30 AM Eastern Range (Agaratoli) — fewer tourists · more elephants · wider visibility\n• 3:30 PM Western Range (Bagori) — large buffalo herds · sunset golden light on grasslands\n• Note: Kaziranga opens ~Oct 15 — confirm exact opening date before planning"]
+
+D25["🌊 Day 25 · Kaziranga → Majuli Island  95 km + ferry\n• 8:00 AM ride east NH27 to Jorhat (100 km) — tea gardens line the road\n• 10:00 AM Nimatighat (17 km from Jorhat) — load Scram 440 onto flat-bottomed ferry\n• 12:00 PM board ferry · 1–1.5 hr crossing · Brahmaputra overwhelming in scale at this point\n• 1:30 PM land on Majuli — check in Garamur or Kamalabari\n• 2:30 PM Kamalabari Satra — Vaishnavite monastery · Sattriya dance practice · ancient masked props\n• 5:00 PM rent cycle · ride through villages · flat · green · water everywhere · egrets in rice fields\n• Evening: attend evening prayer at any satra — drumming · call-and-response singing"]
+
+D26["☀️ Day 26 · Majuli → Sivasagar → Dibrugarh  ⚠️ DO NOT SKIP SIVASAGAR\n• 7:00 AM Brahmaputra sunrise from any riverbank\n• 9:00 AM Auniati Satra — largest on Majuli · museum of Ahom royal artefacts · 300-yr manuscripts · entry ₹50\n• 11:00 AM ride to Nimatighat · board noon ferry back\n• 1:00 PM off ferry · NH37 east toward Dibrugarh\n• 2:30 PM Sivasagar — 60 km from Jorhat ON NH37 ROUTE — literally on your road home\n  · Rang Ghar — India's oldest surviving royal amphitheatre (18th-c · serpent-capped roof)\n  · Talatal Ghar — 7-floor palace (3 underground) with secret escape tunnels to Brahmaputra\n  · Shiva Dol — tallest Shiva temple dome in India (built 1734 · Ahom queen Phuleswari)\n  · Kareng Ghar — 4-floor fortified royal palace at Gargaon\n  All within 3 km of each other · allow 2–3 hrs\n• 5:30 PM depart Sivasagar\n• 7:00 PM arrive Dibrugarh · check in Hotel Gateway or Hotel Aroma\n• Evening prep for Anini: cash · ⛽ full tank · 5L jerry can · offline maps · circuit house confirm"]
+
+D27["☀️ Day 27 · Dibrugarh → Roing  165 km via Bogibeel Bridge\n• ⚡ Digboi option: 6:00 AM depart → Digboi (70 km NE via Tinsukia)\n  World's oldest continuously-operating oil well (1889 · still producing)\n  Digboi Oil Museum · WWII war cemetery (Assam–Burma campaign 1944)\n  Colonial British teak bungalows frozen in time\n  ⚡ Combine with Dehing Patkai WLS (90 km) — India's last lowland rainforest · Hoolock gibbon\n  Return by 11 AM · then depart for Roing\n• 7:00 AM standard: depart Dibrugarh\n• Cross Bogibeel Bridge (4.94 km — India's longest rail-road bridge · opened 2018)\n• 12:00 PM arrive Roing (Lower Dibang Valley HQ)\n• ⛽ FILL COMPLETELY — tank + 5L jerry can\n  This is the LAST reliable pump before Anini (228 km of rough mountain road)\n• 1:00 PM lunch Roing market\n• 2:00 PM Mehao Lake (25 km) — forest lake in Mehao WLS · gayal · leopard · rare birds\n• 5:00 PM return Roing · check in Circuit House or guesthouse\n• Evening: talk to locals about Roing–Anini road conditions (landslides · bridges · convoy schedules)\n• Cash withdrawal — NO ATM in Anini"]
+
+D23 --> D24 --> D25 --> D26 --> D27
+end
+
+
+%% ══════════════════════════════════════════════════════════════
+%%  DIBANG VALLEY — ANINI  D28–D30
+%% ══════════════════════════════════════════════════════════════
+subgraph DIBANG["🔴  DIBANG VALLEY — ANINI  (D28–D30)  Most remote stretch of trip"]
+direction TB
+
+D28["⚠️ Day 28 · Roing → Mayudia Pass → Anini  228 km  — HARDEST DAY\n• 5:30 AM depart before dawn · GOAL: reach Anini before dark\n• Full tank (13 L) + 5L jerry can = 18 L · range 324 km at rough terrain mileage\n• 7:00 AM Mayudia Pass (~30 km from Roing · 2655 m)\n  Old-growth oak · rhododendron · magnolia forest\n  Deciduous autumn colour Oct–Nov (rare in NE India) · CRPF post at top\n• 8:00 AM Hunli (~100 km) — last small settlement\n  Ask about road conditions ahead · fill fuel here IF pump exists\n• Beyond Hunli: NO MOBILE NETWORK (Jio · Airtel · BSNL all dead)\n  Tell someone at Roing your plan and ETA — they cannot contact you from here\n• Road follows the Dibang River — one of India's most powerful rivers\n  Raw Himalayan terrain · bamboo forests · river crossings on variable bridges\n• 2:00–5:00 PM arrive Anini (1968 m)\n  Plateau between Dri and Mathun rivers · population ~4500\n  Home of Idu Mishmi tribe — animist-Buddhist traditions · almost no outside influence\n• Check in Circuit House (book ahead through Dibang Valley DC office)"]
+
+D29["🌄 Day 29 · Anini — Remote Frontier Exploration\n• 7:00 AM walk to Dri River — glacier-fed · milky blue · roaring\n  Traditional cane bridges across it · some centuries old · still functional\n• 9:00 AM Idu Mishmi households near Circuit House (caretaker introduction)\n  Traditional bamboo home · central hearth · woven mats\n  Midu language: fewer than 5000 speakers on Earth\n• Midday: town rhythm · government offices open at 10 · market stalls with basics · army presence\n• 2:00 PM walk toward Dibang Wildlife Sanctuary boundary (just north of town)\n  Red panda · Mishmi takin · musk deer · Asiatic black bear\n  Sclater's monal pheasant (one of rarest in world) · Blyth's tragopan\n• Evening: sit at plateau edge\n  Mountains rising to 5000 m on every side · no noise · no network\n  This is why you came\n• 📡 BSNL may have weak 2-bar signal in town · Jio/Airtel: zero"]
+
+D30["⚠️ Day 30 · Anini → Roing → Dibrugarh  393 km\n• 5:00 AM start before dawn — same road · now familiar\n• 9:30–11:00 AM Hunli — tea · fill if pump has fuel\n• 2:00–4:00 PM reach Roing — ⛽ FILL FUEL + food (relief of civilisation)\n• Decision: stay overnight Roing (closer · safe) or push to Dibrugarh (better facilities)\n• If pushing to Dibrugarh: ~3 more hours via Bogibeel Bridge\n• Evening: hot shower · real food · charge everything"]
+
+D28 --> D29 --> D30
+end
+
+
+%% ══════════════════════════════════════════════════════════════
+%%  RETURN — DIBRUGARH → KOLKATA  D31–D33
+%% ══════════════════════════════════════════════════════════════
+subgraph RETURN["🟢  RETURN — Dibrugarh to Kolkata  (D31–D33)"]
+direction TB
+
+D31["☀️ Day 31 · Dibrugarh → Guwahati  490 km — Recovery Riding\n• 6:00 AM depart Dibrugarh NH37 · flat Assam plains · fast road\n• 7:30 AM Jorhat (~55 km) — tea stop · tea gardens lining the road\n• 10:00 AM Kaziranga area (~150 km) — you did the safaris on D24 · ride through\n• 1:00 PM ⛽ Nagaon (~350 km) — fuel + dhaba lunch (rice · dal · fried river fish)\n• 5:30 PM arrive Guwahati · city feels enormous after Anini\n• Last Assam meal: pork with bamboo shoot · khar fish curry · duck in mustard (Fancy Bazar area)"]
+
+D32["☀️ Day 32 · Guwahati → Siliguri  430 km\n• 6:00 AM depart NH27 · morning Brahmaputra ghats for the last time\n• 9:00 AM ⛽ Bongaigaon (~200 km) — fuel + tea\n• 11:30 AM Golakganj/Dhubri — cross Assam → West Bengal\n  Landscape shifts: wetlands → North Bengal tea gardens and Dooars forest\n• 1:30 PM Cooch Behar (~380 km) — lunch + fuel top-up\n  ⚡ 30-min detour: Cooch Behar Palace (unexpected Italianate palace in North Bengal)\n• 4:30 PM arrive Siliguri — same Hill Cart Road as Day 1\n• Evening: final night outside Kolkata · momos · dinner"]
+
+D33["🏁 Day 33 · Siliguri → Kolkata  570 km — HOME\n• 5:30 AM depart before dawn · NH12 · plains open up immediately · air gets warmer\n• 8:30 AM ⛽ Raiganj/Dalkhola (~220 km) — fuel + luchi with aloo + chai\n• 12:00 PM ⛽ Bardhaman (~470 km) — fuel + lunch\n• 3:30–4:00 PM Dankuni/Kona Expressway — traffic builds from here\n• 5:00 PM 🏠 HOME\n  ~5500 km  ·  33 days  ·  4 states  ·  1 Royal Enfield Scram 440"]
+
+D31 --> D32 --> D33
+end
+
+
+%% ══════════════════════════════════════════════════════════════
+%%  PHASE CONNECTIONS
+%% ══════════════════════════════════════════════════════════════
+D9  -->|"D10 · 6 AM\nDawki → Shillong"| D10
+D14 -->|"D15 (Sat)\nWFH week done"| D15
+D16 -->|"D17 · Phase 3\nbegins"| D17
+D22 -->|"D23\nreturn to Assam"| D23
+D27 -->|"D28 · 5:30 AM\nHardest day"| D28
+D30 -->|"D31\nrecovery + home"| D31
+
+
+%% ══════════════════════════════════════════════════════════════
+%%  NODE COLOUR CLASSES
+%% ══════════════════════════════════════════════════════════════
+classDef wb    fill:#dcfce7,stroke:#22c55e,color:#14532d
+classDef as    fill:#dbeafe,stroke:#3b82f6,color:#1e3a5f
+classDef ml    fill:#f3e8ff,stroke:#a855f7,color:#4a044e
+classDef ap    fill:#fee2e2,stroke:#ef4444,color:#7f1d1d
+classDef wfh   fill:#ffedd5,stroke:#f97316,color:#7c2d12
+classDef hard  fill:#fef2f2,stroke:#dc2626,color:#991b1b
+classDef ret   fill:#f0fdf4,stroke:#16a34a,color:#14532d
+
+class D1,D2 wb
+class D3,D17,D23,D24,D25,D26,D27,D31,D32,D33 as
+class D4,D5,D6,D7,D8,D9,D15,D16 ml
+class D18,D19,D20,D21,D22,D29 ap
+class D10,D11,D12,D13,D14 wfh
+class D28,D30 hard
 ```
 
-**Legend:** 🟢 West Bengal &nbsp;·&nbsp; 🔵 Assam &nbsp;·&nbsp; 🟣 Meghalaya &nbsp;·&nbsp; 🔴 Arunachal Pradesh &nbsp;·&nbsp; 🟠 WFH base &nbsp;·&nbsp; 🟡 ⚡ Optional / easy add &nbsp;·&nbsp; ⬜ ➕ Requires extra days &nbsp;·&nbsp; `D-n` = travel day &nbsp;·&nbsp; day range in node = days spent at that stop
+**Legend:** 🟢 West Bengal &nbsp;·&nbsp; 🔵 Assam &nbsp;·&nbsp; 🟣 Meghalaya &nbsp;·&nbsp; 🔴 Arunachal Pradesh &nbsp;·&nbsp; 🟠 WFH days (10 AM–6 PM no riding) &nbsp;·&nbsp; 🔴 Hard/remote day &nbsp;·&nbsp; ⚡ Optional add-on &nbsp;·&nbsp; ➕ Requires extra days
 
 > 🗺️ **[Open Full Route on Google Maps →](https://www.google.com/maps/dir/Kolkata,+West+Bengal/Siliguri,+West+Bengal/Guwahati,+Assam/Shillong,+Meghalaya/Cherrapunji,+Meghalaya/Dawki,+Meghalaya/Tezpur,+Assam/Bomdila,+Arunachal+Pradesh/Tawang,+Arunachal+Pradesh/Kaziranga+National+Park,+Assam/Jorhat,+Assam/Majuli,+Assam/Sivasagar,+Assam/Dibrugarh,+Assam/Roing,+Arunachal+Pradesh/Anini,+Arunachal+Pradesh/)** — 16 stops across West Bengal · Assam · Meghalaya · Arunachal Pradesh · ~5,500 km
 
