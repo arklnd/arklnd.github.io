@@ -62,26 +62,26 @@ export const stateColor = {
 ```mermaid
 flowchart LR
     %% ─── MAIN ROUTE ────────────────────────────────────────────────
-    KOL["1. Kolkata\nWest Bengal"]     -->|"D1"| SIL["2. Siliguri\nWest Bengal"]
-    SIL                                 -->|"D2"| GHY["3. Guwahati\nAssam"]
-    GHY                                 -->|"D4"| SHL["4. Shillong · WFH\nMeghalaya"]
-    SHL                                 -->|"D6"| CHR["5. Cherrapunji\nMeghalaya"]
-    CHR                                 -->|"D9"| DWK["6. Dawki\nMeghalaya"]
-    DWK                                -->|"D16"| GHY
-    GHY                                -->|"D17"| TEZ["7. Tezpur\nAssam"]
-    TEZ                                -->|"D18"| BHL["8. Bhalukpong · ILP\nArunachal P."]
-    BHL                                -->|"D18"| BOM["9. Bomdila\nArunachal P."]
-    BOM                                -->|"D18"| DIR["10. Dirang\nArunachal P."]
-    DIR                                -->|"D19"| SEL["11. Sela Pass · 4170m\nArunachal P."]
-    SEL                                -->|"D19"| TWG["12. Tawang\nArunachal P."]
-    TWG                   -->|"D22 · return\nSela Tunnel"| BOM
-    BOM                                -->|"D23"| KZR["13. Kaziranga NP\nAssam"]
-    KZR                                -->|"D25"| MAJ["14. Majuli\nAssam"]
-    MAJ                                -->|"D26"| SIV["15. Sivasagar\nAssam"]
-    SIV                                -->|"D26"| DBR["16. Dibrugarh\nAssam"]
-    DBR                                -->|"D27"| ROI["17. Roing\nArunachal P."]
-    ROI                                -->|"D28"| MAY["18. Mayudia · 2655m\nArunachal P."]
-    MAY                                -->|"D28"| ANI["19. Anini\nArunachal P."]
+    KOL["1. Kolkata\nD1 · West Bengal"]            -->|"D1"| SIL["2. Siliguri\nD1–2 · West Bengal"]
+    SIL                                              -->|"D2"| GHY["3. Guwahati\nD2–4 · Assam"]
+    GHY                                              -->|"D4"| SHL["4. Shillong · WFH\nD4–5 · D10–14 · Meghalaya"]
+    SHL                                              -->|"D6"| CHR["5. Cherrapunji\nD6–8 · Meghalaya"]
+    CHR                                              -->|"D9"| DWK["6. Dawki\nD9 · D15 · Meghalaya"]
+    DWK                                             -->|"D16"| GHY
+    GHY                                             -->|"D17"| TEZ["7. Tezpur\nD17 · Assam"]
+    TEZ                                             -->|"D18"| BHL["8. Bhalukpong · ILP\nD18 · Arunachal P."]
+    BHL                                             -->|"D18"| BOM["9. Bomdila\nD18 · D22 · Arunachal P."]
+    BOM                                             -->|"D18"| DIR["10. Dirang\nD18 · Arunachal P."]
+    DIR                                             -->|"D19"| SEL["11. Sela Pass · 4170m\nD19 · Arunachal P."]
+    SEL                                             -->|"D19"| TWG["12. Tawang\nD19–22 · Arunachal P."]
+    TWG                              -->|"D22 · return\nSela Tunnel"| BOM
+    BOM                                             -->|"D23"| KZR["13. Kaziranga NP\nD23–24 · Assam"]
+    KZR                                             -->|"D25"| MAJ["14. Majuli\nD25–26 · Assam"]
+    MAJ                                             -->|"D26"| SIV["15. Sivasagar\nD26 · Assam"]
+    SIV                                             -->|"D26"| DBR["16. Dibrugarh\nD26–27 · Assam"]
+    DBR                                             -->|"D27"| ROI["17. Roing\nD27 · Arunachal P."]
+    ROI                                             -->|"D28"| MAY["18. Mayudia · 2655m\nD28 · Arunachal P."]
+    MAY                                             -->|"D28"| ANI["19. Anini\nD28–30 · Arunachal P."]
 
     %% ─── ⚡ OPTIONAL — no extra days needed ────────────────────────
     SIL -.->|"⚡ +overnight"| JLD(["⚡ Jaldapara NP\nWB Dooars"])
@@ -118,7 +118,7 @@ flowchart LR
     style ANI fill:#ef4444,stroke:#b91c1c,color:#fff
 ```
 
-**Legend:** 🟢 West Bengal &nbsp;·&nbsp; 🔵 Assam &nbsp;·&nbsp; 🟣 Meghalaya &nbsp;·&nbsp; 🔴 Arunachal Pradesh &nbsp;·&nbsp; 🟠 WFH base &nbsp;·&nbsp; 🟡 ⚡ Optional / easy add &nbsp;·&nbsp; ⬜ ➕ Requires extra days &nbsp;·&nbsp; `D-n` = Day number &nbsp;·&nbsp; `1–19` = Stop sequence
+**Legend:** 🟢 West Bengal &nbsp;·&nbsp; 🔵 Assam &nbsp;·&nbsp; 🟣 Meghalaya &nbsp;·&nbsp; 🔴 Arunachal Pradesh &nbsp;·&nbsp; 🟠 WFH base &nbsp;·&nbsp; 🟡 ⚡ Optional / easy add &nbsp;·&nbsp; ⬜ ➕ Requires extra days &nbsp;·&nbsp; `D-n` = travel day &nbsp;·&nbsp; day range in node = days spent at that stop
 
 > 🗺️ **[Open Full Route on Google Maps →](https://www.google.com/maps/dir/Kolkata,+West+Bengal/Siliguri,+West+Bengal/Guwahati,+Assam/Shillong,+Meghalaya/Cherrapunji,+Meghalaya/Dawki,+Meghalaya/Tezpur,+Assam/Bomdila,+Arunachal+Pradesh/Tawang,+Arunachal+Pradesh/Kaziranga+National+Park,+Assam/Jorhat,+Assam/Majuli,+Assam/Sivasagar,+Assam/Dibrugarh,+Assam/Roing,+Arunachal+Pradesh/Anini,+Arunachal+Pradesh/)** — 16 stops across West Bengal · Assam · Meghalaya · Arunachal Pradesh · ~5,500 km
 
