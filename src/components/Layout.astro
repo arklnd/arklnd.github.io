@@ -276,20 +276,36 @@ const ga4Id = import.meta.env.PUBLIC_GA4_MEASUREMENT_ID;
         ac: AbortController
       ) {
         let scale = 1, vpX = origVX, vpY = origVY;
+        // Diagram aspect ratio is fixed; viewBox aspect = origVW/origVH at every zoom level.
+        const diagAspect = origVW / origVH;
 
         function applyViewBox() {
           svg.setAttribute("viewBox", `${vpX} ${vpY} ${origVW / scale} ${origVH / scale}`);
         }
 
+        // With preserveAspectRatio="xMidYMid meet" the SVG element may be larger than the
+        // rendered content (letterboxing). Pixel↔SVG-unit conversion must use the content
+        // pixel size, not the element's bounding rect, otherwise the axes scale differently.
+        function contentSize(rect: DOMRect) {
+          const elAspect = rect.width / rect.height;
+          let cw: number, ch: number;
+          if (diagAspect > elAspect) { cw = rect.width;  ch = rect.width  / diagAspect; }
+          else                       { ch = rect.height; cw = rect.height * diagAspect; }
+          // offsets of content top-left corner inside the element
+          return { cw, ch, cxOff: (rect.width - cw) / 2, cyOff: (rect.height - ch) / 2 };
+        }
+
+        // pxX/pxY are element-relative (from getBoundingClientRect top-left).
         function zoomAt(newScale: number, pxX: number, pxY: number) {
           const rect = svg.getBoundingClientRect();
+          const { cw, ch, cxOff, cyOff } = contentSize(rect);
           const vpW = origVW / scale, vpH = origVH / scale;
-          const svgX = vpX + (pxX / rect.width) * vpW;
-          const svgY = vpY + (pxY / rect.height) * vpH;
+          const relX = pxX - cxOff, relY = pxY - cyOff;
+          const svgX = vpX + (relX / cw) * vpW;
+          const svgY = vpY + (relY / ch) * vpH;
           scale = Math.min(Math.max(newScale, 0.25), 8);
-          const newVpW = origVW / scale, newVpH = origVH / scale;
-          vpX = svgX - (pxX / rect.width) * newVpW;
-          vpY = svgY - (pxY / rect.height) * newVpH;
+          vpX = svgX - (relX / cw) * (origVW / scale);
+          vpY = svgY - (relY / ch) * (origVH / scale);
           applyViewBox();
         }
 
@@ -308,9 +324,10 @@ const ga4Id = import.meta.env.PUBLIC_GA4_MEASUREMENT_ID;
         window.addEventListener("mousemove", (e) => {
           if (!dragging) return;
           const rect = svg.getBoundingClientRect();
+          const { cw, ch } = contentSize(rect);
           const vpW = origVW / scale, vpH = origVH / scale;
-          vpX = ovpX - ((e.clientX - ox) / rect.width) * vpW;
-          vpY = ovpY - ((e.clientY - oy) / rect.height) * vpH;
+          vpX = ovpX - ((e.clientX - ox) / cw) * vpW;
+          vpY = ovpY - ((e.clientY - oy) / ch) * vpH;
           applyViewBox();
         }, { signal: ac.signal });
 
@@ -333,9 +350,10 @@ const ga4Id = import.meta.env.PUBLIC_GA4_MEASUREMENT_ID;
         container.addEventListener("touchmove", (e) => {
           if (e.touches.length === 1 && t0) {
             const rect = svg.getBoundingClientRect();
+            const { cw, ch } = contentSize(rect);
             const vpW = origVW / scale, vpH = origVH / scale;
-            vpX = ovpX0 - ((e.touches[0].clientX - t0.clientX) / rect.width) * vpW;
-            vpY = ovpY0 - ((e.touches[0].clientY - t0.clientY) / rect.height) * vpH;
+            vpX = ovpX0 - ((e.touches[0].clientX - t0.clientX) / cw) * vpW;
+            vpY = ovpY0 - ((e.touches[0].clientY - t0.clientY) / ch) * vpH;
             applyViewBox();
           }
         }, { passive: true });
