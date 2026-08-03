@@ -351,7 +351,9 @@ const ga4Id = import.meta.env.PUBLIC_GA4_MEASUREMENT_ID;
         let pinchDist0 = 0, pinchScale0 = 1, pinchMidX0 = 0, pinchMidY0 = 0;
 
         container.addEventListener("touchstart", (e) => {
-          e.preventDefault(); // prevent tap-delay and any residual browser handling
+          // Let button taps pass through so the browser synthesises a click event.
+          if ((e.target as HTMLElement).closest(".mermaid-zoom-ctrl")) return;
+          e.preventDefault(); // prevent tap-delay and browser pan/pinch on the diagram area
           if (e.touches.length === 1) {
             t0 = e.touches[0];
             ovpX0 = vpX; ovpY0 = vpY;
