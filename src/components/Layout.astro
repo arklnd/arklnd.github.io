@@ -303,7 +303,7 @@ const ga4Id = import.meta.env.PUBLIC_GA4_MEASUREMENT_ID;
           const relX = pxX - cxOff, relY = pxY - cyOff;
           const svgX = vpX + (relX / cw) * vpW;
           const svgY = vpY + (relY / ch) * vpH;
-          scale = Math.min(Math.max(newScale, 0.167), 12);
+          scale = Math.min(Math.max(newScale, 0.111), 18);
           vpX = svgX - (relX / cw) * (origVW / scale);
           vpY = svgY - (relY / ch) * (origVH / scale);
           applyViewBox();
@@ -319,7 +319,7 @@ const ga4Id = import.meta.env.PUBLIC_GA4_MEASUREMENT_ID;
         let lastMX = 0, lastMY = 0, lastMT = 0;
         let momentumRaf = 0;
 
-        const FRICTION    = 0.92;   // velocity multiplier per 16 ms frame
+        const FRICTION    = 0.952;  // velocity multiplier per 16 ms frame (0.92^(1/1.7) ≈ 1.7× longer glide)
         const MIN_PX_MS   = 0.05;  // stop when slower than this (px/ms ≈ 3 px/frame)
 
         function resetVelocity() {
