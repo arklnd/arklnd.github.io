@@ -371,6 +371,11 @@ const ga4Id = import.meta.env.PUBLIC_GA4_MEASUREMENT_ID;
 
         const svgClone = origSvg.cloneNode(true) as SVGSVGElement;
         svgClone.setAttribute("viewBox", `${origVX} ${origVY} ${origVW} ${origVH}`);
+        // Strip Mermaid's inline style (e.g. max-width, width) so CSS can control sizing
+        svgClone.removeAttribute("style");
+        svgClone.setAttribute("width", "100%");
+        svgClone.setAttribute("height", "100%");
+        // preserveAspectRatio default "xMidYMid meet" keeps diagram fully visible and centered
 
         const ctrl = document.createElement("div");
         ctrl.className = "mermaid-zoom-ctrl";
@@ -386,16 +391,6 @@ const ga4Id = import.meta.env.PUBLIC_GA4_MEASUREMENT_ID;
         dialog.appendChild(body);
         document.body.appendChild(dialog);
         dialog.showModal();
-
-        // Size SVG to fill dialog body while maintaining aspect ratio
-        requestAnimationFrame(() => {
-          const bw = body.clientWidth - 32, bh = body.clientHeight - 32;
-          const aspect = origVH / origVW;
-          let w = bw, h = w * aspect;
-          if (h > bh) { h = bh; w = h / aspect; }
-          svgClone.setAttribute("width", `${Math.round(w)}`);
-          svgClone.setAttribute("height", `${Math.round(h)}`);
-        });
 
         const ac = new AbortController();
         const { zoomIn, zoomOut, reset } = attachSvgZoom(svgClone, wrap, origVX, origVY, origVW, origVH, ac);
@@ -703,14 +698,24 @@ const ga4Id = import.meta.env.PUBLIC_GA4_MEASUREMENT_ID;
     flex: 1;
     overflow: hidden;
     display: flex;
-    align-items: center;
-    justify-content: center;
+    align-items: stretch;
+    justify-content: stretch;
     padding: 16px;
     box-sizing: border-box;
   }
 
   .mermaid-dialog-wrap {
     position: relative;
-    display: inline-flex;
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    min-width: 0;
+    min-height: 0;
+  }
+
+  .mermaid-dialog-wrap > svg {
+    width: 100%;
+    height: 100%;
+    display: block;
   }
 </style>
