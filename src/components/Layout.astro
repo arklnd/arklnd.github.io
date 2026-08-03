@@ -303,7 +303,7 @@ const ga4Id = import.meta.env.PUBLIC_GA4_MEASUREMENT_ID;
           const relX = pxX - cxOff, relY = pxY - cyOff;
           const svgX = vpX + (relX / cw) * vpW;
           const svgY = vpY + (relY / ch) * vpH;
-          scale = Math.min(Math.max(newScale, 0.25), 8);
+          scale = Math.min(Math.max(newScale, 0.167), 12);
           vpX = svgX - (relX / cw) * (origVW / scale);
           vpY = svgY - (relY / ch) * (origVH / scale);
           applyViewBox();
