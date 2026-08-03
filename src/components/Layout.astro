@@ -343,11 +343,31 @@ const ga4Id = import.meta.env.PUBLIC_GA4_MEASUREMENT_ID;
           zoomAt(scale * (e.deltaY < 0 ? 1.1 : 0.9), e.clientX - rect.left, e.clientY - rect.top);
         }, { passive: false });
 
+        // Prevent the browser from handling touch gestures (pan/pinch-zoom) on this element.
+        // This must be set so our non-passive touchmove can call preventDefault reliably.
+        container.style.touchAction = "none";
+
         let t0: Touch | null = null, ovpX0 = 0, ovpY0 = 0;
+        let pinchDist0 = 0, pinchScale0 = 1, pinchMidX0 = 0, pinchMidY0 = 0;
+
         container.addEventListener("touchstart", (e) => {
-          if (e.touches.length === 1) { t0 = e.touches[0]; ovpX0 = vpX; ovpY0 = vpY; }
-        }, { passive: true });
+          e.preventDefault(); // prevent tap-delay and any residual browser handling
+          if (e.touches.length === 1) {
+            t0 = e.touches[0];
+            ovpX0 = vpX; ovpY0 = vpY;
+            pinchDist0 = 0;
+          } else if (e.touches.length === 2) {
+            t0 = null; // suspend single-finger pan while pinching
+            const a = e.touches[0], b = e.touches[1];
+            pinchDist0  = Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY);
+            pinchScale0 = scale;
+            pinchMidX0  = (a.clientX + b.clientX) / 2;
+            pinchMidY0  = (a.clientY + b.clientY) / 2;
+          }
+        }, { passive: false });
+
         container.addEventListener("touchmove", (e) => {
+          e.preventDefault(); // block browser pinch-zoom / scroll
           if (e.touches.length === 1 && t0) {
             const rect = svg.getBoundingClientRect();
             const { cw, ch } = contentSize(rect);
@@ -355,8 +375,27 @@ const ga4Id = import.meta.env.PUBLIC_GA4_MEASUREMENT_ID;
             vpX = ovpX0 - ((e.touches[0].clientX - t0.clientX) / cw) * vpW;
             vpY = ovpY0 - ((e.touches[0].clientY - t0.clientY) / ch) * vpH;
             applyViewBox();
+          } else if (e.touches.length === 2 && pinchDist0 > 0) {
+            const a = e.touches[0], b = e.touches[1];
+            const dist   = Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY);
+            const midX   = (a.clientX + b.clientX) / 2;
+            const midY   = (a.clientY + b.clientY) / 2;
+            const rect   = svg.getBoundingClientRect();
+            zoomAt(pinchScale0 * (dist / pinchDist0), midX - rect.left, midY - rect.top);
           }
-        }, { passive: true });
+        }, { passive: false });
+
+        container.addEventListener("touchend", (e) => {
+          if (e.touches.length === 1) {
+            // One finger lifted — restart single-finger pan from current position
+            t0 = e.touches[0];
+            ovpX0 = vpX; ovpY0 = vpY;
+            pinchDist0 = 0;
+          } else if (e.touches.length === 0) {
+            t0 = null;
+            pinchDist0 = 0;
+          }
+        }, { passive: false });
 
         return {
           zoomIn(cx: number, cy: number) { zoomAt(scale * 1.3, cx, cy); },
