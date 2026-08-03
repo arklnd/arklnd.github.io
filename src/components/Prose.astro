@@ -676,6 +676,39 @@ const { bengali = false } = Astro.props;
     height: auto;
   }
 
+  .prose :global(.mermaid-zoom-ctrl) {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: flex;
+    gap: 4px;
+    z-index: 10;
+  }
+
+  .prose :global(.mermaid-zoom-ctrl button) {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-text);
+    border-radius: 4px;
+    font-size: 15px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.15s, background 0.15s;
+    user-select: none;
+  }
+
+  .prose :global(.mermaid-zoom-ctrl button:hover) {
+    opacity: 1;
+    background: var(--color-surface-raised, var(--color-border));
+  }
+
   /* gitGraph: make commit labels more visible */
   .prose :global(.mermaid .commit-label-bkg) {
     opacity: 0.85;

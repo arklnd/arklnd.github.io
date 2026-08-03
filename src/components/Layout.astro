@@ -265,6 +265,114 @@ const ga4Id = import.meta.env.PUBLIC_GA4_MEASUREMENT_ID;
     <script>
       let mermaidModule: any = null;
       const originals = new Map<HTMLElement, string>();
+      const zoomAborts = new WeakMap<HTMLElement, AbortController>();
+
+      function initMermaidZoom(el: HTMLElement) {
+        const maybeSvg = el.querySelector<SVGSVGElement>("svg");
+        if (!maybeSvg) return;
+        const svg: SVGSVGElement = maybeSvg;
+
+        // Abort previous window listeners for this element (theme re-render)
+        zoomAborts.get(el)?.abort();
+        const ac = new AbortController();
+        zoomAborts.set(el, ac);
+
+        // Resolve viewBox — zoom is done by shrinking/expanding viewBox so SVG
+        // re-renders vectors at full quality instead of scaling a bitmap.
+        const raw = svg.getAttribute("viewBox");
+        const parts = raw ? raw.trim().split(/[\s,]+/).map(Number) : [];
+        const origVX = parts[0] ?? 0;
+        const origVY = parts[1] ?? 0;
+        const origVW = parts[2] ?? parseFloat(svg.getAttribute("width") ?? "800");
+        const origVH = parts[3] ?? parseFloat(svg.getAttribute("height") ?? "600");
+        if (!raw) svg.setAttribute("viewBox", `${origVX} ${origVY} ${origVW} ${origVH}`);
+
+        let scale = 1, vpX = origVX, vpY = origVY;
+
+        function applyViewBox() {
+          svg.setAttribute("viewBox", `${vpX} ${vpY} ${origVW / scale} ${origVH / scale}`);
+        }
+
+        function zoomAt(newScale: number, pxX: number, pxY: number) {
+          const rect = svg.getBoundingClientRect();
+          const vpW = origVW / scale, vpH = origVH / scale;
+          // SVG coordinate under the cursor before scale change
+          const svgX = vpX + (pxX / rect.width) * vpW;
+          const svgY = vpY + (pxY / rect.height) * vpH;
+          scale = Math.min(Math.max(newScale, 0.25), 8);
+          const newVpW = origVW / scale, newVpH = origVH / scale;
+          // Keep that SVG coordinate pinned under the cursor after scale change
+          vpX = svgX - (pxX / rect.width) * newVpW;
+          vpY = svgY - (pxY / rect.height) * newVpH;
+          applyViewBox();
+        }
+
+        el.style.cursor = "grab";
+
+        const ctrl = document.createElement("div");
+        ctrl.className = "mermaid-zoom-ctrl";
+        ctrl.innerHTML =
+          `<button data-a="in" title="Zoom in" aria-label="Zoom in">+</button>` +
+          `<button data-a="reset" title="Reset zoom" aria-label="Reset zoom">⊙</button>` +
+          `<button data-a="out" title="Zoom out" aria-label="Zoom out">−</button>`;
+        el.appendChild(ctrl);
+
+        ctrl.addEventListener("click", (e) => {
+          const btn = (e.target as HTMLElement).closest<HTMLElement>("[data-a]");
+          if (!btn) return;
+          const rect = svg.getBoundingClientRect();
+          const cx = rect.width / 2, cy = rect.height / 2;
+          const a = btn.dataset.a;
+          if (a === "in") zoomAt(scale * 1.3, cx, cy);
+          else if (a === "out") zoomAt(scale / 1.3, cx, cy);
+          else { scale = 1; vpX = origVX; vpY = origVY; applyViewBox(); }
+        });
+
+        let dragging = false, ox = 0, oy = 0, ovpX = 0, ovpY = 0;
+
+        el.addEventListener("mousedown", (e) => {
+          if ((e.target as HTMLElement).closest(".mermaid-zoom-ctrl")) return;
+          dragging = true;
+          ox = e.clientX; oy = e.clientY; ovpX = vpX; ovpY = vpY;
+          el.style.cursor = "grabbing";
+          e.preventDefault();
+        });
+
+        window.addEventListener("mousemove", (e) => {
+          if (!dragging) return;
+          const rect = svg.getBoundingClientRect();
+          const vpW = origVW / scale, vpH = origVH / scale;
+          vpX = ovpX - ((e.clientX - ox) / rect.width) * vpW;
+          vpY = ovpY - ((e.clientY - oy) / rect.height) * vpH;
+          applyViewBox();
+        }, { signal: ac.signal });
+
+        window.addEventListener("mouseup", () => {
+          if (!dragging) return;
+          dragging = false;
+          el.style.cursor = "grab";
+        }, { signal: ac.signal });
+
+        el.addEventListener("wheel", (e) => {
+          e.preventDefault();
+          const rect = svg.getBoundingClientRect();
+          zoomAt(scale * (e.deltaY < 0 ? 1.1 : 0.9), e.clientX - rect.left, e.clientY - rect.top);
+        }, { passive: false });
+
+        let t0: Touch | null = null, ovpX0 = 0, ovpY0 = 0;
+        el.addEventListener("touchstart", (e) => {
+          if (e.touches.length === 1) { t0 = e.touches[0]; ovpX0 = vpX; ovpY0 = vpY; }
+        }, { passive: true });
+        el.addEventListener("touchmove", (e) => {
+          if (e.touches.length === 1 && t0) {
+            const rect = svg.getBoundingClientRect();
+            const vpW = origVW / scale, vpH = origVH / scale;
+            vpX = ovpX0 - ((e.touches[0].clientX - t0.clientX) / rect.width) * vpW;
+            vpY = ovpY0 - ((e.touches[0].clientY - t0.clientY) / rect.height) * vpH;
+            applyViewBox();
+          }
+        }, { passive: true });
+      }
 
       async function renderMermaid() {
         const diagrams = document.querySelectorAll<HTMLElement>(".mermaid");
@@ -365,6 +473,9 @@ const ga4Id = import.meta.env.PUBLIC_GA4_MEASUREMENT_ID;
 
         // Remove loading state
         diagrams.forEach((el) => el.classList.remove("mermaid-loading"));
+
+        // Enable zoom/pan on each rendered diagram
+        diagrams.forEach((el) => initMermaidZoom(el));
       }
 
       // Initial render
