@@ -768,4 +768,35 @@ const ga4Id = import.meta.env.PUBLIC_GA4_MEASUREMENT_ID;
     height: 100%;
     display: block;
   }
+
+  /* gitGraph: make commit labels more visible */
+  .mermaid-dialog-wrap .commit-label-bkg {
+    opacity: 0.85;
+    stroke: var(--color-text-secondary);
+    stroke-width: 1px;
+    stroke-dasharray: 4 2;
+    rx: 4;
+    ry: 4;
+    height: 22px;
+    transform: translateY(-3px);
+  }
+  .mermaid-dialog-wrap .commit-label {
+    font-size: 14px !important;
+    font-weight: 600;
+  }
+
+  /* gitGraph: thicker arrow lines */
+  .mermaid-dialog-wrap .arrow {
+    stroke-width: 4 !important;
+  }
+
+  /* gitGraph: better contrast for highlight nodes */
+  .mermaid-dialog-wrap [class*="commit-highlight-outer"] {
+    stroke: var(--color-text-secondary) !important;
+    fill: var(--color-surface) !important;
+  }
+  .mermaid-dialog-wrap .commit-highlight-inner {
+    stroke: var(--color-text-tertiary) !important;
+    fill: var(--color-text-tertiary) !important;
+  }
 </style>
