@@ -7,7 +7,7 @@ import TagPill from "../components/TagPill.astro";
 import { getCollection } from "astro:content";
 import photos, { albums } from "../data/photos";
 
-const posts = (await getCollection("posts", ({ data }) => import.meta.env.DEV || !data.draft)).sort(
+const posts = (await getCollection("posts", ({ data }) => import.meta.env.DEV || import.meta.env.PUBLIC_LOCAL_DEV === "true" || !data.draft)).sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
 );
 
